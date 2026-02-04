@@ -308,6 +308,18 @@ export default function HotelDetails() {
                           title="Protels Crystal Beach Resort Location"
                         />
                       </div>
+                    ) : hotel.id === "la-plage" ? (
+                      <div className="h-full min-h-[300px] w-full bg-gray-100 overflow-hidden">
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0, minHeight: '300px' }}
+                          loading="lazy" 
+                          allowFullScreen 
+                          src="https://maps.google.com/maps?cid=14143868217406177037&output=embed"
+                          title="Protels La Plage Location"
+                        />
+                      </div>
                     ) : (
                       <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
                         <span className="text-gray-400 text-sm">Map Integration</span>
