@@ -48,8 +48,8 @@ export default function Navbar() {
               src={logo} 
               alt="PROTELS" 
               className={cn(
-                "transition-all duration-300",
-                isScrolled ? "h-12 invert" : "h-16"
+                "transition-all duration-300 object-contain h-auto",
+                isScrolled ? "w-[100px] md:w-[140px] invert" : "w-[115px] md:w-[160px]"
               )} 
             />
           </a>
