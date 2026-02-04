@@ -350,42 +350,54 @@ export default function HotelDetails() {
                 </div>
 
                 {/* Mongolian Restaurant Section */}
-                <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg group">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                    <div className="relative h-[400px] md:h-auto overflow-hidden">
+                <div className="mb-16 bg-[#FFFBF7] border border-gray-100 shadow-sm overflow-hidden rounded-lg">
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Hero Image - Left Side on Desktop */}
+                    <div className="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden group">
                       <img 
                         src="/images/mongolian-restaurant/hero.jpg" 
                         alt="Mongolian Restaurant" 
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent lg:hidden" />
+                      <div className="absolute bottom-6 left-6 lg:hidden text-white">
+                         <span className="bg-[#C8A97E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Live Cooking</span>
+                         <h3 className="text-3xl font-serif">Mongolian Restaurant</h3>
+                      </div>
                     </div>
-                    
-                    <div className="p-10 md:p-14 flex flex-col justify-center bg-[#FFFBF7]">
-                      <div className="mb-6">
-                        <span className="bg-[#C8A97E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Live Cooking</span>
-                        <h3 className="text-3xl md:text-4xl font-serif text-[#1a2332]">Mongolian Restaurant</h3>
+
+                    {/* Content - Right Side on Desktop */}
+                    <div className="lg:w-5/12 p-8 lg:p-12 flex flex-col justify-center relative">
+                      <div className="hidden lg:block mb-6">
+                         <span className="bg-[#C8A97E]/10 text-[#C8A97E] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Live Cooking</span>
+                         <h3 className="text-4xl font-serif text-[#1a2332] mb-2">Mongolian Restaurant</h3>
+                         <div className="w-12 h-0.5 bg-[#C8A97E] mt-4"></div>
                       </div>
                       
                       <p className="text-gray-600 leading-relaxed text-lg mb-8 font-light">
                         Savor the vibrant tastes of Asia at our Mongolian Restaurant, where live cooking stations bring fresh ingredients to life. Enjoy a personalized dining experience with authentic flavors in a warm, inviting oriental atmosphere.
                       </p>
-                      
-                      <div className="grid grid-cols-3 gap-4 mb-8">
-                         {[1, 2, 3].map((num) => (
-                           <div key={num} className="aspect-square rounded-md overflow-hidden shadow-sm">
-                             <img 
-                               src={`/images/mongolian-restaurant/gallery-${num}.jpg`}
-                               alt={`Mongolian Detail ${num}`}
-                               className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                             />
-                           </div>
-                         ))}
-                      </div>
 
-                      <Button className="w-full md:w-auto bg-[#1a2332] hover:bg-[#2c3b55] text-white px-8 py-6 rounded-none text-lg font-medium transition-all">
+                      <Button className="w-fit bg-[#1a2332] hover:bg-[#2c3b55] text-white px-8 py-6 rounded-full text-lg font-medium transition-all hover:translate-x-1 shadow-md hover:shadow-lg">
                         Reserve Your Table
                       </Button>
+                    </div>
+                  </div>
+
+                  {/* Gallery Slider (Scroll Snap) */}
+                  <div className="p-8 border-t border-gray-100/50">
+                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">Atmosphere</h4>
+                    <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                      {[1, 2, 3].map((num) => (
+                        <div key={num} className="snap-center shrink-0 w-[280px] md:w-[320px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                          <img 
+                            src={`/images/mongolian-restaurant/gallery-${num}.jpg`}
+                            alt={`Mongolian Detail ${num}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
