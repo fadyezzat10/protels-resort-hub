@@ -1,5 +1,5 @@
 import crystalBeach from "@/assets/images/hotel-crystal-beach.jpg";
-import beachClub from "@/assets/images/hotel-beach-club.jpg";
+import beachClub from "@assets/DSC05597.png11_1770196278235.png";
 import laPlage from "@/assets/images/hotel-la-plage.jpg";
 import royalBay from "@/assets/images/hotel-royal-bay.jpg";
 
