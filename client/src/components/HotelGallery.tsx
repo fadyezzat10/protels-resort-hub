@@ -82,7 +82,7 @@ interface HotelGalleryProps {
 }
 
 export default function HotelGallery({ hotel }: HotelGalleryProps) {
-  const [activeCategory, setActiveCategory] = useState<string>("beach");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -115,7 +115,21 @@ export default function HotelGallery({ hotel }: HotelGalleryProps) {
       );
     }
 
+    const allImages = [
+      ...staticGalleryData.beach.images,
+      ...staticGalleryData.pools.images,
+      ...roomImages,
+      ...staticGalleryData.dining.images,
+      ...staticGalleryData.wellness.images
+    ];
+
     return {
+      all: {
+        id: "all",
+        label: "Crystal Beach",
+        description: "Explore the complete Crystal Beach Resort experience.",
+        images: allImages
+      },
       ...staticGalleryData,
       rooms: {
         id: "rooms",
