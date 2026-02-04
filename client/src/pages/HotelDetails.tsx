@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine, Maximize2, Bed, Mountain } from "lucide-react";
+import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine, Maximize2, Bed, Mountain, Dumbbell } from "lucide-react";
 import NotFound from "@/pages/not-found";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -477,6 +477,57 @@ export default function HotelDetails() {
                       <span className="text-gray-700 font-medium">{feature}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* Fitness Center Section */}
+                <div className="mt-16 bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
+                  <div className="p-8 md:p-10">
+                    <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
+                       <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-6">
+                             <div className="p-2 bg-[#C8A97E]/10 rounded-full">
+                                <Dumbbell className="w-6 h-6 text-[#C8A97E]" />
+                             </div>
+                             <h3 className="text-3xl font-serif text-[#1a2332]">Fitness Center</h3>
+                          </div>
+                          <p className="text-gray-600 leading-relaxed text-lg font-light mb-8 max-w-3xl">
+                            Stay active during your stay with our fully equipped fitness center, featuring modern cardio machines, strength training equipment, and a bright, comfortable atmosphere suitable for all fitness levels.
+                          </p>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6">
+                             {[
+                               "Modern Cardio Machines", 
+                               "Strength Training Area", 
+                               "Air-Conditioned Space", 
+                               "Natural Lighting",
+                               "Open Daily"
+                             ].map((item, i) => (
+                               <div key={i} className="flex items-center gap-3 text-sm text-gray-600">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-[#C8A97E]" />
+                                  {item}
+                               </div>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
+
+                    {/* Gallery Slider */}
+                    <div className="pt-8 border-t border-gray-100">
+                      <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                        {/* Hero Image first, then gallery images */}
+                        {["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"].map((img, i) => (
+                          <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                            <img 
+                              src={`/images/fitness-center/${img}.jpg`}
+                              alt={`Fitness Center ${i + 1}`}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
             )}
