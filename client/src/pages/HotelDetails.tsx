@@ -108,14 +108,14 @@ export default function HotelDetails() {
                 {hotel.id === "crystal-beach" && (
                   <div className="mb-8 p-6 bg-gray-50 border border-gray-100">
                     <h3 className="font-serif text-xl font-bold text-brand-blue mb-4">Room Amenities</h3>
-                    <p className="text-gray-600 mb-4">The resort offers comfortable and well-designed rooms with garden, pool, or sea views. All rooms include:</p>
+                    <p className="text-gray-600 mb-4">Every room is designed as a private retreat, blending modern elegance with comfort. Enjoy stunning views and premium amenities in every stay:</p>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Air Conditioning</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Private Balcony or Terrace</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Satellite TV</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Mini Bar</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Safety Box</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Modern Bathroom Amenities</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Individual Climate Control</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Furnished Balcony or Terrace</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> LED Satellite TV</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Stocked Mini Bar</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Digital Safe Box</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Luxury Bathroom Amenities</li>
                     </ul>
                   </div>
                 )}

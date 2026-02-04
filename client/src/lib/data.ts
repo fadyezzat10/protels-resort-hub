@@ -40,18 +40,18 @@ export const hotels: Hotel[] = [
     mapLink: "https://maps.app.goo.gl/2jjgBH1rqGhVRXJZ8",
     image: crystalBeach,
     description: {
-      en: "A stunning all-inclusive beachfront resort located on the Red Sea, offering crystal clear waters, vibrant coral reefs, and a relaxing atmosphere ideal for families and couples. Perfect for snorkeling, diving, and unforgettable seaside moments.",
-      ar: "منتجع شاطئي مذهل شامل كليًا يقع على البحر الأحمر، ويوفر مياهًا صافية وشعابًا مرجانية نابضة بالحياة وأجواء مريحة مثالية للعائلات والأزواج. مثالية للغطس والغوص ولحظات لا تنسى على شاطئ البحر."
+      en: "Discover a sanctuary of luxury on the shores of the Red Sea. Protels Crystal Beach Resort offers an exclusive all-inclusive experience where pristine waters meet exceptional service. Whether you seek vibrant coral reef exploration or tranquil relaxation by our infinity pools, our resort provides the perfect setting for unforgettable memories. Ideal for families and couples alike, we combine modern comfort with the natural beauty of Marsa Alam.",
+      ar: "اكتشف ملاذًا من الفخامة على شواطئ البحر الأحمر. يقدم منتجع بروتلز كريستال بيتش تجربة حصرية شاملة كليًا حيث تلتقي المياه النقية بالخدمة الاستثنائية. سواء كنت تبحث عن استكشاف الشعاب المرجانية النابضة بالحياة أو الاسترخاء الهادئ بجانب حمامات السباحة اللامتناهية، يوفر منتجعنا المكان المثالي لذكريات لا تُنسى. مثالي للعائلات والأزواج على حد سواء، نجمع بين الراحة العصرية والجمال الطبيعي لمرسى علم."
     },
     features: [
       "Private Sandy Beach",
-      "Swimming Pools",
-      "Diving Center & Snorkeling",
-      "Spa & Wellness Area",
-      "Kids Club",
-      "Animation & Entertainment",
-      "24/7 Front Desk",
-      "Free Wi-Fi in Public Areas"
+      "Multiple Swimming Pools",
+      "PADI Diving Center",
+      "Luxury Spa & Wellness",
+      "Kids Club & Activities",
+      "Day & Night Entertainment",
+      "24-Hour Concierge",
+      "High-Speed Wi-Fi"
     ],
     rooms: ["Standard Room", "Sea View Room", "Family Suite", "Royal Suite"],
     roomDetails: [
@@ -62,15 +62,15 @@ export const hotels: Hotel[] = [
     ],
     dining: {
       main: {
-        name: "Main Restaurant",
-        desc: "Guests enjoy an all-inclusive dining experience with a variety of international and oriental cuisines.",
-        hours: "Breakfast: 07:00 – 10:00 | Lunch: 13:00 – 15:00 | Dinner: 19:00 – 22:00"
+        name: "The Grand Buffet",
+        desc: "Indulge in a culinary journey with our extensive international buffet. Featuring live cooking stations, fresh local ingredients, and themed dinner nights, The Grand Buffet offers a sophisticated dining experience for breakfast, lunch, and dinner.",
+        hours: "Breakfast: 07:00 – 10:30 | Lunch: 13:00 – 15:00 | Dinner: 18:30 – 22:00"
       },
       specialty: [
-        { name: "Oriental Restaurant", desc: "Authentic oriental flavors." },
-        { name: "Italian Restaurant", desc: "Pizza – Pasta – Classic Italian Dishes." }
+        { name: "Al Diwan Oriental", desc: "Experience the authentic tastes of the Middle East with traditional mezzes, grilled meats, and aromatic tagines in an elegant setting." },
+        { name: "La Trattoria", desc: "A taste of Italy by the sea. Enjoy handcrafted pastas, wood-fired pizzas, and a selection of fine wines in a romantic atmosphere." }
       ],
-      bars: ["Beach Bar", "Pool Bar"]
+      bars: ["Sunset Beach Bar", "Azure Pool Bar", "Lobby Lounge"]
     }
   },
   {
