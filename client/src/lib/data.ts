@@ -77,7 +77,6 @@ export const hotels: Hotel[] = [
     id: "beach-club",
     name: "Protels Beach Club & SPA",
     location: "Marsa Alam, Egypt",
-    mapLink: "https://maps.app.goo.gl/1tX2JCjLMdb5m7Ey8",
     image: beachClub,
     description: {
       en: "An exclusive beach club atmosphere with luxurious spa facilities. Enjoy the perfect blend of entertainment and tranquility on the shores of the Red Sea.",
@@ -90,7 +89,6 @@ export const hotels: Hotel[] = [
     id: "la-plage",
     name: "Protels La Plage",
     location: "Zanzibar, Tanzania",
-    mapLink: "https://maps.app.goo.gl/FV9hhKBY7WkUcfCG9",
     image: laPlage,
     description: {
       en: "Experience the exotic charm of Zanzibar at Protels La Plage. White sandy beaches, turquoise waters, and traditional Swahili hospitality await you.",
