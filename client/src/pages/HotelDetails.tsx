@@ -269,6 +269,16 @@ export default function HotelDetails() {
                          <div>
                            <span className="block font-bold text-brand-blue mb-1">Address</span>
                            <span className="text-gray-600">{hotel.location}</span>
+                           {hotel.mapLink && (
+                             <a 
+                               href={hotel.mapLink}
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               className="text-xs font-bold text-brand-gold uppercase tracking-wider hover:underline flex items-center gap-1 mt-2"
+                             >
+                               View on Google Maps
+                             </a>
+                           )}
                          </div>
                        </div>
                        <div className="flex items-start gap-3">

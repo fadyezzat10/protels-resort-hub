@@ -29,6 +29,7 @@ export interface Hotel {
   };
   roomDetails?: { name: string; features?: string[] }[];
   gallery?: string[];
+  mapLink?: string;
 }
 
 export const hotels: Hotel[] = [
@@ -36,6 +37,7 @@ export const hotels: Hotel[] = [
     id: "crystal-beach",
     name: "Protels Crystal Beach Resort",
     location: "Marsa Alam – Egypt",
+    mapLink: "https://maps.app.goo.gl/2jjgBH1rqGhVRXJZ8",
     image: crystalBeach,
     description: {
       en: "A stunning all-inclusive beachfront resort located on the Red Sea, offering crystal clear waters, vibrant coral reefs, and a relaxing atmosphere ideal for families and couples. Perfect for snorkeling, diving, and unforgettable seaside moments.",
@@ -75,6 +77,7 @@ export const hotels: Hotel[] = [
     id: "beach-club",
     name: "Protels Beach Club & SPA",
     location: "Marsa Alam, Egypt",
+    mapLink: "https://maps.app.goo.gl/1tX2JCjLMdb5m7Ey8",
     image: beachClub,
     description: {
       en: "An exclusive beach club atmosphere with luxurious spa facilities. Enjoy the perfect blend of entertainment and tranquility on the shores of the Red Sea.",
@@ -87,6 +90,7 @@ export const hotels: Hotel[] = [
     id: "la-plage",
     name: "Protels La Plage",
     location: "Zanzibar, Tanzania",
+    mapLink: "https://maps.app.goo.gl/FV9hhKBY7WkUcfCG9",
     image: laPlage,
     description: {
       en: "Experience the exotic charm of Zanzibar at Protels La Plage. White sandy beaches, turquoise waters, and traditional Swahili hospitality await you.",
