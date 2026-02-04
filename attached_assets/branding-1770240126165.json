@@ -1,0 +1,155 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Trip Sans VF",
+      "role": "body"
+    },
+    {
+      "family": "Arial",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#00EB5B",
+    "accent": "#00EB5B",
+    "background": "#FFFFFF",
+    "textPrimary": "#002B11",
+    "link": "#002B11"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Trip Sans VF",
+      "heading": "Trip Sans VF"
+    },
+    "fontStacks": {
+      "heading": [
+        "Trip Sans VF",
+        "Trip Sans",
+        "Arial",
+        "sans-serif"
+      ],
+      "body": [
+        "Trip Sans VF",
+        "Trip Sans",
+        "Arial",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Trip Sans VF",
+        "Trip Sans",
+        "Arial",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "44px",
+      "h2": "20px",
+      "body": "14px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "8px"
+  },
+  "components": {
+    "input": {
+      "background": "transparent",
+      "textColor": "#38443A",
+      "borderColor": null,
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonPrimary": {
+      "background": "#00EB5B",
+      "textColor": "#002B11",
+      "borderColor": "#00AB42",
+      "borderRadius": "1000px",
+      "borderRadiusCorners": {
+        "topLeft": "1000px",
+        "topRight": "1000px",
+        "bottomRight": "1000px",
+        "bottomLeft": "1000px"
+      },
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "#FFFFFF",
+      "textColor": "#002B11",
+      "borderColor": "#002B11",
+      "borderRadius": "1000px",
+      "borderRadiusCorners": {
+        "topLeft": "1000px",
+        "topRight": "1000px",
+        "bottomRight": "1000px",
+        "bottomLeft": "1000px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "https://static.tacdn.com/img2/brand_refresh_2025/logos/wordmark.svg",
+    "favicon": "File saved at: attached_assets/favicon.ico",
+    "ogImage": "File saved at: attached_assets/ogImage.jpg",
+    "logoHref": "File saved at: attached_assets/logoHref.html",
+    "logoAlt": "Tripadvisor"
+  },
+  "__framework_hints": [
+    "bootstrap"
+  ],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Selected #0 because it is visible, medium-sized, located in the header, and links to the homepage, matching the brand 'Tripadvisor'.",
+    "confidence": 0.95,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 4,
+      "text": "Check availability",
+      "reasoning": "Button #9 'Check availability' uses the vibrant brand color #00EB5B, making it the most prominent CTA on the page."
+    },
+    "secondary": {
+      "index": 10,
+      "text": "View available hotels",
+      "reasoning": "Button #3 'View available hotels' has a different background color (#FFFFFF) and serves as a secondary action related to exploring options."
+    },
+    "confidence": 0.95
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "travelers and tourists"
+  },
+  "designSystem": {
+    "framework": "bootstrap",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.95,
+    "colors": 0.9,
+    "overall": 0.925
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 0,
+        "selectedLogoReasoning": "Selected #0 because it is visible, medium-sized, located in the header, and links to the homepage, matching the brand 'Tripadvisor'.",
+        "confidence": 0.95
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}

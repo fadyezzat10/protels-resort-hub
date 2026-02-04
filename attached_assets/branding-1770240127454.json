@@ -1,0 +1,154 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Open Sans",
+      "role": "body"
+    },
+    {
+      "family": "Montserrat",
+      "role": "heading"
+    },
+    {
+      "family": "PT Sans",
+      "role": "unknown"
+    }
+  ],
+  "colors": {
+    "primary": "#0058A3",
+    "accent": "#0E55CD",
+    "background": "#FFFFFF",
+    "textPrimary": "#0E55CD",
+    "link": "#0E55CD"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Open Sans",
+      "heading": "Montserrat"
+    },
+    "fontStacks": {
+      "heading": [
+        "Montserrat",
+        "DejaVu Sans",
+        "Verdana",
+        "sans-serif",
+        "Open Sans"
+      ],
+      "body": [
+        "Open Sans",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Open Sans",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "40px",
+      "h2": "24px",
+      "body": "14px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "4px"
+  },
+  "components": {
+    "input": {
+      "background": "transparent",
+      "textColor": "#333333",
+      "borderColor": null,
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonPrimary": {
+      "background": "#0E55CD",
+      "textColor": "#FFFFFF",
+      "borderColor": "#0E55CD",
+      "borderRadius": "140000px",
+      "borderRadiusCorners": {
+        "topLeft": "140000px",
+        "topRight": "140000px",
+        "bottomRight": "140000px",
+        "bottomLeft": "140000px"
+      },
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "#FFFFFF",
+      "textColor": "#0E55CD",
+      "borderColor": "#0E55CD",
+      "borderRadius": "140000px",
+      "borderRadiusCorners": {
+        "topLeft": "140000px",
+        "topRight": "140000px",
+        "bottomRight": "140000px",
+        "bottomLeft": "140000px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "https://www.holidaycheck.de/public/assets/img/favicons/Icon-57.png",
+    "ogImage": "https://www.holidaycheck.de/main-photo-redirect/1dfdb0c7-0622-42f0-9fe6-c237fc1883a1",
+    "logoHref": "https://www.holidaycheck.de/",
+    "logoAlt": "Zurück zur HolidayCheck Homepage"
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 3,
+    "reasoning": "Selected #3 because it is visible, medium-sized, and links to the homepage, matching the brand 'HolidayCheck'.",
+    "confidence": 0.85,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "Reisedaten ändern",
+      "reasoning": "Button #0 ('Reisedaten ändern') uses the vibrant brand color #0E55CD, making it stand out as the primary call-to-action. It is likely a key action for users to modify their travel dates, aligning with the site's purpose."
+    },
+    "secondary": {
+      "index": 7,
+      "text": "Frage zum Hotel stellen",
+      "reasoning": "Button #7 ('Frage zum Hotel stellen') has a different background color (#FFFFFF) and serves as a secondary action, allowing users to ask questions about the hotel."
+    },
+    "confidence": 0.95
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "travelers looking for hotel information"
+  },
+  "designSystem": {
+    "framework": "custom",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.95,
+    "colors": 0.9,
+    "overall": 0.925
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 3,
+        "selectedLogoReasoning": "Selected #3 because it is visible, medium-sized, and links to the homepage, matching the brand 'HolidayCheck'.",
+        "confidence": 0.85
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}
