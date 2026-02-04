@@ -3,6 +3,13 @@ import beachClub from "@assets/DSC05597.png11_1770196278235.png";
 import laPlage from "@assets/22_1770196761222.png";
 import royalBay from "@assets/WhatsApp_Image_2025-12-22_at_12.58.16_PM_(1)_1770197117342.jpeg";
 
+// Gallery Images for La Plage
+import laPlage1 from "@/assets/images/la-plage-1.jpg";
+import laPlage2 from "@/assets/images/la-plage-2.jpg";
+import laPlage3 from "@/assets/images/la-plage-3.jpg";
+import laPlage4 from "@/assets/images/la-plage-4.jpg";
+import laPlage5 from "@/assets/images/la-plage-5.jpg";
+
 export interface Hotel {
   id: string;
   name: string;
@@ -21,6 +28,7 @@ export interface Hotel {
     bars?: string[];
   };
   roomDetails?: { name: string; features?: string[] }[];
+  gallery?: string[];
 }
 
 export const hotels: Hotel[] = [
@@ -86,7 +94,8 @@ export const hotels: Hotel[] = [
     },
     discount: "15% OFF",
     features: ["White Sand Beach", "Water Sports", "Cultural Tours", "Oceanfront Dining", "Tropical Gardens"],
-    rooms: ["Garden Villa", "Ocean View Suite", "Presidential Villa"]
+    rooms: ["Garden Villa", "Ocean View Suite", "Presidential Villa"],
+    gallery: [laPlage, laPlage1, laPlage2, laPlage3, laPlage4, laPlage5]
   },
   {
     id: "royal-bay",

@@ -223,23 +223,35 @@ export default function HotelDetails() {
               <section className="animate-in fade-in duration-500">
                 <div className="flex items-center justify-between mb-8">
                    <h2 className="text-3xl font-serif text-brand-blue">Gallery</h2>
-                   <Button asChild variant="link" className="text-brand-gold">
-                     <a href="/gallery">View All Photos &rarr;</a>
-                   </Button>
                 </div>
-                <div className="grid grid-cols-2 gap-4 h-96">
-                  <div className="h-full">
-                    <img src={hotel.image} className="w-full h-full object-cover" alt="Gallery 1" />
+                
+                {hotel.gallery ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {hotel.gallery.map((img, idx) => (
+                      <div key={idx} className="aspect-square relative group overflow-hidden cursor-pointer">
+                        <img 
+                          src={img} 
+                          alt={`Gallery image ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                      </div>
+                    ))}
                   </div>
-                  <div className="grid grid-rows-2 gap-4 h-full">
-                     <div className="bg-gray-200">
-                       <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 2" />
-                     </div>
-                     <div className="bg-gray-200">
-                       <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 3" />
-                     </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 h-96">
+                    <div className="h-full">
+                      <img src={hotel.image} className="w-full h-full object-cover" alt="Gallery 1" />
+                    </div>
+                    <div className="grid grid-rows-2 gap-4 h-full">
+                       <div className="bg-gray-200">
+                         <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 2" />
+                       </div>
+                       <div className="bg-gray-200">
+                         <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 3" />
+                       </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </section>
             )}
 
