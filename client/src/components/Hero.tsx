@@ -10,7 +10,7 @@ interface HeroProps {
   title?: string;
   subtitle?: string;
   showButton?: boolean;
-  height?: "full" | "half";
+  height?: "full" | "half" | "large";
 }
 
 export default function Hero({ 
@@ -37,17 +37,26 @@ export default function Hero({
     return () => clearInterval(timer);
   }, [heroImages.length]);
 
+  const getHeightClass = () => {
+    switch (height) {
+      case "full": return "h-[100vh]";
+      case "large": return "h-[90vh]";
+      case "half": return "h-[50vh] min-h-[500px]"; // Increased min-height for better look
+      default: return "h-[100vh]";
+    }
+  };
+
   return (
-    <div className={`relative w-full ${height === "full" ? "h-[100vh]" : "h-[48vh]"} overflow-hidden bg-black`}>
+    <div className={`relative w-full ${getHeightClass()} overflow-hidden bg-brand-dark`}>
       {/* Background Slider */}
       <AnimatePresence mode="popLayout">
         <motion.div 
           key={currentIndex}
           className="absolute inset-0 w-full h-full"
-          initial={{ opacity: 0, scale: 1.1 }}
+          initial={{ opacity: 0, scale: 1.05 }} // Subtler scale
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 2, ease: "easeInOut" }} // Slower, smoother transition
         >
           <img 
             src={heroImages[currentIndex]} 
@@ -57,38 +66,40 @@ export default function Hero({
         </motion.div>
       </AnimatePresence>
       
-      {/* Soft Dark Overlay */}
-      <div className="absolute inset-0 bg-black/30 z-10" /> 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10" />
+      {/* Refined Luxury Overlay */}
+      {/* Base darken */}
+      <div className="absolute inset-0 bg-black/20 z-10" /> 
+      {/* Gradient for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40 z-10" />
 
       {/* Content */}
-      <div className="relative z-20 h-full flex flex-col items-center justify-center text-center container-padding">
+      <div className="relative z-20 h-full flex flex-col items-center justify-center text-center container-padding pt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-4xl"
+          transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+          className="max-w-5xl"
         >
           {subtitle && (
-            <p className="text-brand-gold text-lg md:text-xl uppercase tracking-[0.2em] mb-4 font-medium drop-shadow-md">
+            <p className="text-white/90 text-sm md:text-base uppercase tracking-[0.3em] mb-6 font-medium drop-shadow-md">
               {subtitle}
             </p>
           )}
           {title && (
-            <h1 className="text-3xl md:text-6xl lg:text-7xl font-serif text-white mb-8 leading-tight drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-10 leading-tight drop-shadow-xl font-medium">
               {title}
             </h1>
           )}
           
           {showButton && (
-            <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center">
+            <div className="mt-4 flex flex-col md:flex-row gap-4 justify-center">
               <Button 
                 asChild 
                 size="lg"
-                className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-6 py-4 md:px-8 md:py-6 text-sm md:text-lg rounded-none min-w-[160px] md:min-w-[200px] shadow-lg hover:shadow-xl transition-all"
+                className="bg-[#c8a97e] hover:bg-[#b8966c] text-white font-semibold px-10 py-7 text-base rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
               >
                 <a href={bookingLink} target="_blank" rel="noopener noreferrer">
-                  {t("nav.book")}
+                  Book Now
                 </a>
               </Button>
             </div>

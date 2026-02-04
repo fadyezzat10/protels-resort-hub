@@ -56,7 +56,7 @@ export default function HotelDetails() {
         image={hotel.image}
         title={hotel.name}
         subtitle={hotel.location}
-        height="half"
+        height="large"
       />
 
       <div className="h-12 bg-white" />
