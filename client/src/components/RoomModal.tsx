@@ -42,35 +42,35 @@ export default function RoomModal({ room, isOpen, onClose }: RoomModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[1100px] w-[95vw] h-[90vh] md:h-[650px] p-0 overflow-hidden bg-white rounded-xl shadow-2xl border-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
+      <DialogContent className="max-w-[1100px] w-[95vw] max-h-[90vh] p-0 overflow-y-auto bg-white rounded-xl shadow-2xl border-0 scroll-smooth">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
           
           {/* Left Side: Image Gallery */}
-          <div className="relative h-[40%] lg:h-full bg-gray-100 flex flex-col">
-            <div className="relative flex-1 overflow-hidden group">
+          <div className="relative h-64 lg:h-auto bg-gray-100 flex flex-col">
+            <div className="relative flex-1 overflow-hidden group min-h-[300px] lg:min-h-full">
               <img 
                 src={images[currentImageIndex]} 
                 alt={`${room.name} view ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover transition-opacity duration-500 ease-in-out"
+                className="w-full h-full object-cover transition-opacity duration-500 ease-in-out absolute inset-0"
               />
               
               {/* Navigation Arrows */}
               <button 
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button 
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
             </div>
 
             {/* Thumbnails */}
-            <div className="hidden lg:flex p-4 gap-2 bg-white/5 overflow-x-auto absolute bottom-0 w-full backdrop-blur-md">
+            <div className="hidden lg:flex p-4 gap-2 bg-white/5 overflow-x-auto absolute bottom-0 w-full backdrop-blur-md z-10">
               {images.map((img, idx) => (
                 <button
                   key={idx}
@@ -87,7 +87,7 @@ export default function RoomModal({ room, isOpen, onClose }: RoomModalProps) {
           </div>
 
           {/* Right Side: Content */}
-          <div className="p-8 lg:p-10 flex flex-col h-full overflow-y-auto custom-scrollbar bg-brand-white">
+          <div className="p-8 lg:p-10 flex flex-col bg-brand-white">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <div className="flex items-center gap-2 mb-2">
