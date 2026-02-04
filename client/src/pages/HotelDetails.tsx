@@ -57,6 +57,8 @@ export default function HotelDetails() {
         height="half"
       />
 
+      <div className="h-12 bg-white" />
+
       {/* Sticky Tabs Navigation */}
       <div className="sticky top-[72px] md:top-[88px] z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="container-padding">
@@ -87,9 +89,9 @@ export default function HotelDetails() {
             
             {/* Overview */}
             {(activeSection === "overview" || !params?.section) && (
-              <section className="animate-in fade-in duration-500">
-                <h2 className="text-3xl font-serif text-brand-blue mb-6">Overview</h2>
-                <p className="text-gray-600 leading-relaxed text-lg">
+              <section className="animate-in fade-in duration-500 py-6">
+                <h2 className="text-3xl font-serif text-brand-blue mb-8">Overview</h2>
+                <p className="text-gray-600 leading-loose text-lg">
                   {hotel.description[language]}
                 </p>
               </section>
@@ -296,7 +298,7 @@ export default function HotelDetails() {
 
           {/* Sticky Sidebar */}
           <div className="hidden lg:block">
-            <div className="sticky top-[160px] space-y-8">
+            <div className="sticky top-[160px] space-y-8 w-[90%] ml-auto">
               <div className="bg-brand-blue text-white p-8 shadow-xl">
                 <h3 className="text-2xl font-serif mb-2 text-brand-gold">Book Your Stay</h3>
                 <p className="text-white/70 mb-6 text-sm">Best rates guaranteed. No booking fees.</p>

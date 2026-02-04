@@ -38,7 +38,7 @@ export default function Hero({
   }, [heroImages.length]);
 
   return (
-    <div className={`relative w-full ${height === "full" ? "h-[100vh]" : "h-[60vh]"} overflow-hidden bg-black`}>
+    <div className={`relative w-full ${height === "full" ? "h-[100vh]" : "h-[48vh]"} overflow-hidden bg-black`}>
       {/* Background Slider */}
       <AnimatePresence mode="popLayout">
         <motion.div 
