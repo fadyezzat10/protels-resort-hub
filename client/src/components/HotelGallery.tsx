@@ -77,6 +77,23 @@ const staticGalleryData: Record<string, Omit<GalleryCategory, "images"> & { imag
   }
 };
 
+const beachClubGalleryData: Record<string, Omit<GalleryCategory, "images"> & { images: GalleryImage[] }> = {
+  beach: {
+    id: "beach",
+    label: "Beach",
+    description: "Relax on our private sandy beach with crystal clear waters.",
+    images: [
+      { src: "/images/beach-club/facilities/beach/hero.jpg", alt: "Private Beach Hero" },
+      { src: "/images/beach-club/facilities/beach/gallery-1.jpg", alt: "Beach Cabanas" },
+      { src: "/images/beach-club/facilities/beach/gallery-2.jpg", alt: "Sunbeds by the Sea" },
+      { src: "/images/beach-club/facilities/beach/gallery-3.jpg", alt: "Shoreline View" },
+      { src: "/images/beach-club/facilities/beach/gallery-4.jpg", alt: "Beach Atmosphere" },
+      { src: "/images/beach-club/facilities/beach/gallery-5.jpg", alt: "Relaxation" },
+      { src: "/images/beach-club/facilities/beach/gallery-6.jpg", alt: "Beach View" },
+    ]
+  }
+};
+
 interface HotelGalleryProps {
   hotel?: Hotel;
 }
@@ -115,22 +132,25 @@ export default function HotelGallery({ hotel }: HotelGalleryProps) {
       );
     }
 
+    const isBeachClub = hotel?.id === "beach-club";
+    const activeStaticData = isBeachClub ? beachClubGalleryData : staticGalleryData;
+    
+    // For Beach Club, we only have Beach and Rooms images currently.
     const allImages = [
-      ...staticGalleryData.beach.images,
-      ...staticGalleryData.pools.images,
-      ...roomImages,
-      ...staticGalleryData.dining.images,
-      ...staticGalleryData.wellness.images
+      ...Object.values(activeStaticData).flatMap(cat => cat.images),
+      ...roomImages
     ];
 
     return {
       all: {
         id: "all",
-        label: "Crystal Beach",
-        description: "Explore the complete Crystal Beach Resort experience.",
+        label: isBeachClub ? "Beach Club" : "Crystal Beach",
+        description: isBeachClub 
+          ? "Explore the vibrant Protels Beach Club & SPA experience."
+          : "Explore the complete Crystal Beach Resort experience.",
         images: allImages
       },
-      ...staticGalleryData,
+      ...activeStaticData,
       rooms: {
         id: "rooms",
         label: "Rooms",
