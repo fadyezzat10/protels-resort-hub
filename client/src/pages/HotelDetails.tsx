@@ -284,6 +284,71 @@ export default function HotelDetails() {
                   </div>
                 </div>
 
+                {/* Italian Restaurant Section */}
+                <div className="mb-16 bg-[#FDFCF8] border border-gray-100 shadow-sm overflow-hidden rounded-lg">
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Hero Image - Left Side on Desktop */}
+                    <div className="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden group">
+                      <img 
+                        src="/images/italian-restaurant/hero.jpg" 
+                        alt="Italian Restaurant" 
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent lg:hidden" />
+                      <div className="absolute bottom-6 left-6 lg:hidden text-white">
+                         <span className="bg-brand-gold text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Italian Cuisine</span>
+                         <h3 className="text-3xl font-serif">Italian Restaurant</h3>
+                      </div>
+                    </div>
+
+                    {/* Content - Right Side on Desktop */}
+                    <div className="lg:w-5/12 p-8 lg:p-12 flex flex-col justify-center relative">
+                      <div className="hidden lg:block mb-6">
+                         <span className="bg-brand-gold/10 text-brand-gold text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Italian Cuisine</span>
+                         <h3 className="text-4xl font-serif text-brand-blue mb-2">Italian Restaurant</h3>
+                         <div className="w-12 h-0.5 bg-brand-gold mt-4"></div>
+                      </div>
+                      
+                      <p className="text-gray-600 leading-relaxed text-lg mb-8 font-light">
+                        Experience authentic Italian flavors in a romantic seaside setting.
+                        Enjoy handcrafted pasta, gourmet dishes, and a warm elegant atmosphere perfect for unforgettable evenings.
+                      </p>
+
+                      <div className="space-y-4 mb-8">
+                        <div className="flex items-center gap-3 text-sm text-gray-500">
+                           <Clock className="w-4 h-4 text-brand-gold" />
+                           <span>Dinner: 18:30 - 22:30</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-gray-500">
+                           <Wine className="w-4 h-4 text-brand-gold" />
+                           <span>Extensive Wine Selection</span>
+                        </div>
+                      </div>
+
+                      <Button className="w-fit bg-brand-gold hover:bg-brand-gold/90 text-white px-8 py-6 rounded-full text-lg font-medium transition-all hover:translate-x-1 shadow-md hover:shadow-lg">
+                        View Menu
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Gallery Slider (Scroll Snap) */}
+                  <div className="p-8 border-t border-gray-100/50">
+                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">Gallery Highlights</h4>
+                    <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                      {[1, 2, 3, 4, 5, 6].map((num) => (
+                        <div key={num} className="snap-center shrink-0 w-[280px] md:w-[320px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                          <img 
+                            src={`/images/italian-restaurant/gallery-${num}.jpg`}
+                            alt={`Italian Dish ${num}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 {hotel.dining ? (
                   <div className="space-y-8">
                     {/* Main Restaurant */}
