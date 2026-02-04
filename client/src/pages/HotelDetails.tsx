@@ -1,11 +1,11 @@
-import { useParams } from "wouter";
+import { useLocation } from "wouter";
 import { hotels, bookingLink } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi } from "lucide-react";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
