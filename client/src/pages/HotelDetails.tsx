@@ -349,6 +349,47 @@ export default function HotelDetails() {
                   </div>
                 </div>
 
+                {/* Mongolian Restaurant Section */}
+                <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg group">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    <div className="relative h-[400px] md:h-auto overflow-hidden">
+                      <img 
+                        src="/images/mongolian-restaurant/hero.jpg" 
+                        alt="Mongolian Restaurant" 
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                    </div>
+                    
+                    <div className="p-10 md:p-14 flex flex-col justify-center bg-[#FFFBF7]">
+                      <div className="mb-6">
+                        <span className="bg-[#C8A97E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Live Cooking</span>
+                        <h3 className="text-3xl md:text-4xl font-serif text-[#1a2332]">Mongolian Restaurant</h3>
+                      </div>
+                      
+                      <p className="text-gray-600 leading-relaxed text-lg mb-8 font-light">
+                        Savor the vibrant tastes of Asia at our Mongolian Restaurant, where live cooking stations bring fresh ingredients to life. Enjoy a personalized dining experience with authentic flavors in a warm, inviting oriental atmosphere.
+                      </p>
+                      
+                      <div className="grid grid-cols-3 gap-4 mb-8">
+                         {[1, 2, 3].map((num) => (
+                           <div key={num} className="aspect-square rounded-md overflow-hidden shadow-sm">
+                             <img 
+                               src={`/images/mongolian-restaurant/gallery-${num}.jpg`}
+                               alt={`Mongolian Detail ${num}`}
+                               className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                             />
+                           </div>
+                         ))}
+                      </div>
+
+                      <Button className="w-full md:w-auto bg-[#1a2332] hover:bg-[#2c3b55] text-white px-8 py-6 rounded-none text-lg font-medium transition-all">
+                        Reserve Your Table
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
                 {hotel.dining ? (
                   <div className="space-y-8">
                     {/* Main Restaurant */}
