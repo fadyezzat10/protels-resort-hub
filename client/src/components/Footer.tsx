@@ -1,6 +1,7 @@
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import logo from "@assets/شسشسشسشس_1770192758083.png";
 
 export default function Footer() {
   const { t } = useI18n();
@@ -11,8 +12,8 @@ export default function Footer() {
       <div className="container-padding">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
-          <div className="space-y-4">
-            <h2 className="font-serif text-3xl font-bold text-brand-gold">PROTELS</h2>
+          <div className="space-y-6">
+            <img src={logo} alt="PROTELS" className="h-20" />
             <p className="text-white/70 text-sm leading-relaxed max-w-xs">
               {t("about.desc")}
             </p>

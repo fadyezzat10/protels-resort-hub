@@ -13,6 +13,9 @@
   --color-brand-blue: hsl(215 45% 15%);
   --color-brand-blue-light: hsl(215 35% 25%);
   
+  /* Brand Pink: From Logo */
+  --color-brand-pink: hsl(340 50% 90%);
+  
   /* Gold/Sand: Warmth & Elegance */
   --color-brand-gold: hsl(38 45% 75%);
   --color-brand-gold-light: hsl(38 60% 90%);

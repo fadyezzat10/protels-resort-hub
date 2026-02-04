@@ -5,6 +5,7 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import logo from "@assets/شسشسشسشس_1770192758083.png";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
@@ -36,14 +37,21 @@ export default function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full",
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-4" : "bg-transparent py-6"
+        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-2" : "bg-transparent py-4"
       )}
     >
       <div className="container-padding flex items-center justify-between">
         {/* Logo */}
         <Link href="/">
-          <a className={cn("font-serif text-2xl font-bold tracking-widest", isScrolled ? "text-brand-blue" : "text-white")}>
-            PROTELS
+          <a className="flex items-center gap-2 group">
+            <img 
+              src={logo} 
+              alt="PROTELS" 
+              className={cn(
+                "transition-all duration-300",
+                isScrolled ? "h-12 invert" : "h-16"
+              )} 
+            />
           </a>
         </Link>
 
