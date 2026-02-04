@@ -43,7 +43,7 @@ export default function Navbar() {
       <div className="container-padding flex items-center justify-between">
         {/* Logo */}
         <Link href="/">
-          <a className="flex items-center gap-2 group">
+          <a className="flex items-center gap-4 group">
             <img 
               src={logo} 
               alt="PROTELS" 

@@ -75,7 +75,7 @@ export default function Hero({
             </p>
           )}
           {title && (
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-8 leading-tight drop-shadow-lg">
+            <h1 className="text-3xl md:text-6xl lg:text-7xl font-serif text-white mb-8 leading-tight drop-shadow-lg">
               {title}
             </h1>
           )}
@@ -85,7 +85,7 @@ export default function Hero({
               <Button 
                 asChild 
                 size="lg"
-                className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-8 py-6 text-lg rounded-none min-w-[200px] shadow-lg hover:shadow-xl transition-all"
+                className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-6 py-4 md:px-8 md:py-6 text-sm md:text-lg rounded-none min-w-[160px] md:min-w-[200px] shadow-lg hover:shadow-xl transition-all"
               >
                 <a href={bookingLink} target="_blank" rel="noopener noreferrer">
                   {t("nav.book")}
