@@ -1,6 +1,6 @@
 import crystalBeach from "@assets/Protels_Crystal_Beach_Resort_1770196464483.png";
 import beachClub from "@assets/DSC05597.png11_1770196278235.png";
-import laPlage from "@/assets/images/hotel-la-plage.jpg";
+import laPlage from "@assets/22_1770196761222.png";
 import royalBay from "@/assets/images/hotel-royal-bay.jpg";
 
 export interface Hotel {
