@@ -10,9 +10,13 @@ import laPlage3 from "@/assets/images/la-plage-3.jpg";
 import laPlage4 from "@/assets/images/la-plage-4.jpg";
 import laPlage5 from "@/assets/images/la-plage-5.jpg";
 
-// Room Images
-import standardRoom1 from "@/assets/images/room-standard-1.jpg";
-import standardRoom2 from "@/assets/images/room-standard-2.jpg";
+// Standard Room Images
+import standard1 from "@/assets/images/standard-1.jpg";
+import standard2 from "@/assets/images/standard-2.jpg";
+import standard3 from "@/assets/images/standard-3.jpg";
+import standard4 from "@/assets/images/standard-4.jpg";
+import standard5 from "@/assets/images/standard-5.jpg";
+import standard6 from "@/assets/images/standard-6.jpg";
 
 // Suite Images
 import suite1 from "@/assets/images/suite-1.jpg";
@@ -97,11 +101,11 @@ export const hotels: Hotel[] = [
       { 
         name: "Standard Room",
         size: "25 m²",
-        bed: "2 Twin Beds",
+        bed: "Twin or King Bed",
         view: "Garden View",
-        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
-        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
-        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower", "Private Bathroom"],
+        description: "A charming and comfortable Standard Room designed for a relaxing stay, featuring unique architectural details and warm tones. The room offers a private balcony or terrace with garden views, ensuring a peaceful atmosphere. Guests enjoy modern amenities including air conditioning, a flat-screen TV, and a well-appointed private bathroom, making it an ideal choice for a memorable coastal retreat.",
+        images: [standard5, standard6, standard1, standard4, standard3, standard2]
       },
       { 
         name: "Superior Room", 
