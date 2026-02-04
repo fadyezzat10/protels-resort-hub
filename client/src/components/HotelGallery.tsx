@@ -43,17 +43,30 @@ const staticGalleryData: Record<string, Omit<GalleryCategory, "images"> & { imag
       { src: "/images/pools-aquapark/gallery-5.jpg", alt: "Night Pool View" },
     ]
   },
-  facilities: {
-    id: "facilities",
-    label: "Facilities",
-    description: "Enjoy world-class dining, wellness, and recreational activities.",
+  dining: {
+    id: "dining",
+    label: "Dining",
+    description: "Savor exquisite flavors at our world-class restaurants and bars.",
     images: [
-      { src: "/images/facilities/hero.jpg", alt: "Spa & Wellness" },
-      { src: "/images/facilities/gallery-1.jpg", alt: "Fitness Center" },
-      { src: "/images/facilities/gallery-2.jpg", alt: "Italian Restaurant" },
-      { src: "/images/facilities/gallery-3.jpg", alt: "Massage Room" },
-      { src: "/images/facilities/gallery-4.jpg", alt: "El Dokka Dining" },
-      { src: "/images/facilities/gallery-5.jpg", alt: "Mongolian Restaurant" },
+      { src: "/images/italian-restaurant/hero.jpg", alt: "La Trattoria Italian Restaurant" },
+      { src: "/images/el-dokka/hero.jpg", alt: "El Dokka Dining Experience" },
+      { src: "/images/mongolian-restaurant/hero.jpg", alt: "Mongolian Specialty Restaurant" },
+      { src: "/images/italian-restaurant/gallery-1.jpg", alt: "Fine Dining Atmosphere" },
+      { src: "/images/el-dokka/gallery-1.jpg", alt: "Seaside Dining" },
+      { src: "/images/mongolian-restaurant/gallery-1.jpg", alt: "Live Cooking Station" },
+    ]
+  },
+  wellness: {
+    id: "wellness",
+    label: "Wellness",
+    description: "Rejuvenate your body and mind at our luxury spa and fitness center.",
+    images: [
+      { src: "/images/spa-wellness/hero.jpg", alt: "Luxury Spa" },
+      { src: "/images/fitness-center/hero.jpg", alt: "State-of-the-art Gym" },
+      { src: "/images/spa-wellness/gallery-1.jpg", alt: "Massage Therapy" },
+      { src: "/images/fitness-center/gallery-1.jpg", alt: "Cardio Equipment" },
+      { src: "/images/spa-wellness/gallery-2.jpg", alt: "Relaxation Area" },
+      { src: "/images/fitness-center/gallery-2.jpg", alt: "Weights Section" },
     ]
   }
 };
