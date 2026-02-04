@@ -33,6 +33,15 @@ import superior3 from "@/assets/images/superior-3.jpg";
 import superior4 from "@/assets/images/superior-4.jpg";
 import superior5 from "@/assets/images/superior-5.jpg";
 
+// Standard Pool View Room Images (Beach Club)
+import standardPoolHero from "@/assets/images/beach-club/standard-pool-view/hero.jpg";
+import standardPool1 from "@/assets/images/beach-club/standard-pool-view/gallery-1.jpg";
+import standardPool2 from "@/assets/images/beach-club/standard-pool-view/gallery-2.jpg";
+import standardPool3 from "@/assets/images/beach-club/standard-pool-view/gallery-3.jpg";
+import standardPool4 from "@/assets/images/beach-club/standard-pool-view/gallery-4.jpg";
+import standardPool5 from "@/assets/images/beach-club/standard-pool-view/gallery-5.jpg";
+import standardPool6 from "@/assets/images/beach-club/standard-pool-view/gallery-6.jpg";
+
 // Family Room Images
 import family1 from "@/assets/images/family-room-1.jpg";
 import family2 from "@/assets/images/family-room-2.jpg";
@@ -158,16 +167,16 @@ export const hotels: Hotel[] = [
       ar: "انغمس في أجواء البحر الأحمر النابضة بالحياة في بروتلز بيتش كلوب وسبا. صُمم منتجعنا للمسافر العصري، حيث يمزج بين الاسترخاء والطاقة، ويوفر وصولاً مباشراً إلى شاطئ رملي خاص ومياه كريستالية صافية. استمتع بمجموعة متنوعة من حمامات السباحة، وأكوا بارك مثيرة، ومركز عافية متكامل لتجديد حواسك. مع الترفيه الحيوي، وخيارات الطعام المتنوعة، والجو الترحيبي، إنه الملاذ المثالي للعائلات والأزواج والأصدقاء الباحثين عن الشمس والمرح والراحة."
     },
     features: ["Private Sandy Beach", "Aquapark & Pools", "Spa & Wellness Center", "Family Entertainment", "Beachfront Dining"],
-    rooms: ["Double Room", "Superior Double or Twin Room with Sea View", "Family Room", "Junior Suite"],
+    rooms: ["Standard Pool View Room", "Superior Double or Twin Room with Sea View", "Family Room", "Junior Suite"],
     roomDetails: [
       { 
-        name: "Double Room",
+        name: "Standard Pool View Room",
         size: "30 m²",
         bed: "King or Twin Beds",
         view: "Garden or Pool View",
         amenities: ["Balcony", "Air Conditioning", "Flat Screen TV", "Mini Fridge", "Safe Box", "Private Bathroom"],
         description: "A comfortable and modern Double Room designed for couples or friends. Featuring bright interiors, your choice of a king or twin beds, and a private balcony with relaxing garden or pool views.",
-        images: [standard5, standard6]
+        images: [standardPoolHero, standardPool1, standardPool2, standardPool3, standardPool4, standardPool5, standardPool6]
       },
       { 
         name: "Superior Double or Twin Room with Sea View", 
