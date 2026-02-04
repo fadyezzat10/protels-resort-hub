@@ -29,6 +29,15 @@ import superior3 from "@/assets/images/superior-3.jpg";
 import superior4 from "@/assets/images/superior-4.jpg";
 import superior5 from "@/assets/images/superior-5.jpg";
 
+// Family Room Images
+import family1 from "@/assets/images/family-room-1.jpg";
+import family2 from "@/assets/images/family-room-2.jpg";
+import family3 from "@/assets/images/family-room-3.jpg";
+import family4 from "@/assets/images/family-room-4.jpg";
+import family5 from "@/assets/images/family-room-5.jpg";
+import family6 from "@/assets/images/family-room-6.jpg";
+import family7 from "@/assets/images/family-room-7.jpg";
+
 export interface RoomDetail {
   name: string;
   size?: string;
@@ -108,9 +117,9 @@ export const hotels: Hotel[] = [
         size: "45 m²", 
         bed: "King + 2 Twin", 
         view: "Pool View",
-        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
-        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
-        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower", "Private Bathroom"],
+        description: "A spacious and comfortable family room designed for relaxation and convenience. Featuring modern furnishings, natural daylight, and a private balcony or terrace with garden or partial sea views. The room includes air conditioning, a flat-screen TV, and a private bathroom with premium amenities. Ideal for families seeking comfort, space, and a peaceful coastal atmosphere near the beach.",
+        images: [family1, family2, family3, family4, family5, family6, family7]
       },
       { 
         name: "Suite", 
