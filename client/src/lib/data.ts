@@ -14,6 +14,14 @@ import laPlage5 from "@/assets/images/la-plage-5.jpg";
 import standardRoom1 from "@/assets/images/room-standard-1.jpg";
 import standardRoom2 from "@/assets/images/room-standard-2.jpg";
 
+// Suite Images
+import suite1 from "@/assets/images/suite-1.jpg";
+import suite2 from "@/assets/images/suite-2.jpg";
+import suite3 from "@/assets/images/suite-3.jpg";
+import suite4 from "@/assets/images/suite-4.jpg";
+import suite5 from "@/assets/images/suite-5.jpg";
+import suite6 from "@/assets/images/suite-6.jpg";
+
 export interface RoomDetail {
   name: string;
   size?: string;
@@ -103,8 +111,8 @@ export const hotels: Hotel[] = [
         bed: "King Bed", 
         view: "Panoramic Sea View",
         amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
-        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
-        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+        description: "Spacious luxury suite designed for ultimate comfort and relaxation. Featuring modern furniture, natural light, elegant décor, and a private balcony with stunning panoramic sea views. Ideal for couples and families seeking a premium seaside experience.",
+        images: [suite1, suite2, suite3, suite4, suite5, suite6]
       }
     ],
     dining: {
