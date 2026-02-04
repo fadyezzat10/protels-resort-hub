@@ -92,14 +92,14 @@ export default function Hero({
           )}
           
           {showButton && (
-            <div className="mt-4 flex flex-col md:flex-row gap-4 justify-center">
+            <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center">
               <Button 
                 asChild 
                 size="lg"
-                className="bg-[#c8a97e] hover:bg-[#b8966c] text-white font-semibold px-10 py-7 text-base rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                className="bg-[#C8A97E] hover:bg-[#b8966c] text-white font-bold px-8 py-3 text-lg rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 transform"
               >
                 <a href={bookingLink} target="_blank" rel="noopener noreferrer">
-                  Book Now
+                  {t("nav.book")}
                 </a>
               </Button>
             </div>
