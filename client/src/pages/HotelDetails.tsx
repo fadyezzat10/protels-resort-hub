@@ -635,7 +635,8 @@ export default function HotelDetails() {
                   ))}
                 </div>
 
-                {/* Fitness Center Section */}
+                {/* Fitness Center Section - Hidden for La Plage */}
+                {!isLaPlage && (
                 <div className="mt-16 bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
                     <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
@@ -685,8 +686,10 @@ export default function HotelDetails() {
                     </div>
                   </div>
                 </div>
+                )}
 
-                {/* Spa & Wellness Center Section */}
+                {/* Spa & Wellness Center Section - Hidden for La Plage */}
+                {!isLaPlage && (
                 <div className="mt-16 bg-[#FDFCF8] border border-gray-100 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
                     <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
@@ -736,6 +739,7 @@ export default function HotelDetails() {
                     </div>
                   </div>
                 </div>
+                )}
                 {/* Private Beach Facilities Section - Hidden for La Plage */}
                 {!isLaPlage && (
                 <div className="mt-16 bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
