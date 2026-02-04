@@ -848,6 +848,62 @@ export default function HotelDetails() {
                 </div>
                 )}
 
+                {/* La Plage Specific - Beach / Beachfront */}
+                {isLaPlage && (
+                <div className="mt-16 bg-[#F9F6F0] border border-[#8B5A2B]/10 shadow-sm rounded-lg overflow-hidden">
+                  <div className="p-8 md:p-10">
+                    <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
+                       <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-6">
+                             <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
+                                <Umbrella className="w-6 h-6 text-[#8B5A2B]" />
+                             </div>
+                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Pristine Beachfront</h3>
+                          </div>
+                          <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-8 max-w-3xl">
+                            Step onto the powder-soft white sands of our private Zanzibar beach. Framed by swaying coconut palms and the turquoise Indian Ocean, this is your sanctuary for pure island relaxation. Whether basking in the sun or taking a barefoot stroll at low tide, experience the authentic soul of the coast.
+                          </p>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6">
+                             {[
+                               "Private White Sand Beach", 
+                               "Turquoise Lagoon", 
+                               "Palm-Shaded Loungers", 
+                               "Oceanfront Service", 
+                               "Sunset Views"
+                             ].map((item, i) => (
+                               <div key={i} className="flex items-center gap-3 text-sm text-[#8B5A2B]">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B]" />
+                                  {item}
+                               </div>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
+
+                    {/* Gallery Slider */}
+                    <div className="pt-8 border-t border-[#8B5A2B]/10">
+                      <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                        {[
+                          "aerial-1.png", "aerial-2.png", "aerial-3.png", "aerial-4.png", 
+                          "aerial-5.png", "aerial-6.png", "aerial-7.png", "aerial-8.png",
+                          "pool-palm-1.png", "pool-palm-2.png"
+                        ].map((img, i) => (
+                          <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                            <img 
+                              src={`/images/la-plage/facilities/${img}`}
+                              alt={`La Plage Beach ${i + 1}`}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                )}
+
                 {/* La Plage Specific - Pools & Relaxation */}
                 {isLaPlage && (
                 <div className="mt-16 bg-[#F9F6F0] border border-[#8B5A2B]/10 shadow-sm rounded-lg overflow-hidden">
