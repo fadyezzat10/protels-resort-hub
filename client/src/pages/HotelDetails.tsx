@@ -1,14 +1,15 @@
 import { useLocation, Link, useRoute } from "wouter";
-import { hotels, bookingLink } from "@/lib/data";
+import { hotels, bookingLink, RoomDetail } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine } from "lucide-react";
+import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine, Maximize2, Bed, Mountain } from "lucide-react";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import RoomModal from "@/components/RoomModal";
 
 export default function HotelDetails() {
   const [location, setLocation] = useLocation();
@@ -22,6 +23,7 @@ export default function HotelDetails() {
   const activeSection = params?.section || "overview";
   
   const hotel = hotels.find(h => h.id === hotelId);
+  const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
 
   if (!hotel) return <NotFound />;
 
@@ -102,25 +104,55 @@ export default function HotelDetails() {
               <section className="animate-in fade-in duration-500">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-serif text-brand-blue">Accommodation</h2>
-                  <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.rooms.length} Room Types</span>
+                  <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.roomDetails?.length || hotel.rooms.length} Room Types</span>
                 </div>
                 
-                {hotel.id === "crystal-beach" && (
-                  <div className="mb-8 p-6 bg-gray-50 border border-gray-100">
-                    <h3 className="font-serif text-xl font-bold text-brand-blue mb-4">Room Amenities</h3>
-                    <p className="text-gray-600 mb-4">Every room is designed as a private retreat, blending modern elegance with comfort. Enjoy stunning views and premium amenities in every stay:</p>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Individual Climate Control</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Furnished Balcony or Terrace</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> LED Satellite TV</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Stocked Mini Bar</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Digital Safe Box</li>
-                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Luxury Bathroom Amenities</li>
-                    </ul>
+                {hotel.id === "crystal-beach" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {hotel.roomDetails?.map((room, idx) => (
+                      <div key={idx} className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src={room.images?.[0] || hotel.image} 
+                            alt={room.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
+                        </div>
+                        <div className="p-6 flex flex-col flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                             <h3 className="font-serif text-xl font-bold text-brand-blue">{room.name}</h3>
+                          </div>
+                          <p className="text-xs text-gray-400 mb-4 line-clamp-2">{room.description || "Luxury room with premium amenities."}</p>
+                          
+                          <div className="grid grid-cols-2 gap-2 mb-6 text-xs text-gray-600">
+                            <div className="flex items-center gap-1.5">
+                              <Maximize2 className="w-3.5 h-3.5 text-brand-gold" /> {room.size || "Unknown"}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Bed className="w-3.5 h-3.5 text-brand-gold" /> {room.bed || "Standard"}
+                            </div>
+                            <div className="flex items-center gap-1.5 col-span-2">
+                              <Mountain className="w-3.5 h-3.5 text-brand-gold" /> {room.view || "Various Views"}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-auto">
+                            <Button 
+                              className="w-full bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold tracking-wide"
+                              onClick={() => setSelectedRoom(room)}
+                            >
+                              View Room
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {/* Render standard layout for other rooms if needed or just empty if all covered by roomDetails */}
                   </div>
-                )}
-
-                <div className="space-y-6">
+                ) : (
+                  <div className="space-y-6">
                   {hotel.rooms.map((room, idx) => (
                     <div key={room} className="group bg-white border border-gray-100 p-6 hover:border-brand-gold transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
@@ -132,7 +164,8 @@ export default function HotelDetails() {
                       </Button>
                     </div>
                   ))}
-                </div>
+                  </div>
+                )}
               </section>
             )}
 
@@ -286,6 +319,7 @@ export default function HotelDetails() {
                          <div>
                            <span className="block font-bold text-brand-blue mb-1">Phone</span>
                            <span className="text-gray-600">+20 123 456 7890</span>
+                           <span className="text-gray-600">+20 123 456 7890</span>
                          </div>
                        </div>
                        <div className="flex items-start gap-3">
@@ -385,6 +419,14 @@ export default function HotelDetails() {
       </div>
 
       <Footer />
+
+      {selectedRoom && (
+        <RoomModal 
+          room={selectedRoom} 
+          isOpen={!!selectedRoom} 
+          onClose={() => setSelectedRoom(null)} 
+        />
+      )}
     </div>
   );
 }

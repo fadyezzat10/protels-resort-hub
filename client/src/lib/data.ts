@@ -10,6 +10,21 @@ import laPlage3 from "@/assets/images/la-plage-3.jpg";
 import laPlage4 from "@/assets/images/la-plage-4.jpg";
 import laPlage5 from "@/assets/images/la-plage-5.jpg";
 
+// Room Images
+import standardRoom1 from "@/assets/images/room-standard-1.jpg";
+import standardRoom2 from "@/assets/images/room-standard-2.jpg";
+
+export interface RoomDetail {
+  name: string;
+  size?: string;
+  bed?: string;
+  view?: string;
+  amenities?: string[];
+  description?: string;
+  features?: string[];
+  images?: string[];
+}
+
 export interface Hotel {
   id: string;
   name: string;
@@ -27,7 +42,7 @@ export interface Hotel {
     specialty?: { name: string; desc: string }[];
     bars?: string[];
   };
-  roomDetails?: { name: string; features?: string[] }[];
+  roomDetails?: RoomDetail[];
   gallery?: string[];
   mapLink?: string;
 }
@@ -53,12 +68,20 @@ export const hotels: Hotel[] = [
       "24-Hour Concierge",
       "High-Speed Wi-Fi"
     ],
-    rooms: ["Standard Room", "Sea View Room", "Family Suite", "Royal Suite"],
+    rooms: ["Standard Double Room", "Sea View Room", "Family Suite", "Royal Suite"],
     roomDetails: [
-      { name: "Standard Room" },
-      { name: "Sea View Room" },
-      { name: "Family Suite" },
-      { name: "Royal Suite" }
+      { 
+        name: "Standard Double Room",
+        size: "25 m²",
+        bed: "2 Twin Beds",
+        view: "Garden View",
+        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
+        description: "Luxury comfortable double room designed for relaxation near the Red Sea. Includes balcony with garden view, modern furniture, and premium bedding.",
+        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+      },
+      { name: "Sea View Room", size: "30 m²", bed: "King Bed", view: "Sea View" },
+      { name: "Family Suite", size: "45 m²", bed: "King + 2 Twin", view: "Pool View" },
+      { name: "Royal Suite", size: "60 m²", bed: "King Bed", view: "Panoramic Sea View" }
     ],
     dining: {
       main: {
