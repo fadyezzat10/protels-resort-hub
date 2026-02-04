@@ -158,7 +158,45 @@ export const hotels: Hotel[] = [
       ar: "انغمس في أجواء البحر الأحمر النابضة بالحياة في بروتلز بيتش كلوب وسبا. صُمم منتجعنا للمسافر العصري، حيث يمزج بين الاسترخاء والطاقة، ويوفر وصولاً مباشراً إلى شاطئ رملي خاص ومياه كريستالية صافية. استمتع بمجموعة متنوعة من حمامات السباحة، وأكوا بارك مثيرة، ومركز عافية متكامل لتجديد حواسك. مع الترفيه الحيوي، وخيارات الطعام المتنوعة، والجو الترحيبي، إنه الملاذ المثالي للعائلات والأزواج والأصدقاء الباحثين عن الشمس والمرح والراحة."
     },
     features: ["Private Sandy Beach", "Aquapark & Pools", "Spa & Wellness Center", "Family Entertainment", "Beachfront Dining"],
-    rooms: ["Club Room", "Pool View Suite", "Beachfront Bungalow"]
+    rooms: ["Double Room", "Superior Double or Twin Room with Sea View", "Family Room", "Junior Suite"],
+    roomDetails: [
+      { 
+        name: "Double Room",
+        size: "30 m²",
+        bed: "King or Twin Beds",
+        view: "Garden or Pool View",
+        amenities: ["Balcony", "Air Conditioning", "Flat Screen TV", "Mini Fridge", "Safe Box", "Private Bathroom"],
+        description: "A comfortable and modern Double Room designed for couples or friends. Featuring bright interiors, your choice of a king or twin beds, and a private balcony with relaxing garden or pool views.",
+        images: [standard5, standard6]
+      },
+      { 
+        name: "Superior Double or Twin Room with Sea View", 
+        size: "35 m²", 
+        bed: "King or Twin Beds", 
+        view: "Sea View",
+        amenities: ["Sea View Balcony", "Air Conditioning", "Flat Screen TV", "Mini Bar", "Coffee/Tea Maker", "Private Bathroom"],
+        description: "Enjoy stunning Red Sea views from this spacious Superior Room. Designed with modern beach aesthetics, it offers a private balcony, comfortable bedding, and all essential amenities for a relaxing seaside stay.",
+        images: [superior1, superior2, superior3]
+      },
+      { 
+        name: "Family Room", 
+        size: "50 m²", 
+        bed: "King Bed + 2 Sofa Beds", 
+        view: "Pool or Garden View",
+        amenities: ["Spacious Balcony", "Separate Living Area", "Air Conditioning", "Flat Screen TV", "Family Bathroom", "Mini Fridge"],
+        description: "Perfect for families, this spacious room features a king bed and a comfortable living area with sofa beds. Enjoy ample space, modern amenities, and easy access to the resort’s pools and activities.",
+        images: [family1, family2, family3]
+      },
+      { 
+        name: "Junior Suite", 
+        size: "65 m²", 
+        bed: "King Bed", 
+        view: "Sea or Pool View",
+        amenities: ["Large Terrace", "Living Area", "Air Conditioning", "Flat Screen TV", "Premium Toiletries", "Coffee Machine"],
+        description: "Elevate your stay in our stylish Junior Suite. Offering generous living space, a plush king bed, and a large terrace with beautiful views, it’s the ideal choice for couples seeking extra comfort and luxury.",
+        images: [suite1, suite2]
+      }
+    ]
   },
   {
     id: "la-plage",
