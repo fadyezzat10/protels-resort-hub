@@ -218,7 +218,36 @@ export const hotels: Hotel[] = [
     },
     discount: "15% OFF",
     features: ["White Sand Beach", "Water Sports", "Cultural Tours", "Oceanfront Dining", "Tropical Gardens"],
-    rooms: ["Garden Villa", "Ocean View Suite", "Presidential Villa"],
+    rooms: ["Superior Room", "Bungalow", "Family Bungalow"],
+    roomDetails: [
+      {
+        name: "Superior Room",
+        size: "40 m²",
+        bed: "King or Twin Beds",
+        view: "Pool & Ocean View",
+        amenities: ["Private Balcony", "Air Conditioning", "Ocean Breeze", "Walk-in Shower", "Wi-Fi", "Minibar"],
+        description: "A spacious and airy retreat blending Swahili charm with modern comfort. Enjoy sweeping views of the turquoise pool and Indian Ocean from your private balcony.",
+        images: [laPlage1, laPlage2, laPlage3]
+      },
+      {
+        name: "Bungalow",
+        size: "48 m²",
+        bed: "King Bed",
+        view: "Garden View",
+        amenities: ["Private Terrace", "Outdoor Seating", "Air Conditioning", "Rain Shower", "Coffee Maker", "Garden Access"],
+        description: "Nestled in our lush tropical gardens, this standalone bungalow offers privacy and serenity. Featuring natural wood accents and a large terrace perfect for relaxing amidst nature.",
+        images: [laPlage4, laPlage5, laPlage1]
+      },
+      {
+        name: "Family Bungalow",
+        size: "55 m²",
+        bed: "King Bed + 2 Single Beds",
+        view: "Garden View",
+        amenities: ["Two Sleeping Areas", "Large Terrace", "Family Bathroom", "Air Conditioning", "Mini Fridge", "Easy Beach Access"],
+        description: "Ideal for families, this expansive bungalow provides ample space and comfort. Located close to the beach and pool, it offers a peaceful garden setting with separate sleeping areas for privacy.",
+        images: [laPlage2, laPlage3, laPlage4]
+      }
+    ],
     gallery: [laPlage, laPlage1, laPlage2, laPlage3, laPlage4, laPlage5]
   },
   {
