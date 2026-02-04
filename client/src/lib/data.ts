@@ -14,6 +14,7 @@ export interface Hotel {
   };
   features: string[];
   rooms: string[];
+  discount?: string;
 }
 
 export const hotels: Hotel[] = [
@@ -50,6 +51,7 @@ export const hotels: Hotel[] = [
       en: "Experience the exotic charm of Zanzibar at Protels La Plage. White sandy beaches, turquoise waters, and traditional Swahili hospitality await you.",
       ar: "جرب السحر الاستوائي لزنجبار في بروتلز لا بلاج. شواطئ رملية بيضاء، مياه فيروزية، وضيافة سواحيلية تقليدية بانتظارك."
     },
+    discount: "15% OFF",
     features: ["White Sand Beach", "Water Sports", "Cultural Tours", "Oceanfront Dining", "Tropical Gardens"],
     rooms: ["Garden Villa", "Ocean View Suite", "Presidential Villa"]
   },

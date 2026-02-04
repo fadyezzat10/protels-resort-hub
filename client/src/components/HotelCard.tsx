@@ -24,6 +24,11 @@ export default function HotelCard({ hotel, featured = false }: HotelCardProps) {
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-brand-blue uppercase tracking-wider">
           4 Stars
         </div>
+        {hotel.discount && (
+          <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm">
+            {hotel.discount}
+          </div>
+        )}
       </div>
       <CardContent className="flex-1 p-6 flex flex-col bg-white">
         <div className="flex items-start justify-between mb-2">
