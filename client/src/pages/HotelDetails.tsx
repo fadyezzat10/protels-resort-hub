@@ -389,9 +389,10 @@ export default function HotelDetails() {
             {/* Dining */}
             {activeSection === "dining" && (
               <section className="animate-in fade-in duration-500">
-                <h2 className="text-3xl font-serif text-brand-blue mb-8">Dining & Drinks</h2>
+                <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>Dining & Drinks</h2>
                 
-                {/* El Dokka Restaurant Section */}
+                {/* El Dokka Restaurant Section - Hidden for La Plage */}
+                {!isLaPlage && (
                 <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg">
                   {/* Hero Image */}
                   <div className="h-[400px] relative">
@@ -553,6 +554,7 @@ export default function HotelDetails() {
                     </div>
                   </div>
                 </div>
+                )}
 
                 {hotel.dining ? (
                   <div className="space-y-8">

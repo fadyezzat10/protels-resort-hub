@@ -248,7 +248,20 @@ export const hotels: Hotel[] = [
         images: [laPlage2, laPlage3, laPlage4]
       }
     ],
-    gallery: [laPlage, laPlage1, laPlage2, laPlage3, laPlage4, laPlage5]
+    gallery: [laPlage, laPlage1, laPlage2, laPlage3, laPlage4, laPlage5],
+    dining: {
+      main: {
+        name: "La Cabana – Main Restaurant",
+        desc: "Savor the essence of the island at La Cabana, where fresh local ingredients meet international culinary artistry. Enjoy an exquisite buffet experience with daily themed dinners in a relaxed, open-air setting that captures the gentle ocean breeze.",
+        hours: "Breakfast: 07:00 – 10:00 | Lunch: 12:30 – 14:30 | Dinner: 19:30 – 21:30"
+      },
+      specialty: [
+        { name: "Beach Bar", desc: "Unwind with refreshing cocktails and cold drinks while soaking in direct beachfront views. The perfect spot to watch the dhows sail by. (09:00 AM – 12:00 AM)" },
+        { name: "Blu Pool Bar", desc: "A refreshing swim-up bar offering cool beverages without ever leaving the water. Relish the tropical sun with your favorite drink in hand. (10:00 AM – 06:00 PM)" },
+        { name: "Jazz Lobby Bar", desc: "An elegant space to enjoy hot and cold beverages in a sophisticated atmosphere. Perfect for a quiet morning coffee or an evening aperitif. (10:00 AM – 08:00 PM)" },
+        { name: "The Lounge", desc: "A comfortable retreat serving coffee, tea, and light snacks throughout the day. Stay connected with Wi-Fi in a relaxed, cozy setting. (Open most of the day)" }
+      ]
+    }
   },
   {
     id: "royal-bay",
