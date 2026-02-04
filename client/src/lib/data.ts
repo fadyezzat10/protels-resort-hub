@@ -76,12 +76,36 @@ export const hotels: Hotel[] = [
         bed: "2 Twin Beds",
         view: "Garden View",
         amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
-        description: "Luxury comfortable double room designed for relaxation near the Red Sea. Includes balcony with garden view, modern furniture, and premium bedding.",
+        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
         images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
       },
-      { name: "Superior Room", size: "30 m²", bed: "King Bed", view: "Sea View" },
-      { name: "Family Room", size: "45 m²", bed: "King + 2 Twin", view: "Pool View" },
-      { name: "Suite", size: "60 m²", bed: "King Bed", view: "Panoramic Sea View" }
+      { 
+        name: "Superior Room", 
+        size: "30 m²", 
+        bed: "King Bed", 
+        view: "Sea View",
+        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
+        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
+        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+      },
+      { 
+        name: "Family Room", 
+        size: "45 m²", 
+        bed: "King + 2 Twin", 
+        view: "Pool View",
+        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
+        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
+        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+      },
+      { 
+        name: "Suite", 
+        size: "60 m²", 
+        bed: "King Bed", 
+        view: "Panoramic Sea View",
+        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
+        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
+        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+      }
     ],
     dining: {
       main: {
