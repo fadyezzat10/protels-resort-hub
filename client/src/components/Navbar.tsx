@@ -5,7 +5,7 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logo from "@assets/سش.pngش_1770192833207.png";
+import logoIcon from "@/assets/images/logo-icon.png";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
@@ -43,15 +43,28 @@ export default function Navbar() {
       <div className="container-padding flex items-center justify-between">
         {/* Logo */}
         <Link href="/">
-          <a className="flex items-center gap-2 group">
-            <img 
-              src={logo} 
-              alt="PROTELS" 
-              className={cn(
-                "transition-all duration-300",
-                isScrolled ? "h-12 invert" : "h-16"
-              )} 
-            />
+          <a className="flex items-center gap-4 group">
+            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+              <img 
+                src={logoIcon} 
+                alt="P" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className={cn(
+                "font-sans font-medium tracking-[0.3em] text-lg leading-none uppercase",
+                isScrolled ? "text-brand-blue" : "text-white"
+              )}>
+                PROTELS
+              </span>
+              <span className={cn(
+                "font-sans text-[0.6rem] tracking-[0.2em] uppercase mt-1 opacity-70",
+                isScrolled ? "text-brand-blue" : "text-white"
+              )}>
+                Hotels & Resorts
+              </span>
+            </div>
           </a>
         </Link>
 
@@ -61,7 +74,7 @@ export default function Navbar() {
             <Link key={link.href} href={link.href}>
               <a
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-brand-gold uppercase tracking-wider",
+                  "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
                   location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
                 )}
               >
@@ -77,15 +90,15 @@ export default function Navbar() {
             variant="ghost"
             size="sm"
             onClick={toggleLanguage}
-            className={cn("flex items-center gap-2", isScrolled ? "text-brand-blue" : "text-white")}
+            className={cn("flex items-center gap-2 text-xs tracking-widest uppercase font-medium", isScrolled ? "text-brand-blue" : "text-white")}
           >
             <Globe className="w-4 h-4" />
-            {language === "en" ? "العربية" : "English"}
+            {language === "en" ? "AR" : "EN"}
           </Button>
           
           <Button 
             asChild 
-            className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-6"
+            className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-6 rounded-none text-xs uppercase tracking-widest"
           >
             <a href={bookingLink} target="_blank" rel="noopener noreferrer">
               {t("nav.book")}
@@ -108,7 +121,7 @@ export default function Navbar() {
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}>
               <a 
-                className="text-brand-blue font-medium text-lg py-2 border-b border-gray-100"
+                className="text-brand-blue font-medium text-lg py-2 border-b border-gray-100 uppercase tracking-widest text-sm"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t(link.label)}
@@ -122,14 +135,14 @@ export default function Navbar() {
                 toggleLanguage();
                 setMobileMenuOpen(false);
               }}
-              className="justify-start gap-2"
+              className="justify-start gap-2 uppercase tracking-widest text-xs rounded-none"
             >
               <Globe className="w-4 h-4" />
               {language === "en" ? "العربية" : "English"}
             </Button>
             <Button 
               asChild 
-              className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue w-full"
+              className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue w-full rounded-none uppercase tracking-widest text-xs"
             >
               <a href={bookingLink} target="_blank" rel="noopener noreferrer">
                 {t("nav.book")}

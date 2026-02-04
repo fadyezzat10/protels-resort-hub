@@ -1,69 +1,86 @@
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
-import logo from "@assets/سش.pngش_1770192833207.png";
+import logoIcon from "@/assets/images/logo-icon.png";
 
 export default function Footer() {
   const { t } = useI18n();
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-brand-blue text-white pt-16 pb-8">
+    <footer className="bg-brand-blue text-white pt-16 pb-8 border-t border-brand-gold/10">
       <div className="container-padding">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-6">
-            <img src={logo} alt="PROTELS" className="h-20" />
-            <p className="text-white/70 text-sm leading-relaxed max-w-xs">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 overflow-hidden rounded-xl shadow-lg border border-white/10">
+                <img src={logoIcon} alt="P" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-medium tracking-[0.4em] text-xl uppercase text-brand-gold">
+                  PROTELS
+                </span>
+                <span className="font-sans text-[0.6rem] tracking-[0.2em] uppercase opacity-60">
+                  Hotels & Resorts
+                </span>
+              </div>
+            </div>
+            <p className="text-white/60 text-sm leading-relaxed max-w-xs font-sans">
               {t("about.desc")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-serif text-lg font-bold mb-6 text-brand-gold">{t("nav.hotels")}</h3>
-            <ul className="space-y-3">
-              <li><Link href="/hotels"><a className="text-white/70 hover:text-white transition-colors">Protels Crystal Beach</a></Link></li>
-              <li><Link href="/hotels"><a className="text-white/70 hover:text-white transition-colors">Protels Beach Club</a></Link></li>
-              <li><Link href="/hotels"><a className="text-white/70 hover:text-white transition-colors">Protels La Plage</a></Link></li>
-              <li><Link href="/hotels"><a className="text-white/70 hover:text-white transition-colors">Protels Royal Bay</a></Link></li>
+            <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-8 text-brand-gold">{t("nav.hotels")}</h3>
+            <ul className="space-y-4 font-sans text-sm">
+              <li><Link href="/hotels"><a className="text-white/60 hover:text-brand-gold transition-colors tracking-wide">Protels Crystal Beach</a></Link></li>
+              <li><Link href="/hotels"><a className="text-white/60 hover:text-brand-gold transition-colors tracking-wide">Protels Beach Club</a></Link></li>
+              <li><Link href="/hotels"><a className="text-white/60 hover:text-brand-gold transition-colors tracking-wide">Protels La Plage</a></Link></li>
+              <li><Link href="/hotels"><a className="text-white/60 hover:text-brand-gold transition-colors tracking-wide">Protels Royal Bay</a></Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="font-serif text-lg font-bold mb-6 text-brand-gold">{t("nav.contact")}</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-white/70">
-                <MapPin className="w-5 h-5 mt-1 shrink-0 text-brand-gold" />
-                <span>Marsa Alam, Red Sea, Egypt</span>
+            <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-8 text-brand-gold">{t("nav.contact")}</h3>
+            <ul className="space-y-6 font-sans text-sm">
+              <li className="flex items-start gap-4 text-white/60">
+                <MapPin className="w-5 h-5 mt-1 shrink-0 text-brand-gold/50" />
+                <span className="leading-relaxed">Marsa Alam, Red Sea, Egypt</span>
               </li>
-              <li className="flex items-center gap-3 text-white/70">
-                <Phone className="w-5 h-5 shrink-0 text-brand-gold" />
-                <span>+20 123 456 7890</span>
+              <li className="flex items-center gap-4 text-white/60">
+                <Phone className="w-5 h-5 shrink-0 text-brand-gold/50" />
+                <span className="tracking-widest">+20 123 456 7890</span>
               </li>
-              <li className="flex items-center gap-3 text-white/70">
-                <Mail className="w-5 h-5 shrink-0 text-brand-gold" />
-                <span>info@protels.com</span>
+              <li className="flex items-center gap-4 text-white/60">
+                <Mail className="w-5 h-5 shrink-0 text-brand-gold/50" />
+                <span className="tracking-wide">info@protels.com</span>
               </li>
             </ul>
           </div>
 
           {/* Social */}
           <div>
-            <h3 className="font-serif text-lg font-bold mb-6 text-brand-gold">Follow Us</h3>
-            <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold hover:text-brand-blue transition-all">
-                <Facebook className="w-5 h-5" />
+            <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-8 text-brand-gold">Connect</h3>
+            <div className="flex gap-6">
+              <a href="#" className="text-white/40 hover:text-brand-gold transition-all transform hover:scale-110">
+                <Facebook className="w-6 h-6" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold hover:text-brand-blue transition-all">
-                <Instagram className="w-5 h-5" />
+              <a href="#" className="text-white/40 hover:text-brand-gold transition-all transform hover:scale-110">
+                <Instagram className="w-6 h-6" />
               </a>
+            </div>
+            <div className="mt-12 bg-white/5 p-6 rounded-none border border-white/10">
+              <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/40 leading-relaxed">
+                Experience the pinnacle of coastal luxury across our exclusive portfolio.
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-8 text-center text-white/40 text-sm">
+        <div className="border-t border-white/5 pt-8 text-center text-white/20 text-[0.65rem] uppercase tracking-[0.3em]">
           <p>&copy; {currentYear} PROTELS Hotels & Resorts. {t("footer.rights")}.</p>
         </div>
       </div>
