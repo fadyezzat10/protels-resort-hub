@@ -296,9 +296,23 @@ export default function HotelDetails() {
                          </div>
                        </div>
                      </div>
-                     <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
-                       <span className="text-gray-400 text-sm">Map Integration</span>
-                     </div>
+                     {hotel.id === "crystal-beach" ? (
+                      <div className="h-full min-h-[300px] w-full bg-gray-100 overflow-hidden">
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0, minHeight: '300px' }}
+                          loading="lazy" 
+                          allowFullScreen 
+                          src="https://maps.google.com/maps?cid=4429004655439307872&output=embed"
+                          title="Protels Crystal Beach Resort Location"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">Map Integration</span>
+                      </div>
+                    )}
                    </div>
                 </div>
               </section>
