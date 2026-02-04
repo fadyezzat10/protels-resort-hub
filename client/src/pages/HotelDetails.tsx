@@ -173,7 +173,7 @@ export default function HotelDetails() {
                   <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.roomDetails?.length || hotel.rooms.length} Room Types</span>
                 </div>
                 
-                {hotel.id === "crystal-beach" ? (
+                {hotel.id === "crystal-beach" || hotel.id === "beach-club" ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {hotel.roomDetails?.map((room, idx) => (
                       <div key={idx} className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
