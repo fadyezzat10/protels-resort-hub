@@ -11,8 +11,11 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export default function HotelDetails() {
-  const { id } = useParams();
+  const [location] = useLocation();
   const { t, language } = useI18n();
+  
+  // Extract hotel ID from the URL path (remove leading slash)
+  const id = location.substring(1);
   const hotel = hotels.find(h => h.id === id);
   const [activeTab, setActiveTab] = useState("overview");
 

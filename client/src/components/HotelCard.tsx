@@ -56,7 +56,7 @@ export default function HotelCard({ hotel, featured = false }: HotelCardProps) {
           </div>
           
           <div className="flex gap-3 mt-2">
-            <Link href={`/hotels/${hotel.id}`}>
+            <Link href={`/${hotel.id}`}>
               <a className="flex-1">
                 <Button variant="outline" className="w-full border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none">
                   {t("hotel.view")}

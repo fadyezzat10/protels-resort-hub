@@ -17,10 +17,16 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/hotels" component={Hotels} />
-      <Route path="/hotels/:id" component={HotelDetails} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/contact" component={Contact} />
       <Route path="/about" component={About} />
+      
+      {/* Individual Hotel Pages */}
+      <Route path="/crystal-beach" component={HotelDetails} />
+      <Route path="/beach-club" component={HotelDetails} />
+      <Route path="/la-plage" component={HotelDetails} />
+      <Route path="/royal-bay" component={HotelDetails} />
+      
       <Route component={NotFound} />
     </Switch>
   );
