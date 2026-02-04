@@ -848,7 +848,7 @@ export default function HotelDetails() {
                 </div>
                 )}
 
-                {/* La Plage Specific - Resort Pools & Tropical Landscape */}
+                {/* La Plage Specific - Pools & Relaxation */}
                 {isLaPlage && (
                 <div className="mt-16 bg-[#F9F6F0] border border-[#8B5A2B]/10 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
@@ -858,19 +858,19 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
                                 <Waves className="w-6 h-6 text-[#8B5A2B]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Pools & Tropical Landscape</h3>
+                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Swimming Pools</h3>
                           </div>
                           <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-8 max-w-3xl">
-                            Immerse yourself in the serene beauty of Protels La Plage. Our resort features stunning swimming pools woven into lush tropical gardens, offering a tranquil oasis where ancient palms sway in the ocean breeze. Relax on spacious sun decks, enjoy the natural harmony of our landscape, and find your perfect spot of paradise.
+                            Unwind in our stunning swimming pools, designed to blend seamlessly with the natural island landscape. Relax on comfortable sun loungers, enjoy refreshing dips, and let the gentle rhythm of Zanzibar wash over you in our peaceful aquatic sanctuary.
                           </p>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6">
                              {[
-                               "Main Swimming Pool", 
-                               "Tropical Gardens", 
-                               "Palm-Fringed Sun Decks", 
-                               "Ocean Views", 
-                               "Relaxation Zones"
+                               "Expansive Main Pool", 
+                               "Relaxation Zones", 
+                               "Palm-Shaded Sunbeds", 
+                               "Swim-up Bar", 
+                               "Kid-Friendly Areas"
                              ].map((item, i) => (
                                <div key={i} className="flex items-center gap-3 text-sm text-[#8B5A2B]">
                                   <div className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B]" />
@@ -885,14 +885,14 @@ export default function HotelDetails() {
                     <div className="pt-8 border-t border-[#8B5A2B]/10">
                       <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
                         {[
-                          "aerial-3.png", "aerial-1.png", "aerial-2.png", "aerial-4.png", 
-                          "aerial-5.png", "aerial-6.png", "aerial-7.png", "aerial-8.png",
-                          "pool-palm-1.png", "pool-palm-2.png"
+                          "pool-hero.png", "pool-1.jpg", "pool-2.jpg", "pool-3.jpg", 
+                          "pool-4.jpg", "pool-5.jpg", "pool-6.jpg", "pool-7.png",
+                          "pool-8.png", "pool-9.png", "pool-10.png", "pool-11.png", "pool-12.png"
                         ].map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
                             <img 
-                              src={`/images/la-plage/facilities/${img}`}
-                              alt={`La Plage Facility ${i + 1}`}
+                              src={`/images/la-plage/facilities/pools/${img}`}
+                              alt={`La Plage Pool ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
