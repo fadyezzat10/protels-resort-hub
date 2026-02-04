@@ -64,7 +64,7 @@ export default function HotelDetails() {
       {/* Sticky Tabs Navigation */}
       <div className="sticky top-[72px] md:top-[88px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100/50 shadow-sm transition-all duration-300">
         <div className="container-padding">
-          <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap scrollbar-none no-scrollbar py-2">
+          <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap py-2 thin-scrollbar">
             {tabs.map((tab) => (
               <Link key={tab.id} href={tab.id === "overview" ? `/${hotelId}` : `/${hotelId}/${tab.id}`}>
                 <a

@@ -118,4 +118,26 @@
   .container-padding {
     @apply px-4 md:px-8 lg:px-12 max-w-7xl mx-auto;
   }
+
+  /* Thin Luxury Scrollbar */
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-brand-gold) transparent;
+  }
+  
+  .thin-scrollbar::-webkit-scrollbar {
+    height: 4px; /* Thin horizontal scrollbar */
+    display: block; /* Force display */
+  }
+  
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-brand-gold);
+    border-radius: 20px;
+    border: 2px solid transparent; /* padding around thumb */
+    background-clip: content-box;
+  }
 }
