@@ -22,7 +22,7 @@ export default function HotelCard({ hotel, featured = false }: HotelCardProps) {
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
         />
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-brand-blue uppercase tracking-wider">
-          5 Stars
+          4 Stars
         </div>
       </div>
       <CardContent className="flex-1 p-6 flex flex-col bg-white">
