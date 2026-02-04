@@ -68,10 +68,10 @@ export const hotels: Hotel[] = [
       "24-Hour Concierge",
       "High-Speed Wi-Fi"
     ],
-    rooms: ["Standard Double Room", "Sea View Room", "Family Suite", "Royal Suite"],
+    rooms: ["Standard Room", "Superior Room", "Family Room", "Suite"],
     roomDetails: [
       { 
-        name: "Standard Double Room",
+        name: "Standard Room",
         size: "25 m²",
         bed: "2 Twin Beds",
         view: "Garden View",
@@ -79,9 +79,9 @@ export const hotels: Hotel[] = [
         description: "Luxury comfortable double room designed for relaxation near the Red Sea. Includes balcony with garden view, modern furniture, and premium bedding.",
         images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
       },
-      { name: "Sea View Room", size: "30 m²", bed: "King Bed", view: "Sea View" },
-      { name: "Family Suite", size: "45 m²", bed: "King + 2 Twin", view: "Pool View" },
-      { name: "Royal Suite", size: "60 m²", bed: "King Bed", view: "Panoramic Sea View" }
+      { name: "Superior Room", size: "30 m²", bed: "King Bed", view: "Sea View" },
+      { name: "Family Room", size: "45 m²", bed: "King + 2 Twin", view: "Pool View" },
+      { name: "Suite", size: "60 m²", bed: "King Bed", view: "Panoramic Sea View" }
     ],
     dining: {
       main: {
