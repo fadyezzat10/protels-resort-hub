@@ -21,11 +21,9 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/about" component={About} />
       
-      {/* Individual Hotel Pages */}
-      <Route path="/crystal-beach" component={HotelDetails} />
-      <Route path="/beach-club" component={HotelDetails} />
-      <Route path="/la-plage" component={HotelDetails} />
-      <Route path="/royal-bay" component={HotelDetails} />
+      {/* Dynamic hotel page routing with sections */}
+      <Route path="/:hotelId" component={HotelDetails} />
+      <Route path="/:hotelId/:section" component={HotelDetails} />
       
       <Route component={NotFound} />
     </Switch>

@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+import { useLocation, Link, useRoute } from "wouter";
 import { hotels, bookingLink } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
@@ -11,13 +11,18 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export default function HotelDetails() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { t, language } = useI18n();
+
+  // Match the dynamic route to get parameters
+  const [match, params] = useRoute("/:hotelId/:section?");
   
-  // Extract hotel ID from the URL path (remove leading slash)
-  const id = location.substring(1);
-  const hotel = hotels.find(h => h.id === id);
-  const [activeTab, setActiveTab] = useState("overview");
+  // Extract hotelId and section from the route parameters
+  // If not matching the dynamic route (should be impossible given App.tsx), fallback to simple logic
+  const hotelId = params?.hotelId || location.split('/')[1];
+  const activeSection = params?.section || "overview";
+  
+  const hotel = hotels.find(h => h.id === hotelId);
 
   if (!hotel) return <NotFound />;
 
@@ -30,44 +35,6 @@ export default function HotelDetails() {
     { id: "gallery", label: "Gallery" },
     { id: "contact", label: "Contact" },
   ];
-
-  const scrollToSection = (sectionId: string) => {
-    setActiveTab(sectionId);
-    const element = document.getElementById(sectionId);
-    if (element) {
-      // Offset for fixed navbar (~80px) + sticky tabs (~60px)
-      const offset = 140;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
-  };
-
-  // Scroll spy to update active tab
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = 150;
-      const sections = tabs.map(tab => document.getElementById(tab.id));
-      
-      const current = sections.find(section => {
-        if (!section) return false;
-        const top = section.offsetTop - offset;
-        const bottom = top + section.offsetHeight;
-        return window.scrollY >= top && window.scrollY < bottom;
-      });
-
-      if (current) {
-        setActiveTab(current.id);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [tabs]);
 
   // Feature Icons mapping
   const getFeatureIcon = (feature: string) => {
@@ -93,18 +60,18 @@ export default function HotelDetails() {
         <div className="container-padding">
           <div className="flex items-center gap-8 min-w-max">
             {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => scrollToSection(tab.id)}
-                className={cn(
-                  "py-4 text-sm uppercase tracking-widest font-medium border-b-2 transition-colors",
-                  activeTab === tab.id 
-                    ? "border-brand-gold text-brand-blue" 
-                    : "border-transparent text-gray-400 hover:text-brand-blue"
-                )}
-              >
-                {tab.label}
-              </button>
+              <Link key={tab.id} href={tab.id === "overview" ? `/${hotelId}` : `/${hotelId}/${tab.id}`}>
+                <a
+                  className={cn(
+                    "py-4 text-sm uppercase tracking-widest font-medium border-b-2 transition-colors",
+                    activeSection === tab.id || (tab.id === "overview" && !params?.section)
+                      ? "border-brand-gold text-brand-blue" 
+                      : "border-transparent text-gray-400 hover:text-brand-blue"
+                  )}
+                >
+                  {tab.label}
+                </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -114,134 +81,146 @@ export default function HotelDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           {/* Main Content Area */}
-          <div className="lg:col-span-2 space-y-20">
+          <div className="lg:col-span-2 space-y-20 min-h-[500px]">
             
             {/* Overview */}
-            <section id="overview" className="scroll-mt-40">
-              <h2 className="text-3xl font-serif text-brand-blue mb-6">Overview</h2>
-              <p className="text-gray-600 leading-relaxed text-lg">
-                {hotel.description[language]}
-              </p>
-            </section>
+            {(activeSection === "overview" || !params?.section) && (
+              <section className="animate-in fade-in duration-500">
+                <h2 className="text-3xl font-serif text-brand-blue mb-6">Overview</h2>
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  {hotel.description[language]}
+                </p>
+              </section>
+            )}
 
             {/* Accommodation */}
-            <section id="accommodation" className="scroll-mt-40">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-serif text-brand-blue">Accommodation</h2>
-                <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.rooms.length} Room Types</span>
-              </div>
-              <div className="space-y-6">
-                {hotel.rooms.map((room, idx) => (
-                  <div key={room} className="group bg-white border border-gray-100 p-6 hover:border-brand-gold transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">{room}</h3>
-                      <p className="text-sm text-gray-500">Luxury amenities • Garden or Sea View • King Size Bed</p>
+            {activeSection === "accommodation" && (
+              <section className="animate-in fade-in duration-500">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-serif text-brand-blue">Accommodation</h2>
+                  <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.rooms.length} Room Types</span>
+                </div>
+                <div className="space-y-6">
+                  {hotel.rooms.map((room, idx) => (
+                    <div key={room} className="group bg-white border border-gray-100 p-6 hover:border-brand-gold transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">{room}</h3>
+                        <p className="text-sm text-gray-500">Luxury amenities • Garden or Sea View • King Size Bed</p>
+                      </div>
+                      <Button asChild variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none whitespace-nowrap">
+                        <a href={bookingLink} target="_blank">Check Rates</a>
+                      </Button>
                     </div>
-                    <Button asChild variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none whitespace-nowrap">
-                      <a href={bookingLink} target="_blank">Check Rates</a>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </section>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Dining */}
-            <section id="dining" className="scroll-mt-40">
-              <h2 className="text-3xl font-serif text-brand-blue mb-8">Dining & Drinks</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="bg-gray-50 p-6">
-                    <Utensils className="w-8 h-8 text-brand-gold mb-4" />
-                    <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
-                    <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
-                    <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
-                 </div>
-                 <div className="bg-gray-50 p-6">
-                    <Utensils className="w-8 h-8 text-brand-gold mb-4" />
-                    <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
-                    <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
-                    <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
-                 </div>
-              </div>
-            </section>
+            {activeSection === "dining" && (
+              <section className="animate-in fade-in duration-500">
+                <h2 className="text-3xl font-serif text-brand-blue mb-8">Dining & Drinks</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className="bg-gray-50 p-6">
+                      <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                      <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
+                      <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
+                      <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
+                   </div>
+                   <div className="bg-gray-50 p-6">
+                      <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                      <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
+                      <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
+                      <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
+                   </div>
+                </div>
+              </section>
+            )}
 
             {/* Facilities */}
-            <section id="facilities" className="scroll-mt-40">
-              <h2 className="text-3xl font-serif text-brand-blue mb-8">Resort Facilities</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {hotel.features.map(feature => (
-                  <div key={feature} className="flex items-center gap-4 p-4 bg-white border border-gray-100">
-                    {getFeatureIcon(feature)}
-                    <span className="text-gray-700 font-medium">{feature}</span>
+            {activeSection === "facilities" && (
+              <section className="animate-in fade-in duration-500">
+                <h2 className="text-3xl font-serif text-brand-blue mb-8">Resort Facilities</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {hotel.features.map(feature => (
+                    <div key={feature} className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                      {getFeatureIcon(feature)}
+                      <span className="text-gray-700 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                    <Wifi className="w-5 h-5 text-brand-gold" />
+                    <span className="text-gray-700 font-medium">Free High-Speed Wi-Fi</span>
                   </div>
-                ))}
-                <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
-                  <Wifi className="w-5 h-5 text-brand-gold" />
-                  <span className="text-gray-700 font-medium">Free High-Speed Wi-Fi</span>
+                  <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                    <Clock className="w-5 h-5 text-brand-gold" />
+                    <span className="text-gray-700 font-medium">24/7 Front Desk</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
-                  <Clock className="w-5 h-5 text-brand-gold" />
-                  <span className="text-gray-700 font-medium">24/7 Front Desk</span>
-                </div>
-              </div>
-            </section>
+              </section>
+            )}
 
             {/* Gallery Preview */}
-            <section id="gallery" className="scroll-mt-40">
-              <div className="flex items-center justify-between mb-8">
-                 <h2 className="text-3xl font-serif text-brand-blue">Gallery</h2>
-                 <Button asChild variant="link" className="text-brand-gold">
-                   <a href="/gallery">View All Photos &rarr;</a>
-                 </Button>
-              </div>
-              <div className="grid grid-cols-2 gap-4 h-96">
-                <div className="h-full">
-                  <img src={hotel.image} className="w-full h-full object-cover" alt="Gallery 1" />
+            {activeSection === "gallery" && (
+              <section className="animate-in fade-in duration-500">
+                <div className="flex items-center justify-between mb-8">
+                   <h2 className="text-3xl font-serif text-brand-blue">Gallery</h2>
+                   <Button asChild variant="link" className="text-brand-gold">
+                     <a href="/gallery">View All Photos &rarr;</a>
+                   </Button>
                 </div>
-                <div className="grid grid-rows-2 gap-4 h-full">
-                   <div className="bg-gray-200">
-                     <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 2" />
-                   </div>
-                   <div className="bg-gray-200">
-                     <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 3" />
-                   </div>
+                <div className="grid grid-cols-2 gap-4 h-96">
+                  <div className="h-full">
+                    <img src={hotel.image} className="w-full h-full object-cover" alt="Gallery 1" />
+                  </div>
+                  <div className="grid grid-rows-2 gap-4 h-full">
+                     <div className="bg-gray-200">
+                       <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 2" />
+                     </div>
+                     <div className="bg-gray-200">
+                       <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 3" />
+                     </div>
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            )}
 
             {/* Contact */}
-            <section id="contact" className="scroll-mt-40 mb-20">
-              <h2 className="text-3xl font-serif text-brand-blue mb-8">Location & Contact</h2>
-              <div className="bg-white border border-gray-100 p-8">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                   <div className="space-y-4">
-                     <div className="flex items-start gap-3">
-                       <MapPin className="w-5 h-5 text-brand-gold mt-1" />
-                       <div>
-                         <span className="block font-bold text-brand-blue mb-1">Address</span>
-                         <span className="text-gray-600">{hotel.location}</span>
+            {activeSection === "contact" && (
+              <section className="mb-20 animate-in fade-in duration-500">
+                <h2 className="text-3xl font-serif text-brand-blue mb-8">Location & Contact</h2>
+                <div className="bg-white border border-gray-100 p-8">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                     <div className="space-y-4">
+                       <div className="flex items-start gap-3">
+                         <MapPin className="w-5 h-5 text-brand-gold mt-1" />
+                         <div>
+                           <span className="block font-bold text-brand-blue mb-1">Address</span>
+                           <span className="text-gray-600">{hotel.location}</span>
+                         </div>
+                       </div>
+                       <div className="flex items-start gap-3">
+                         <Phone className="w-5 h-5 text-brand-gold mt-1" />
+                         <div>
+                           <span className="block font-bold text-brand-blue mb-1">Phone</span>
+                           <span className="text-gray-600">+20 123 456 7890</span>
+                         </div>
+                       </div>
+                       <div className="flex items-start gap-3">
+                         <Mail className="w-5 h-5 text-brand-gold mt-1" />
+                         <div>
+                           <span className="block font-bold text-brand-blue mb-1">Email</span>
+                           <span className="text-gray-600">reservations@protels.com</span>
+                         </div>
                        </div>
                      </div>
-                     <div className="flex items-start gap-3">
-                       <Phone className="w-5 h-5 text-brand-gold mt-1" />
-                       <div>
-                         <span className="block font-bold text-brand-blue mb-1">Phone</span>
-                         <span className="text-gray-600">+20 123 456 7890</span>
-                       </div>
-                     </div>
-                     <div className="flex items-start gap-3">
-                       <Mail className="w-5 h-5 text-brand-gold mt-1" />
-                       <div>
-                         <span className="block font-bold text-brand-blue mb-1">Email</span>
-                         <span className="text-gray-600">reservations@protels.com</span>
-                       </div>
+                     <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
+                       <span className="text-gray-400 text-sm">Map Integration</span>
                      </div>
                    </div>
-                   <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
-                     <span className="text-gray-400 text-sm">Map Integration</span>
-                   </div>
-                 </div>
-              </div>
-            </section>
+                </div>
+              </section>
+            )}
 
           </div>
 
