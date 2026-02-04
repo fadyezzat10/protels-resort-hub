@@ -54,6 +54,12 @@ const staticGalleryData: Record<string, Omit<GalleryCategory, "images"> & { imag
       { src: "/images/italian-restaurant/gallery-1.jpg", alt: "Fine Dining Atmosphere" },
       { src: "/images/el-dokka/gallery-1.jpg", alt: "Seaside Dining" },
       { src: "/images/mongolian-restaurant/gallery-1.jpg", alt: "Live Cooking Station" },
+      { src: "/images/italian-restaurant/gallery-2.jpg", alt: "Italian Cuisine" },
+      { src: "/images/el-dokka/gallery-2.jpg", alt: "El Dokka Interior" },
+      { src: "/images/mongolian-restaurant/gallery-2.jpg", alt: "Mongolian Buffet" },
+      { src: "/images/italian-restaurant/gallery-3.jpg", alt: "Chef Specialty" },
+      { src: "/images/el-dokka/gallery-3.jpg", alt: "Sunset Dinner" },
+      { src: "/images/mongolian-restaurant/gallery-3.jpg", alt: "Authentic Decor" },
     ]
   },
   wellness: {
