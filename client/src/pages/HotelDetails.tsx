@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi } from "lucide-react";
+import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine } from "lucide-react";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,6 @@ export default function HotelDetails() {
   const [match, params] = useRoute("/:hotelId/:section?");
   
   // Extract hotelId and section from the route parameters
-  // If not matching the dynamic route (should be impossible given App.tsx), fallback to simple logic
   const hotelId = params?.hotelId || location.split('/')[1];
   const activeSection = params?.section || "overview";
   
@@ -38,9 +37,12 @@ export default function HotelDetails() {
 
   // Feature Icons mapping
   const getFeatureIcon = (feature: string) => {
-    if (feature.includes("Beach")) return <Waves className="w-5 h-5 text-brand-gold" />;
+    if (feature.includes("Beach") || feature.includes("Snorkeling")) return <Waves className="w-5 h-5 text-brand-gold" />;
     if (feature.includes("Pool")) return <Waves className="w-5 h-5 text-brand-gold" />;
     if (feature.includes("Dining") || feature.includes("Restaurant")) return <Utensils className="w-5 h-5 text-brand-gold" />;
+    if (feature.includes("Spa") || feature.includes("Wellness")) return <Sun className="w-5 h-5 text-brand-gold" />;
+    if (feature.includes("Wi-Fi")) return <Wifi className="w-5 h-5 text-brand-gold" />;
+    if (feature.includes("Desk")) return <Clock className="w-5 h-5 text-brand-gold" />;
     return <Sun className="w-5 h-5 text-brand-gold" />;
   };
 
@@ -100,6 +102,22 @@ export default function HotelDetails() {
                   <h2 className="text-3xl font-serif text-brand-blue">Accommodation</h2>
                   <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.rooms.length} Room Types</span>
                 </div>
+                
+                {hotel.id === "crystal-beach" && (
+                  <div className="mb-8 p-6 bg-gray-50 border border-gray-100">
+                    <h3 className="font-serif text-xl font-bold text-brand-blue mb-4">Room Amenities</h3>
+                    <p className="text-gray-600 mb-4">The resort offers comfortable and well-designed rooms with garden, pool, or sea views. All rooms include:</p>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Air Conditioning</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Private Balcony or Terrace</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Satellite TV</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Mini Bar</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Safety Box</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-brand-gold rounded-full" /> Modern Bathroom Amenities</li>
+                    </ul>
+                  </div>
+                )}
+
                 <div className="space-y-6">
                   {hotel.rooms.map((room, idx) => (
                     <div key={room} className="group bg-white border border-gray-100 p-6 hover:border-brand-gold transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -120,20 +138,68 @@ export default function HotelDetails() {
             {activeSection === "dining" && (
               <section className="animate-in fade-in duration-500">
                 <h2 className="text-3xl font-serif text-brand-blue mb-8">Dining & Drinks</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="bg-gray-50 p-6">
-                      <Utensils className="w-8 h-8 text-brand-gold mb-4" />
-                      <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
-                      <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
-                      <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
-                   </div>
-                   <div className="bg-gray-50 p-6">
-                      <Utensils className="w-8 h-8 text-brand-gold mb-4" />
-                      <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
-                      <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
-                      <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
-                   </div>
-                </div>
+                
+                {hotel.dining ? (
+                  <div className="space-y-8">
+                    {/* Main Restaurant */}
+                    {hotel.dining.main && (
+                      <div className="bg-gray-50 p-8 border border-gray-100">
+                        <div className="flex items-start gap-4">
+                          <Utensils className="w-8 h-8 text-brand-gold shrink-0" />
+                          <div>
+                            <h3 className="font-serif text-2xl font-bold text-brand-blue mb-2">{hotel.dining.main.name}</h3>
+                            <p className="text-gray-600 mb-4">{hotel.dining.main.desc}</p>
+                            <div className="inline-block bg-white px-4 py-2 text-xs font-bold text-brand-blue uppercase tracking-wider border border-gray-200">
+                              {hotel.dining.main.hours}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Specialty Restaurants */}
+                      {hotel.dining.specialty?.map((rest, idx) => (
+                        <div key={idx} className="bg-white p-6 border border-gray-100 hover:border-brand-gold transition-colors">
+                          <Coffee className="w-6 h-6 text-brand-gold mb-3" />
+                          <h3 className="font-serif text-lg font-bold text-brand-blue mb-2">{rest.name}</h3>
+                          <p className="text-sm text-gray-600">{rest.desc}</p>
+                        </div>
+                      ))}
+                      
+                      {/* Bars */}
+                      {hotel.dining.bars && (
+                        <div className="bg-white p-6 border border-gray-100 hover:border-brand-gold transition-colors">
+                          <Wine className="w-6 h-6 text-brand-gold mb-3" />
+                          <h3 className="font-serif text-lg font-bold text-brand-blue mb-2">Bars</h3>
+                          <ul className="space-y-2">
+                            {hotel.dining.bars.map((bar, idx) => (
+                              <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
+                                <div className="w-1 h-1 bg-brand-gold rounded-full" /> {bar}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  // Default Fallback Layout for other hotels
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div className="bg-gray-50 p-6">
+                        <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                        <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
+                        <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
+                        <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
+                     </div>
+                     <div className="bg-gray-50 p-6">
+                        <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                        <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
+                        <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
+                        <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
+                     </div>
+                  </div>
+                )}
               </section>
             )}
 
@@ -143,19 +209,11 @@ export default function HotelDetails() {
                 <h2 className="text-3xl font-serif text-brand-blue mb-8">Resort Facilities</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {hotel.features.map(feature => (
-                    <div key={feature} className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                    <div key={feature} className="flex items-center gap-4 p-4 bg-white border border-gray-100 hover:shadow-sm transition-shadow">
                       {getFeatureIcon(feature)}
                       <span className="text-gray-700 font-medium">{feature}</span>
                     </div>
                   ))}
-                  <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
-                    <Wifi className="w-5 h-5 text-brand-gold" />
-                    <span className="text-gray-700 font-medium">Free High-Speed Wi-Fi</span>
-                  </div>
-                  <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
-                    <Clock className="w-5 h-5 text-brand-gold" />
-                    <span className="text-gray-700 font-medium">24/7 Front Desk</span>
-                  </div>
                 </div>
               </section>
             )}

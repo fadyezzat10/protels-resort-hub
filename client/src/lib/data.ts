@@ -15,20 +15,53 @@ export interface Hotel {
   features: string[];
   rooms: string[];
   discount?: string;
+  dining?: {
+    main?: { name: string; desc: string; hours: string };
+    specialty?: { name: string; desc: string }[];
+    bars?: string[];
+  };
+  roomDetails?: { name: string; features?: string[] }[];
 }
 
 export const hotels: Hotel[] = [
   {
     id: "crystal-beach",
     name: "Protels Crystal Beach Resort",
-    location: "Marsa Alam, Egypt",
+    location: "Marsa Alam – Egypt",
     image: crystalBeach,
     description: {
-      en: "A stunning beachfront resort in Marsa Alam offering crystal clear waters, vibrant coral reefs, and world-class diving experiences. Perfect for relaxation and underwater adventures.",
-      ar: "منتجع شاطئي مذهل في مرسى علم يوفر مياه نقية كريستالية، شعاب مرجانية نابضة بالحياة، وتجارب غوص عالمية المستوى. مثالي للاسترخاء والمغامرات تحت الماء."
+      en: "A stunning all-inclusive beachfront resort located on the Red Sea, offering crystal clear waters, vibrant coral reefs, and a relaxing atmosphere ideal for families and couples. Perfect for snorkeling, diving, and unforgettable seaside moments.",
+      ar: "منتجع شاطئي مذهل شامل كليًا يقع على البحر الأحمر، ويوفر مياهًا صافية وشعابًا مرجانية نابضة بالحياة وأجواء مريحة مثالية للعائلات والأزواج. مثالية للغطس والغوص ولحظات لا تنسى على شاطئ البحر."
     },
-    features: ["Private Beach", "Diving Center", "Spa & Wellness", "Kids Club", "All-Inclusive Dining"],
-    rooms: ["Standard Room", "Sea View Room", "Family Suite", "Royal Suite"]
+    features: [
+      "Private Sandy Beach",
+      "Swimming Pools",
+      "Diving Center & Snorkeling",
+      "Spa & Wellness Area",
+      "Kids Club",
+      "Animation & Entertainment",
+      "24/7 Front Desk",
+      "Free Wi-Fi in Public Areas"
+    ],
+    rooms: ["Standard Room", "Sea View Room", "Family Suite", "Royal Suite"],
+    roomDetails: [
+      { name: "Standard Room" },
+      { name: "Sea View Room" },
+      { name: "Family Suite" },
+      { name: "Royal Suite" }
+    ],
+    dining: {
+      main: {
+        name: "Main Restaurant",
+        desc: "Guests enjoy an all-inclusive dining experience with a variety of international and oriental cuisines.",
+        hours: "Breakfast: 07:00 – 10:00 | Lunch: 13:00 – 15:00 | Dinner: 19:00 – 22:00"
+      },
+      specialty: [
+        { name: "Oriental Restaurant", desc: "Authentic oriental flavors." },
+        { name: "Italian Restaurant", desc: "Pizza – Pasta – Classic Italian Dishes." }
+      ],
+      bars: ["Beach Bar", "Pool Bar"]
+    }
   },
   {
     id: "beach-club",
