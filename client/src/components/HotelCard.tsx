@@ -24,7 +24,12 @@ export default function HotelCard({ hotel, featured = false }: HotelCardProps) {
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-brand-blue uppercase tracking-wider">
           4 Stars
         </div>
-        {hotel.discount && (
+        {hotel.id === "royal-bay" && (
+          <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-md uppercase tracking-wider z-10">
+            Coming Soon
+          </div>
+        )}
+        {hotel.discount && hotel.id !== "royal-bay" && (
           <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm">
             {hotel.discount}
           </div>
@@ -63,11 +68,17 @@ export default function HotelCard({ hotel, featured = false }: HotelCardProps) {
                 </Button>
               </a>
             </Link>
-            <Button asChild className="flex-1 bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold rounded-none">
-              <a href={bookingLink} target="_blank" rel="noopener noreferrer">
-                {t("nav.book")}
-              </a>
-            </Button>
+            {hotel.id === "royal-bay" ? (
+              <Button disabled className="flex-1 bg-gray-200 text-gray-400 font-bold rounded-none cursor-not-allowed uppercase text-xs tracking-wider">
+                Available Soon
+              </Button>
+            ) : (
+              <Button asChild className="flex-1 bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold rounded-none">
+                <a href={bookingLink} target="_blank" rel="noopener noreferrer">
+                  {t("nav.book")}
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
