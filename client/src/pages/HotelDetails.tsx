@@ -1,19 +1,70 @@
-import { useParams, useLocation } from "wouter";
+import { useParams } from "wouter";
 import { hotels, bookingLink } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { MapPin, Check, Wifi, Utensils, Waves, Sun } from "lucide-react";
+import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock } from "lucide-react";
 import NotFound from "@/pages/not-found";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function HotelDetails() {
   const { id } = useParams();
   const { t, language } = useI18n();
   const hotel = hotels.find(h => h.id === id);
+  const [activeTab, setActiveTab] = useState("overview");
 
   if (!hotel) return <NotFound />;
+
+  // Tabs Configuration
+  const tabs = [
+    { id: "overview", label: "Overview" },
+    { id: "accommodation", label: "Accommodation" },
+    { id: "dining", label: "Dining" },
+    { id: "facilities", label: "Facilities" },
+    { id: "gallery", label: "Gallery" },
+    { id: "contact", label: "Contact" },
+  ];
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveTab(sectionId);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // Offset for fixed navbar (~80px) + sticky tabs (~60px)
+      const offset = 140;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  // Scroll spy to update active tab
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = 150;
+      const sections = tabs.map(tab => document.getElementById(tab.id));
+      
+      const current = sections.find(section => {
+        if (!section) return false;
+        const top = section.offsetTop - offset;
+        const bottom = top + section.offsetHeight;
+        return window.scrollY >= top && window.scrollY < bottom;
+      });
+
+      if (current) {
+        setActiveTab(current.id);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [tabs]);
 
   // Feature Icons mapping
   const getFeatureIcon = (feature: string) => {
@@ -34,62 +85,197 @@ export default function HotelDetails() {
         height="half"
       />
 
-      <div className="container-padding py-16">
+      {/* Sticky Tabs Navigation */}
+      <div className="sticky top-[72px] md:top-[88px] z-40 bg-white border-b border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
+        <div className="container-padding">
+          <div className="flex items-center gap-8 min-w-max">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => scrollToSection(tab.id)}
+                className={cn(
+                  "py-4 text-sm uppercase tracking-widest font-medium border-b-2 transition-colors",
+                  activeTab === tab.id 
+                    ? "border-brand-gold text-brand-blue" 
+                    : "border-transparent text-gray-400 hover:text-brand-blue"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="container-padding py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl font-serif text-brand-blue mb-6">Overview</h2>
-            <p className="text-gray-600 leading-relaxed text-lg mb-8">
-              {hotel.description[language]}
-            </p>
+          {/* Main Content Area */}
+          <div className="lg:col-span-2 space-y-20">
+            
+            {/* Overview */}
+            <section id="overview" className="scroll-mt-40">
+              <h2 className="text-3xl font-serif text-brand-blue mb-6">Overview</h2>
+              <p className="text-gray-600 leading-relaxed text-lg">
+                {hotel.description[language]}
+              </p>
+            </section>
 
-            <h3 className="text-2xl font-serif text-brand-blue mb-6 mt-12">{t("hotel.features")}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {hotel.features.map(feature => (
-                <div key={feature} className="flex items-center gap-3 p-4 bg-white border border-gray-100 shadow-sm">
-                  {getFeatureIcon(feature)}
-                  <span className="text-gray-700">{feature}</span>
-                </div>
-              ))}
-            </div>
+            {/* Accommodation */}
+            <section id="accommodation" className="scroll-mt-40">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-serif text-brand-blue">Accommodation</h2>
+                <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.rooms.length} Room Types</span>
+              </div>
+              <div className="space-y-6">
+                {hotel.rooms.map((room, idx) => (
+                  <div key={room} className="group bg-white border border-gray-100 p-6 hover:border-brand-gold transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">{room}</h3>
+                      <p className="text-sm text-gray-500">Luxury amenities • Garden or Sea View • King Size Bed</p>
+                    </div>
+                    <Button asChild variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none whitespace-nowrap">
+                      <a href={bookingLink} target="_blank">Check Rates</a>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-            <h3 className="text-2xl font-serif text-brand-blue mb-6 mt-12">{t("hotel.rooms")}</h3>
-            <div className="space-y-4">
-              {hotel.rooms.map(room => (
-                <div key={room} className="p-6 bg-white border border-gray-100 flex items-center justify-between group hover:border-brand-gold transition-colors">
-                  <span className="font-medium text-lg text-brand-blue">{room}</span>
-                  <Button asChild variant="ghost" className="text-brand-gold hover:text-brand-blue">
-                    <a href={bookingLink} target="_blank">Book This Room &rarr;</a>
-                  </Button>
+            {/* Dining */}
+            <section id="dining" className="scroll-mt-40">
+              <h2 className="text-3xl font-serif text-brand-blue mb-8">Dining & Drinks</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="bg-gray-50 p-6">
+                    <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                    <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
+                    <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
+                    <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
+                 </div>
+                 <div className="bg-gray-50 p-6">
+                    <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                    <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
+                    <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
+                    <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
+                 </div>
+              </div>
+            </section>
+
+            {/* Facilities */}
+            <section id="facilities" className="scroll-mt-40">
+              <h2 className="text-3xl font-serif text-brand-blue mb-8">Resort Facilities</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {hotel.features.map(feature => (
+                  <div key={feature} className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                    {getFeatureIcon(feature)}
+                    <span className="text-gray-700 font-medium">{feature}</span>
+                  </div>
+                ))}
+                <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                  <Wifi className="w-5 h-5 text-brand-gold" />
+                  <span className="text-gray-700 font-medium">Free High-Speed Wi-Fi</span>
                 </div>
-              ))}
-            </div>
+                <div className="flex items-center gap-4 p-4 bg-white border border-gray-100">
+                  <Clock className="w-5 h-5 text-brand-gold" />
+                  <span className="text-gray-700 font-medium">24/7 Front Desk</span>
+                </div>
+              </div>
+            </section>
+
+            {/* Gallery Preview */}
+            <section id="gallery" className="scroll-mt-40">
+              <div className="flex items-center justify-between mb-8">
+                 <h2 className="text-3xl font-serif text-brand-blue">Gallery</h2>
+                 <Button asChild variant="link" className="text-brand-gold">
+                   <a href="/gallery">View All Photos &rarr;</a>
+                 </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4 h-96">
+                <div className="h-full">
+                  <img src={hotel.image} className="w-full h-full object-cover" alt="Gallery 1" />
+                </div>
+                <div className="grid grid-rows-2 gap-4 h-full">
+                   <div className="bg-gray-200">
+                     <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 2" />
+                   </div>
+                   <div className="bg-gray-200">
+                     <img src={hotel.image} className="w-full h-full object-cover opacity-80" alt="Gallery 3" />
+                   </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Contact */}
+            <section id="contact" className="scroll-mt-40 mb-20">
+              <h2 className="text-3xl font-serif text-brand-blue mb-8">Location & Contact</h2>
+              <div className="bg-white border border-gray-100 p-8">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                   <div className="space-y-4">
+                     <div className="flex items-start gap-3">
+                       <MapPin className="w-5 h-5 text-brand-gold mt-1" />
+                       <div>
+                         <span className="block font-bold text-brand-blue mb-1">Address</span>
+                         <span className="text-gray-600">{hotel.location}</span>
+                       </div>
+                     </div>
+                     <div className="flex items-start gap-3">
+                       <Phone className="w-5 h-5 text-brand-gold mt-1" />
+                       <div>
+                         <span className="block font-bold text-brand-blue mb-1">Phone</span>
+                         <span className="text-gray-600">+20 123 456 7890</span>
+                       </div>
+                     </div>
+                     <div className="flex items-start gap-3">
+                       <Mail className="w-5 h-5 text-brand-gold mt-1" />
+                       <div>
+                         <span className="block font-bold text-brand-blue mb-1">Email</span>
+                         <span className="text-gray-600">reservations@protels.com</span>
+                       </div>
+                     </div>
+                   </div>
+                   <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
+                     <span className="text-gray-400 text-sm">Map Integration</span>
+                   </div>
+                 </div>
+              </div>
+            </section>
+
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-8">
-            <div className="bg-brand-blue text-white p-8">
-              <h3 className="text-2xl font-serif mb-4 text-brand-gold">Ready to Book?</h3>
-              <p className="text-white/70 mb-6">Best rates guaranteed when booking directly through our website.</p>
-              <Button asChild className="w-full bg-brand-gold text-brand-blue font-bold hover:bg-white text-lg py-6">
-                <a href={bookingLink} target="_blank" rel="noopener noreferrer">
-                  {t("nav.book")}
-                </a>
-              </Button>
-            </div>
+          {/* Sticky Sidebar */}
+          <div className="hidden lg:block">
+            <div className="sticky top-[160px] space-y-8">
+              <div className="bg-brand-blue text-white p-8 shadow-xl">
+                <h3 className="text-2xl font-serif mb-2 text-brand-gold">Book Your Stay</h3>
+                <p className="text-white/70 mb-6 text-sm">Best rates guaranteed. No booking fees.</p>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                    <span className="text-white/60">Check-in</span>
+                    <span>14:00</span>
+                  </div>
+                  <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                    <span className="text-white/60">Check-out</span>
+                    <span>12:00</span>
+                  </div>
+                </div>
 
-            <div className="bg-white p-8 border border-gray-100">
-               <h3 className="text-xl font-serif mb-4 text-brand-blue">{t("hotel.location")}</h3>
-               <div className="flex items-start gap-3 text-gray-600 mb-4">
-                 <MapPin className="w-5 h-5 mt-1 shrink-0 text-brand-gold" />
-                 {hotel.location}
-               </div>
-               <div className="aspect-video bg-gray-200 w-full relative group cursor-pointer overflow-hidden">
-                 <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
-                    <span className="text-xs bg-white px-2 py-1 shadow-sm">View on Map</span>
-                 </div>
-               </div>
+                <Button asChild className="w-full bg-brand-gold text-brand-blue font-bold hover:bg-white text-lg py-6 shadow-md transition-all hover:scale-105">
+                  <a href={bookingLink} target="_blank" rel="noopener noreferrer">
+                    {t("nav.book")}
+                  </a>
+                </Button>
+                
+                <p className="text-center text-xs text-white/40 mt-4">Secure payment via our official booking engine</p>
+              </div>
+
+              <div className="bg-white p-6 border border-gray-100 shadow-sm">
+                <h4 className="font-bold text-brand-blue mb-4">Need Assistance?</h4>
+                <p className="text-gray-600 text-sm mb-4">Our concierge team is available 24/7 to help plan your perfect stay.</p>
+                <Button variant="outline" className="w-full text-brand-blue border-brand-blue hover:bg-brand-blue hover:text-white">
+                  Contact Concierge
+                </Button>
+              </div>
             </div>
           </div>
 
