@@ -1,7 +1,7 @@
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
-import logo from "@assets/شسشسشسشس_1770192758083.png";
+import logo from "@assets/سش.pngش_1770192833207.png";
 
 export default function Footer() {
   const { t } = useI18n();

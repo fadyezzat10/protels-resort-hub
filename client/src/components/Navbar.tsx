@@ -5,7 +5,7 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logo from "@assets/شسشسشسشس_1770192758083.png";
+import logo from "@assets/سش.pngش_1770192833207.png";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
