@@ -393,6 +393,7 @@ export default function HotelDetails() {
                 
                 {/* El Dokka Restaurant Section - Hidden for La Plage */}
                 {!isLaPlage && (
+                <>
                 <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg">
                   {/* Hero Image */}
                   <div className="h-[400px] relative">
@@ -554,6 +555,7 @@ export default function HotelDetails() {
                     </div>
                   </div>
                 </div>
+                </>
                 )}
 
                 {hotel.dining ? (
