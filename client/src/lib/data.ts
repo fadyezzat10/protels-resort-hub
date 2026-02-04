@@ -154,10 +154,10 @@ export const hotels: Hotel[] = [
     location: "Marsa Alam, Egypt",
     image: beachClub,
     description: {
-      en: "An exclusive beach club atmosphere with luxurious spa facilities. Enjoy the perfect blend of entertainment and tranquility on the shores of the Red Sea.",
-      ar: "جو نادي شاطئي حصري مع مرافق سبا فاخرة. استمتع بالمزيج المثالي من الترفيه والهدوء على شواطئ البحر الأحمر."
+      en: "Immerse yourself in a vibrant Red Sea getaway at Protels Beach Club & SPA. Designed for the modern traveler, our resort blends relaxation with energy, offering direct access to a private sandy beach and crystal-clear waters. Enjoy a variety of swimming pools, an exciting aquapark, and a full-service wellness center to recharge your senses. With lively entertainment, diverse dining options, and a welcoming atmosphere, it’s the perfect escape for families, couples, and friends seeking sun, fun, and comfort.",
+      ar: "انغمس في أجواء البحر الأحمر النابضة بالحياة في بروتلز بيتش كلوب وسبا. صُمم منتجعنا للمسافر العصري، حيث يمزج بين الاسترخاء والطاقة، ويوفر وصولاً مباشراً إلى شاطئ رملي خاص ومياه كريستالية صافية. استمتع بمجموعة متنوعة من حمامات السباحة، وأكوا بارك مثيرة، ومركز عافية متكامل لتجديد حواسك. مع الترفيه الحيوي، وخيارات الطعام المتنوعة، والجو الترحيبي، إنه الملاذ المثالي للعائلات والأزواج والأصدقاء الباحثين عن الشمس والمرح والراحة."
     },
-    features: ["Infinity Pool", "Luxury Spa", "Nightly Entertainment", "Gourmet Restaurants", "Fitness Center"],
+    features: ["Private Sandy Beach", "Aquapark & Pools", "Spa & Wellness Center", "Family Entertainment", "Beachfront Dining"],
     rooms: ["Club Room", "Pool View Suite", "Beachfront Bungalow"]
   },
   {
