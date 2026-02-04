@@ -617,10 +617,16 @@ export default function HotelDetails() {
                     <div className="pt-8 border-t border-gray-100">
                       <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
                         {/* Hero Image first, then gallery images */}
-                        {["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"].map((img, i) => (
+                        {(hotel.id === "beach-club" 
+                          ? ["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5", "gallery-6"] 
+                          : ["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"]
+                        ).map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
                             <img 
-                              src={`/images/private-beach/${img}.jpg`}
+                              src={hotel.id === "beach-club" 
+                                ? `/images/beach-club/facilities/beach/${img}.jpg` 
+                                : `/images/private-beach/${img}.jpg`
+                              }
                               alt={`Private Beach ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
