@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import HotelGallery from "@/components/HotelGallery";
 import RoomModal from "@/components/RoomModal";
 
+import tribalPattern from "@/assets/images/tribal-pattern.png";
+
 export default function HotelDetails() {
   const [location, setLocation] = useLocation();
   const { t, language } = useI18n();
@@ -49,8 +51,38 @@ export default function HotelDetails() {
     return <Sun className="w-5 h-5 text-brand-gold" />;
   };
 
+  const isLaPlage = hotel.id === "la-plage";
+
   return (
-    <div className="min-h-screen bg-brand-white">
+    <div className={cn("min-h-screen bg-brand-white transition-colors duration-500", isLaPlage && "bg-[#F9F6F0]")}>
+      {isLaPlage && (
+        <style>{`
+          .la-plage-theme {
+            --color-brand-blue: hsl(180 60% 25%); /* Deep Teal */
+            --color-brand-blue-light: hsl(175 50% 35%);
+            --color-brand-gold: hsl(25 70% 50%); /* Burnt Orange/Terracotta */
+            --color-brand-gold-light: hsl(30 60% 85%);
+            --color-brand-white: hsl(40 33% 96%); /* Warm Beige */
+            --color-background: hsl(40 33% 96%);
+            
+            /* Font overrides if needed, but keeping hierarchy */
+          }
+          
+          .la-plage-theme .font-serif {
+            /* Maybe a slightly more organic serif if possible, but keeping standard for now */
+          }
+        `}</style>
+      )}
+
+      {/* Tribal Pattern Overlay for La Plage */}
+      {isLaPlage && (
+        <div 
+          className="fixed inset-0 opacity-[0.03] pointer-events-none z-0 mix-blend-multiply"
+          style={{ backgroundImage: `url(${tribalPattern})`, backgroundSize: '400px' }}
+        />
+      )}
+
+      <div className={cn("relative z-10", isLaPlage && "la-plage-theme")}>
       <Navbar />
       
       <Hero 
@@ -60,10 +92,13 @@ export default function HotelDetails() {
         height="large"
       />
 
-      <div className="h-12 bg-white" />
+      <div className={cn("h-12 bg-white", isLaPlage && "bg-[#F9F6F0]")} />
 
       {/* Sticky Tabs Navigation */}
-      <div className="sticky top-[72px] md:top-[88px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100/50 shadow-sm transition-all duration-300">
+      <div className={cn(
+        "sticky top-[72px] md:top-[88px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100/50 shadow-sm transition-all duration-300",
+        isLaPlage && "bg-[#F9F6F0]/95 border-[#8B5A2B]/10"
+      )}>
         <div className="container-padding">
           <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap py-2 thin-scrollbar">
             {tabs.map((tab) => (
@@ -73,7 +108,10 @@ export default function HotelDetails() {
                     "py-2 px-3 text-[13px] font-medium tracking-[0.5px] transition-all border-b-2 text-center shrink-0",
                     activeSection === tab.id || (tab.id === "overview" && !params?.section)
                       ? "border-[#C8A97E] text-[#222222]" 
-                      : "border-transparent text-[#777777] hover:text-[#222222]"
+                      : "border-transparent text-[#777777] hover:text-[#222222]",
+                    isLaPlage && (activeSection === tab.id || (tab.id === "overview" && !params?.section)
+                      ? "border-[var(--color-brand-gold)] text-[var(--color-brand-blue)]" 
+                      : "text-[#8B5A2B]/70 hover:text-[var(--color-brand-blue)]")
                   )}
                 >
                   {tab.label}
@@ -93,8 +131,8 @@ export default function HotelDetails() {
             {/* Overview */}
             {(activeSection === "overview" || !params?.section) && (
               <section className="animate-in fade-in duration-500 py-6">
-                <h2 className="text-3xl font-serif text-brand-blue mb-8">Overview</h2>
-                <p className="text-gray-600 leading-loose text-lg">
+                <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>Overview</h2>
+                <p className={cn("text-gray-600 leading-loose text-lg", isLaPlage && "text-[#5D4E40]")}>
                   {hotel.description[language]}
                 </p>
                 
@@ -882,6 +920,7 @@ export default function HotelDetails() {
           onClose={() => setSelectedRoom(null)} 
         />
       )}
+      </div>
     </div>
   );
 }

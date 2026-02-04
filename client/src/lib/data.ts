@@ -213,8 +213,8 @@ export const hotels: Hotel[] = [
     location: "Zanzibar, Tanzania",
     image: laPlage,
     description: {
-      en: "Experience the exotic charm of Zanzibar at Protels La Plage. White sandy beaches, turquoise waters, and traditional Swahili hospitality await you.",
-      ar: "جرب السحر الاستوائي لزنجبار في بروتلز لا بلاج. شواطئ رملية بيضاء، مياه فيروزية، وضيافة سواحيلية تقليدية بانتظارك."
+      en: "A soulful escape on the shores of Zanzibar, where African warmth meets barefoot luxury. Protels La Plage invites you to experience a sanctuary of calm, surrounded by the rhythmic sounds of the Indian Ocean. Designed with natural materials and inspired by local Swahili culture, our boutique resort offers an authentic connection to nature. Unwind in private villas nestled among swaying palms, savor ocean-to-table dining under the stars, and let the slow pace of island life rejuvenate your spirit.",
+      ar: "ملاذ روحي على شواطئ زنجبار، حيث يلتقي الدفء الأفريقي بالفخامة البسيطة. يدعوك بروتلز لا بلاج لتجربة ملاذ من الهدوء، محاطًا بأصوات المحيط الهندي الإيقاعية. صُمم منتجعنا البوتيكي بمواد طبيعية ومستوحى من الثقافة السواحيلية المحلية، ويوفر اتصالاً أصيلاً بالطبيعة. استرخ في فيلات خاصة تقع بين أشجار النخيل المتمايلة، وتذوق الطعام من المحيط إلى المائدة تحت النجوم، ودع الوتيرة البطيئة لحياة الجزيرة تجدد روحك."
     },
     discount: "15% OFF",
     features: ["White Sand Beach", "Water Sports", "Cultural Tours", "Oceanfront Dining", "Tropical Gardens"],
