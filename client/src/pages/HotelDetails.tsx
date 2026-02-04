@@ -239,6 +239,51 @@ export default function HotelDetails() {
               <section className="animate-in fade-in duration-500">
                 <h2 className="text-3xl font-serif text-brand-blue mb-8">Dining & Drinks</h2>
                 
+                {/* El Dokka Restaurant Section */}
+                <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg">
+                  {/* Hero Image */}
+                  <div className="h-[400px] relative">
+                    <img 
+                      src="/images/el-dokka/hero.jpg" 
+                      alt="El Dokka Restaurant" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
+                       <h3 className="text-4xl font-serif text-white mb-2">El Dokka Restaurant</h3>
+                       <p className="text-white/90 text-lg font-light">Authentic Oriental Cuisine</p>
+                    </div>
+                  </div>
+
+                  <div className="p-8 md:p-12">
+                    <div className="max-w-3xl mx-auto text-center mb-12">
+                      <div className="flex justify-center mb-6">
+                        <Utensils className="w-10 h-10 text-[#C8A97E]" />
+                      </div>
+                      <h4 className="text-2xl font-serif text-[#1a2332] mb-6">Experience the Authentic Taste</h4>
+                      <p className="text-gray-600 leading-relaxed text-lg mb-8">
+                        Experience the authentic taste of traditional oriental cuisine at El Dokka Restaurant.
+                        A warm and cozy dining atmosphere inspired by local culture, handcrafted décor, and rich flavors.
+                        Enjoy a selection of grilled specialties, traditional dishes, and freshly prepared meals that bring the true taste of the region to your table.
+                      </p>
+                      <Button className="bg-[#C8A97E] hover:bg-[#b0936a] text-white px-8 py-6 rounded-full text-lg font-medium transition-all hover:scale-105">
+                        View Menu
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {[1, 2, 3].map((num) => (
+                        <div key={num} className="aspect-[4/3] overflow-hidden rounded-lg group cursor-pointer">
+                          <img 
+                            src={`/images/el-dokka/gallery-${num}.jpg`}
+                            alt={`El Dokka Detail ${num}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 {hotel.dining ? (
                   <div className="space-y-8">
                     {/* Main Restaurant */}
