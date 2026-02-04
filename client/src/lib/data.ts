@@ -36,7 +36,7 @@ export const hotels: Hotel[] = [
   {
     id: "crystal-beach",
     name: "Protels Crystal Beach Resort",
-    location: "Marsa Alam – Egypt",
+    location: "Marsa Alam, Egypt",
     mapLink: "https://maps.app.goo.gl/2jjgBH1rqGhVRXJZ8",
     image: crystalBeach,
     description: {
