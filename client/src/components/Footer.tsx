@@ -1,7 +1,7 @@
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
-import logoIcon from "@/assets/images/logo-icon.png";
+import logo from "@assets/سش.pngش_1770193463633.png";
 
 export default function Footer() {
   const { t } = useI18n();
@@ -13,19 +13,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 overflow-hidden rounded-xl shadow-lg border border-white/10">
-                <img src={logoIcon} alt="P" className="w-full h-full object-cover" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-sans font-medium tracking-[0.4em] text-xl uppercase text-brand-gold">
-                  PROTELS
-                </span>
-                <span className="font-sans text-[0.6rem] tracking-[0.2em] uppercase opacity-60">
-                  Hotels & Resorts
-                </span>
-              </div>
-            </div>
+            <img src={logo} alt="PROTELS" className="h-24" />
             <p className="text-white/60 text-sm leading-relaxed max-w-xs font-sans">
               {t("about.desc")}
             </p>

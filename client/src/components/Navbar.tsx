@@ -5,7 +5,7 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logoIcon from "@/assets/images/logo-icon.png";
+import logo from "@assets/سش.pngش_1770193463633.png";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
@@ -43,28 +43,15 @@ export default function Navbar() {
       <div className="container-padding flex items-center justify-between">
         {/* Logo */}
         <Link href="/">
-          <a className="flex items-center gap-4 group">
-            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
-              <img 
-                src={logoIcon} 
-                alt="P" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className={cn(
-                "font-sans font-medium tracking-[0.3em] text-lg leading-none uppercase",
-                isScrolled ? "text-brand-blue" : "text-white"
-              )}>
-                PROTELS
-              </span>
-              <span className={cn(
-                "font-sans text-[0.6rem] tracking-[0.2em] uppercase mt-1 opacity-70",
-                isScrolled ? "text-brand-blue" : "text-white"
-              )}>
-                Hotels & Resorts
-              </span>
-            </div>
+          <a className="flex items-center gap-2 group">
+            <img 
+              src={logo} 
+              alt="PROTELS" 
+              className={cn(
+                "transition-all duration-300",
+                isScrolled ? "h-12 invert" : "h-16"
+              )} 
+            />
           </a>
         </Link>
 
