@@ -22,6 +22,13 @@ import suite4 from "@/assets/images/suite-4.jpg";
 import suite5 from "@/assets/images/suite-5.jpg";
 import suite6 from "@/assets/images/suite-6.jpg";
 
+// Superior Room Images
+import superior1 from "@/assets/images/superior-1.jpg";
+import superior2 from "@/assets/images/superior-2.jpg";
+import superior3 from "@/assets/images/superior-3.jpg";
+import superior4 from "@/assets/images/superior-4.jpg";
+import superior5 from "@/assets/images/superior-5.jpg";
+
 export interface RoomDetail {
   name: string;
   size?: string;
@@ -90,11 +97,11 @@ export const hotels: Hotel[] = [
       { 
         name: "Superior Room", 
         size: "30 m²", 
-        bed: "King Bed", 
+        bed: "Twin Beds", 
         view: "Sea View",
-        amenities: ["Balcony", "Terrace", "Air Conditioning", "Flat Screen TV", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Bathtub", "Shower"],
-        description: "A comfortable and elegant room designed for relaxation near the Red Sea, featuring modern furniture, natural light, and a private balcony with beautiful views.",
-        images: [standardRoom1, standardRoom2, standardRoom1, standardRoom2, standardRoom1]
+        amenities: ["Balcony", "Air Conditioning", "Flat Screen TV", "Private Bathroom", "Natural Sunlight", "Modern Furniture", "Free Wi-Fi", "Electric Kettle", "Wardrobe", "Non-Smoking", "Shower"],
+        description: "A bright and elegant Superior Room featuring twin beds, modern furnishings, and a private balcony overlooking the beautiful Red Sea. Designed with natural light and calming blue tones, the room offers comfort, space, and a relaxing atmosphere ideal for both couples and families.",
+        images: [superior1, superior2, superior4, superior3, superior5]
       },
       { 
         name: "Family Room", 
