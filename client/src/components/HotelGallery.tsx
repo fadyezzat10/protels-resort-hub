@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Maximize2, X, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { Hotel } from "@/lib/data";
 
 type GalleryImage = {
   src: string;
@@ -15,7 +16,7 @@ type GalleryCategory = {
   images: GalleryImage[];
 };
 
-const galleryData: Record<string, GalleryCategory> = {
+const staticGalleryData: Record<string, Omit<GalleryCategory, "images"> & { images: GalleryImage[] }> = {
   beach: {
     id: "beach",
     label: "Beach",
@@ -42,19 +43,6 @@ const galleryData: Record<string, GalleryCategory> = {
       { src: "/images/pools-aquapark/gallery-5.jpg", alt: "Night Pool View" },
     ]
   },
-  rooms: {
-    id: "rooms",
-    label: "Rooms",
-    description: "Experience ultimate comfort in our modern, well-appointed rooms.",
-    images: [
-      { src: "/images/rooms/hero.jpg", alt: "Luxury Ocean View Room" },
-      { src: "/images/rooms/gallery-1.jpg", alt: "King Size Bed" },
-      { src: "/images/rooms/gallery-2.jpg", alt: "Balcony Sea View" },
-      { src: "/images/rooms/gallery-3.jpg", alt: "Modern Bathroom" },
-      { src: "/images/rooms/gallery-4.jpg", alt: "Suite Living Area" },
-      { src: "/images/rooms/gallery-5.jpg", alt: "Bright Interior" },
-    ]
-  },
   facilities: {
     id: "facilities",
     label: "Facilities",
@@ -70,13 +58,57 @@ const galleryData: Record<string, GalleryCategory> = {
   }
 };
 
-export default function HotelGallery() {
+interface HotelGalleryProps {
+  hotel?: Hotel;
+}
+
+export default function HotelGallery({ hotel }: HotelGalleryProps) {
   const [activeCategory, setActiveCategory] = useState<string>("beach");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const currentCategory = galleryData[activeCategory];
-  const allImages = currentCategory.images;
+  const galleryData = useMemo(() => {
+    // Get dynamic room images from hotel data
+    const roomImages: GalleryImage[] = [];
+    
+    if (hotel && hotel.roomDetails) {
+      hotel.roomDetails.forEach(room => {
+        if (room.images && room.images.length > 0) {
+          room.images.forEach((img, idx) => {
+            roomImages.push({
+              src: img,
+              alt: `${room.name} - Image ${idx + 1}`
+            });
+          });
+        }
+      });
+    }
+
+    // Fallback if no room images found in data
+    if (roomImages.length === 0) {
+      roomImages.push(
+        { src: "/images/rooms/hero.jpg", alt: "Luxury Ocean View Room" },
+        { src: "/images/rooms/gallery-1.jpg", alt: "King Size Bed" },
+        { src: "/images/rooms/gallery-2.jpg", alt: "Balcony Sea View" },
+        { src: "/images/rooms/gallery-3.jpg", alt: "Modern Bathroom" },
+        { src: "/images/rooms/gallery-4.jpg", alt: "Suite Living Area" },
+        { src: "/images/rooms/gallery-5.jpg", alt: "Bright Interior" },
+      );
+    }
+
+    return {
+      ...staticGalleryData,
+      rooms: {
+        id: "rooms",
+        label: "Rooms",
+        description: "Experience ultimate comfort in our modern, well-appointed rooms.",
+        images: roomImages
+      }
+    };
+  }, [hotel]);
+
+  const currentCategory = galleryData[activeCategory as keyof typeof galleryData];
+  const allImages = currentCategory?.images || [];
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);

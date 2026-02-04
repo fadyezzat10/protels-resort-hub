@@ -687,7 +687,7 @@ export default function HotelDetails() {
             {/* Gallery Preview */}
             {activeSection === "gallery" && (
               <section className="animate-in fade-in duration-500 mb-20">
-                <HotelGallery />
+                <HotelGallery hotel={hotel} />
               </section>
             )}
 
