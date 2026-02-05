@@ -133,6 +133,33 @@ export default function HotelGallery({ hotel }: HotelGalleryProps) {
     }
 
     const isBeachClub = hotel?.id === "beach-club";
+    const isLaPlage = hotel?.id === "la-plage";
+    
+    // For La Plage, we use the specific gallery from data.ts
+    if (isLaPlage) {
+      const mainGalleryImages = hotel?.gallery?.map((src, idx) => ({
+        src,
+        alt: `La Plage Gallery Image ${idx + 1}`
+      })) || [];
+
+      const allLaPlageImages = [...mainGalleryImages, ...roomImages];
+
+      return {
+        all: {
+          id: "all",
+          label: "La Plage",
+          description: "Explore the authentic Zanzibar experience at Protels La Plage.",
+          images: allLaPlageImages
+        },
+        rooms: {
+          id: "rooms",
+          label: "Rooms",
+          description: "Experience ultimate comfort in our swahili-style bungalows.",
+          images: roomImages
+        }
+      };
+    }
+
     const activeStaticData = isBeachClub ? beachClubGalleryData : staticGalleryData;
     
     // For Beach Club, we only have Beach and Rooms images currently.
