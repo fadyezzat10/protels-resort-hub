@@ -252,28 +252,7 @@ export const hotels: Hotel[] = [
         images: [laPlage2, laPlage3, laPlage4]
       }
     ],
-    gallery: [
-      "/images/la-plage/gallery/gallery-ext_1.jpg",
-      "/images/la-plage/gallery/gallery-ext_2.jpg",
-      "/images/la-plage/gallery/gallery-ext_3.jpg",
-      "/images/la-plage/gallery/gallery-ext_4.jpg",
-      "/images/la-plage/gallery/gallery-ext_5.jpg",
-      "/images/la-plage/gallery/gallery-ext_6.jpg",
-      "/images/la-plage/gallery/gallery-ext_7.jpg",
-      "/images/la-plage/gallery/gallery-ext_8.jpg",
-      "/images/la-plage/gallery/gallery-ext_9.jpg",
-      "/images/la-plage/gallery/gallery-ext_10.jpg",
-      "/images/la-plage/gallery/gallery-int_1.jpg",
-      "/images/la-plage/gallery/gallery-int_2.jpg",
-      "/images/la-plage/gallery/gallery-int_3.jpg",
-      "/images/la-plage/gallery/gallery-int_4.jpg",
-      "/images/la-plage/gallery/gallery-int_5.jpg",
-      "/images/la-plage/gallery/gallery-int_6.jpg",
-      "/images/la-plage/gallery/gallery-int_7.jpg",
-      "/images/la-plage/gallery/gallery-int_8.jpg",
-      "/images/la-plage/gallery/gallery-int_9.jpg",
-      "/images/la-plage/gallery/gallery-int_10.jpg"
-    ],
+    gallery: [],
     dining: {
       main: {
         name: "La Cabana – Main Restaurant",
