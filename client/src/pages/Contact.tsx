@@ -19,8 +19,8 @@ const hotelsContactInfo = [
     emailReservations: "info@protels.com",
     phone: "+20 65 338 0063",
     mobile: "+20 150 092 5579",
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5000!2d34.795265!3d25.235576!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x3d76fc44ac02e460!5e0!3m2!1sen!2sus",
-    mapShareUrl: "https://www.google.com/maps?cid=4429004655439307872"
+    mapEmbedUrl: "https://maps.google.com/maps?q=25.235576,34.795265&z=15&output=embed",
+    mapShareUrl: "https://www.google.com/maps?q=25.235576,34.795265"
   },
   {
     id: "beach-club",
@@ -32,8 +32,8 @@ const hotelsContactInfo = [
     emailReservations: "info@protels.com",
     phone: "+20 65 338 0063",
     mobile: "+20 150 092 5579",
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5000!2d34.79464!3d25.23666!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x21d53d2d666a5453!5e0!3m2!1sen!2sus",
-    mapShareUrl: "https://www.google.com/maps?cid=2437922038492058707"
+    mapEmbedUrl: "https://maps.google.com/maps?q=25.23666,34.79464&z=15&output=embed",
+    mapShareUrl: "https://www.google.com/maps?q=25.23666,34.79464"
   },
   {
     id: "royal-bay",
@@ -45,8 +45,8 @@ const hotelsContactInfo = [
     emailReservations: "reservation.royalbay@protels.com",
     phone: "+20 65 346 0000",
     mobile: "+20 120 000 0003",
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3621.6337225227745!2d33.8236!3d27.1556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1452870000000001%3A0x1234567890abcdef!2sProtels%20Royal%20Bay%20Resort!5e0!3m2!1sen!2seg!4v1709123456791!5m2!1sen!2seg",
-    mapShareUrl: "https://www.google.com/maps/search/?api=1&query=Protels+Royal+Bay+Resort"
+    mapEmbedUrl: "https://maps.google.com/maps?q=27.1556,33.8236&z=15&output=embed",
+    mapShareUrl: "https://www.google.com/maps?q=27.1556,33.8236"
   },
   {
     id: "la-plage",
@@ -58,8 +58,8 @@ const hotelsContactInfo = [
     emailReservations: "reservation.laplage@protels.com",
     phone: "+255 24 123 4567",
     mobile: "+255 77 123 4567",
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5000!2d39.532805!3d-6.22587!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xc4491d34d06ebf0d!5e0!3m2!1sen!2sus",
-    mapShareUrl: "https://www.google.com/maps?cid=14143868217406177037"
+    mapEmbedUrl: "https://maps.google.com/maps?q=-6.22587,39.532805&z=15&output=embed",
+    mapShareUrl: "https://www.google.com/maps?q=-6.22587,39.532805"
   }
 ];
 
