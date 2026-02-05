@@ -125,12 +125,15 @@ export default function Careers() {
         file_name: formData.cv?.name
       };
 
-      const SERVICE_ID = "service_38p8y24";
-      const TEMPLATE_ID = "template_gmryc8";
+      // Ensure IDs are trimmed to remove accidental whitespace
+      const SERVICE_ID = "service_38p8y24".trim();
+      const TEMPLATE_ID = "template_gmryc8".trim();
       
       if (!PUBLIC_KEY) {
         throw new Error("EmailJS Public Key is missing. Please check your environment configuration.");
       }
+
+      console.log("Sending EmailJS...", { SERVICE_ID, TEMPLATE_ID, PUBLIC_KEY: PUBLIC_KEY ? "Loaded" : "Missing" });
 
       // We pass the public key explicitly to send as well, ensuring it's used
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
