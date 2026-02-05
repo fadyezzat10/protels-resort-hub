@@ -127,7 +127,7 @@ export default function Careers() {
 
       // Ensure IDs are trimmed to remove accidental whitespace
       const SERVICE_ID = "service_38p8y24".trim();
-      const TEMPLATE_ID = "template_gmryc8".trim();
+      const TEMPLATE_ID = "template_gmryc8s".trim();
       
       if (!PUBLIC_KEY) {
         throw new Error("EmailJS Public Key is missing. Please check your environment configuration.");
