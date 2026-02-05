@@ -240,7 +240,12 @@ export const hotels: Hotel[] = [
         view: "Garden View",
         amenities: ["Private Terrace", "Outdoor Seating", "Air Conditioning", "Rain Shower", "Coffee Maker", "Garden Access"],
         description: "Nestled in our lush tropical gardens, this standalone bungalow offers privacy and serenity. Featuring natural wood accents and a large terrace perfect for relaxing amidst nature.",
-        images: [laPlage4, laPlage5, laPlage1]
+        images: [
+          "/images/la-plage/rooms/bungalow/room-detail-1.png",
+          laPlage4,
+          laPlage5,
+          laPlage1
+        ]
       },
       {
         name: "Family Bungalow",
