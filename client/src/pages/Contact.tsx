@@ -26,11 +26,11 @@ const hotelsContactInfo = [
     name: "Protels Beach Club & SPA",
     country: "Egypt",
     city: "Marsa Alam",
-    address: "Km 21, South El Quseir, Marsa Alam Road",
-    emailSales: "sales.beachclub@protels.com",
-    emailReservations: "reservation.beachclub@protels.com",
-    phone: "+20 65 339 0025",
-    mobile: "+20 120 000 0002",
+    address: "20 Km North of Marsa Alam, Red Sea 84721, Egypt",
+    emailSales: null,
+    emailReservations: "info@protels.com",
+    phone: "+20 65 338 0063",
+    mobile: "+20 150 092 5579",
     mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3588.0!2d34.3!3d26.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDA2JzAwLjAiTiAzNMKwMTgnMDAuMCJF!5e0!3m2!1sen!2seg!4v1709123456790!5m2!1sen!2seg"
   },
   {
