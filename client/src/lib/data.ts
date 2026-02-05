@@ -70,6 +70,10 @@ export interface Hotel {
   description: {
     en: string;
     ar: string;
+    fr?: string;
+    de?: string;
+    es?: string;
+    ru?: string;
   };
   features: string[];
   rooms: string[];
@@ -93,7 +97,11 @@ export const hotels: Hotel[] = [
     image: crystalBeach,
     description: {
       en: "Discover a sanctuary of luxury on the shores of the Red Sea. Protels Crystal Beach Resort offers an exclusive all-inclusive experience where pristine waters meet exceptional service. Whether you seek vibrant coral reef exploration or tranquil relaxation by our infinity pools, our resort provides the perfect setting for unforgettable memories. Ideal for families and couples alike, we combine modern comfort with the natural beauty of Marsa Alam.",
-      ar: "اكتشف ملاذًا من الفخامة على شواطئ البحر الأحمر. يقدم منتجع بروتلز كريستال بيتش تجربة حصرية شاملة كليًا حيث تلتقي المياه النقية بالخدمة الاستثنائية. سواء كنت تبحث عن استكشاف الشعاب المرجانية النابضة بالحياة أو الاسترخاء الهادئ بجانب حمامات السباحة اللامتناهية، يوفر منتجعنا المكان المثالي لذكريات لا تُنسى. مثالي للعائلات والأزواج على حد سواء، نجمع بين الراحة العصرية والجمال الطبيعي لمرسى علم."
+      ar: "اكتشف ملاذًا من الفخامة على شواطئ البحر الأحمر. يقدم منتجع بروتلز كريستال بيتش تجربة حصرية شاملة كليًا حيث تلتقي المياه النقية بالخدمة الاستثنائية. سواء كنت تبحث عن استكشاف الشعاب المرجانية النابضة بالحياة أو الاسترخاء الهادئ بجانب حمامات السباحة اللامتناهية، يوفر منتجعنا المكان المثالي لذكريات لا تُنسى. مثالي للعائلات والأزواج على حد سواء، نجمع بين الراحة العصرية والجمال الطبيعي لمرسى علم.",
+      fr: "Découvrez un sanctuaire de luxe sur les rives de la mer Rouge. Protels Crystal Beach Resort offre une expérience exclusive tout compris où les eaux cristallines rencontrent un service exceptionnel. Que vous cherchiez à explorer des récifs coralliens vibrants ou à vous détendre tranquillement au bord de nos piscines à débordement, notre complexe offre le cadre idéal pour des souvenirs inoubliables.",
+      de: "Entdecken Sie ein Heiligtum des Luxus an den Ufern des Roten Meeres. Das Protels Crystal Beach Resort bietet ein exklusives All-Inclusive-Erlebnis, bei dem kristallklares Wasser auf außergewöhnlichen Service trifft. Ob Sie die lebhaften Korallenriffe erkunden oder sich an unseren Infinity-Pools entspannen möchten, unser Resort bietet den perfekten Rahmen für unvergessliche Erinnerungen.",
+      es: "Descubra un santuario de lujo a orillas del Mar Rojo. Protels Crystal Beach Resort ofrece una experiencia exclusiva todo incluido donde las aguas cristalinas se encuentran con un servicio excepcional. Ya sea que busque explorar vibrantes arrecifes de coral o relajarse tranquilamente junto a nuestras piscinas infinitas, nuestro resort ofrece el entorno perfecto para recuerdos inolvidables.",
+      ru: "Откройте для себя святилище роскоши на берегах Красного моря. Protels Crystal Beach Resort предлагает эксклюзивный отдых по системе «все включено», где чистейшие воды встречаются с исключительным сервисом. Ищете ли вы яркие исследования коралловых рифов или спокойный отдых у наших пейзажных бассейнов, наш курорт обеспечивает идеальную обстановку для незабываемых воспоминаний."
     },
     features: [
       "Private Sandy Beach",
@@ -164,7 +172,11 @@ export const hotels: Hotel[] = [
     image: beachClub,
     description: {
       en: "Immerse yourself in a vibrant Red Sea getaway at Protels Beach Club & SPA. Designed for the modern traveler, our resort blends relaxation with energy, offering direct access to a private sandy beach and crystal-clear waters. Enjoy a variety of swimming pools, an exciting aquapark, and a full-service wellness center to recharge your senses. With lively entertainment, diverse dining options, and a welcoming atmosphere, it’s the perfect escape for families, couples, and friends seeking sun, fun, and comfort.",
-      ar: "انغمس في أجواء البحر الأحمر النابضة بالحياة في بروتلز بيتش كلوب وسبا. صُمم منتجعنا للمسافر العصري، حيث يمزج بين الاسترخاء والطاقة، ويوفر وصولاً مباشراً إلى شاطئ رملي خاص ومياه كريستالية صافية. استمتع بمجموعة متنوعة من حمامات السباحة، وأكوا بارك مثيرة، ومركز عافية متكامل لتجديد حواسك. مع الترفيه الحيوي، وخيارات الطعام المتنوعة، والجو الترحيبي، إنه الملاذ المثالي للعائلات والأزواج والأصدقاء الباحثين عن الشمس والمرح والراحة."
+      ar: "انغمس في أجواء البحر الأحمر النابضة بالحياة في بروتلز بيتش كلوب وسبا. صُمم منتجعنا للمسافر العصري، حيث يمزج بين الاسترخاء والطاقة، ويوفر وصولاً مباشراً إلى شاطئ رملي خاص ومياه كريستالية صافية. استمتع بمجموعة متنوعة من حمامات السباحة، وأكوا بارك مثيرة، ومركز عافية متكامل لتجديد حواسك. مع الترفيه الحيوي، وخيارات الطعام المتنوعة، والجو الترحيبي، إنه الملاذ المثالي للعائلات والأزواج والأصدقاء الباحثين عن الشمس والمرح والراحة.",
+      fr: "Plongez dans une escapade vibrante en mer Rouge au Protels Beach Club & SPA. Conçu pour le voyageur moderne, notre complexe allie détente et énergie, offrant un accès direct à une plage de sable privée et des eaux cristallines. Profitez d'une variété de piscines, d'un parc aquatique passionnant et d'un centre de bien-être complet pour recharger vos sens.",
+      de: "Tauchen Sie ein in einen lebhaften Kurzurlaub am Roten Meer im Protels Beach Club & SPA. Unser Resort wurde für den modernen Reisenden entworfen und verbindet Entspannung mit Energie. Es bietet direkten Zugang zu einem privaten Sandstrand und kristallklarem Wasser. Genießen Sie eine Vielzahl von Pools, einen aufregenden Aquapark und ein Wellnesscenter mit umfassendem Service.",
+      es: "Sumérjase en una vibrante escapada al Mar Rojo en Protels Beach Club & SPA. Diseñado para el viajero moderno, nuestro resort combina relajación con energía, ofreciendo acceso directo a una playa de arena privada y aguas cristalinas. Disfrute de una variedad de piscinas, un emocionante parque acuático y un centro de bienestar completo para recargar sus sentidos.",
+      ru: "Погрузитесь в яркий отдых на Красном море в Protels Beach Club & SPA. Созданный для современного путешественника, наш курорт сочетает в себе расслабление и энергию, предлагая прямой доступ к частному песчаному пляжу и кристально чистым водам. Наслаждайтесь разнообразием бассейнов, захватывающим аквапарком и оздоровительным центром с полным спектром услуг."
     },
     features: ["Private Sandy Beach", "Aquapark & Pools", "Spa & Wellness Center", "Family Entertainment", "Beachfront Dining"],
     rooms: ["Standard Pool View Room", "Superior Double or Twin Room with Sea View", "Family Room", "Junior Suite"],
@@ -214,7 +226,11 @@ export const hotels: Hotel[] = [
     image: laPlage,
     description: {
       en: "Surrender to the rhythm of the Indian Ocean at Protels La Plage, an intimate sanctuary where African warmth meets barefoot luxury. Nestled on the pristine shores of Zanzibar, our boutique retreat is a celebration of Swahili culture and slow island living. Here, days drift by in harmony with the tides, and the boundaries between nature and comfort dissolve. Designed with local materials and organic textures, every corner whispers of the island's heritage. Whether you're unwinding in a palm-shaded bungalow or savoring spice-infused flavors under the stars, La Plage offers a soulful escape for those seeking deep relaxation and authentic connection.",
-      ar: "استسلم لإيقاع المحيط الهندي في بروتلز لا بلاج، ملاذ حميمي يلتقي فيه الدفء الأفريقي بالفخامة البسيطة. يقع منتجعنا البوتيكي على شواطئ زنجبار البكر، وهو احتفال بالثقافة السواحيلية وحياة الجزيرة البطيئة. هنا، تمضي الأيام في انسجام مع المد والجزر، وتذوب الحدود بين الطبيعة والراحة. صمم كل ركن باستخدام مواد محلية وقوام عضوي ليعكس تراث الجزيرة. سواء كنت تسترخي في بنغل مظلل بأشجار النخيل أو تتذوق النكهات الغنية بالتوابل تحت النجوم، يقدم لا بلاج ملاذًا روحيًا لمن يبحثون عن الاسترخاء العميق والاتصال الحقيقي."
+      ar: "استسلم لإيقاع المحيط الهندي في بروتلز لا بلاج، ملاذ حميمي يلتقي فيه الدفء الأفريقي بالفخامة البسيطة. يقع منتجعنا البوتيكي على شواطئ زنجبار البكر، وهو احتفال بالثقافة السواحيلية وحياة الجزيرة البطيئة. هنا، تمضي الأيام في انسجام مع المد والجزر، وتذوب الحدود بين الطبيعة والراحة. صمم كل ركن باستخدام مواد محلية وقوام عضوي ليعكس تراث الجزيرة. سواء كنت تسترخي في بنغل مظلل بأشجار النخيل أو تتذوق النكهات الغنية بالتوابل تحت النجوم، يقدم لا بلاج ملاذًا روحيًا لمن يبحثون عن الاسترخاء العميق والاتصال الحقيقي.",
+      fr: "Abandonnez-vous au rythme de l'océan Indien au Protels La Plage, un sanctuaire intime où la chaleur africaine rencontre le luxe pieds nus. Niché sur les rives immaculées de Zanzibar, notre retraite boutique est une célébration de la culture swahili et de la douceur de vivre insulaire.",
+      de: "Geben Sie sich im Protels La Plage dem Rhythmus des Indischen Ozeans hin, einem intimen Zufluchtsort, an dem afrikanische Wärme auf Barfuß-Luxus trifft. Eingebettet an den unberührten Ufern von Sansibar ist unser Boutique-Retreat eine Feier der Swahili-Kultur und des langsamen Insellebens.",
+      es: "Entréguese al ritmo del Océano Índico en Protels La Plage, un santuario íntimo donde la calidez africana se encuentra con el lujo descalzo. Ubicado en las costas vírgenes de Zanzíbar, nuestro retiro boutique es una celebración de la cultura swahili y la vida lenta en la isla.",
+      ru: "Сдайтесь ритму Индийского океана в Protels La Plage, интимном святилище, где африканское тепло встречается с роскошью босиком. Расположенный на нетронутых берегах Занзибара, наш бутик-курорт — это праздник культуры суахили и неспешной островной жизни."
     },
     discount: "15% OFF",
     features: ["White Sand Beach", "Water Sports", "Cultural Tours", "Oceanfront Dining", "Tropical Gardens"],
@@ -343,7 +359,11 @@ export const hotels: Hotel[] = [
     image: royalBay,
     description: {
       en: "A majestic resort in the heart of Hurghada. Royal Bay offers grand architecture, extensive pool landscapes, and activities for the whole family.",
-      ar: "منتجع مهيب في قلب الغردقة. يقدم رويال باي هندسة معمارية رائعة، ومناظر طبيعية واسعة للمسبح، وأنشطة لجميع أفراد الأسرة."
+      ar: "منتجع مهيب في قلب الغردقة. يقدم رويال باي هندسة معمارية رائعة، ومناظر طبيعية واسعة للمسبح، وأنشطة لجميع أفراد الأسرة.",
+      fr: "Un complexe majestueux au cœur d'Hurghada. Royal Bay offre une architecture grandiose, de vastes paysages de piscines et des activités pour toute la famille.",
+      de: "Ein majestätisches Resort im Herzen von Hurghada. Royal Bay bietet großartige Architektur, weitläufige Poollandschaften und Aktivitäten für die ganze Familie.",
+      es: "Un majestuoso resort en el corazón de Hurghada. Royal Bay ofrece una gran arquitectura, extensos paisajes de piscinas y actividades para toda la familia.",
+      ru: "Величественный курорт в самом сердце Хургады. Royal Bay предлагает грандиозную архитектуру, обширные ландшафты бассейнов и развлечения для всей семьи."
     },
     features: ["Aqua Park", "Private Marina", "Multiple Pools", "Tennis Courts", "Shopping Arcade"],
     rooms: ["Superior Room", "Deluxe Sea View", "Family Connected Room", "Royal Suite"]

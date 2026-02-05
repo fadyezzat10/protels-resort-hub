@@ -1,0 +1,84 @@
+You are a senior Frontend Engineer specialized in multilingual hotel websites.
+
+Project:
+A luxury hotel website built with React + TypeScript + Vite + Tailwind CSS.
+The site already supports Arabic (RTL) and English (LTR).
+
+Goal:
+Extend the existing language system to support multiple additional languages
+across the ENTIRE website in a clean, scalable, production-ready way.
+
+━━━━━━━━━━━━━━━━━━━━━━
+1️⃣ LANGUAGES TO SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━
+Keep existing:
+- English (EN) – LTR
+- Arabic (AR) – RTL
+
+Add the following tourism-focused languages:
+- French (FR)
+- German (DE)
+- Spanish (ES)
+- Russian (RU)
+
+━━━━━━━━━━━━━━━━━━━━━━
+2️⃣ LANGUAGE SYSTEM REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━
+- Use a centralized i18n solution (recommended: i18next or custom translations object).
+- One source of truth for all translations.
+- No duplicated text hardcoded in components.
+- Easy to add more languages later.
+
+━━━━━━━━━━━━━━━━━━━━━━
+3️⃣ RTL / LTR HANDLING
+━━━━━━━━━━━━━━━━━━━━━━
+- Arabic must fully support RTL:
+  - document direction
+  - text alignment
+  - spacing & layout
+- Other languages must remain LTR.
+- Direction should switch automatically based on selected language.
+- No layout breaking when switching languages.
+
+━━━━━━━━━━━━━━━━━━━━━━
+4️⃣ LANGUAGE SWITCHER (HEADER)
+━━━━━━━━━━━━━━━━━━━━━━
+- Add a professional language switcher in the top navigation.
+- Hotel-style, clean, minimal (NO flashy UI).
+- Format example:
+  EN | AR | FR | DE | ES | RU
+- Active language clearly highlighted.
+- Language change should be instant (no page reload).
+
+━━━━━━━━━━━━━━━━━━━━━━
+5️⃣ TRANSLATION SCOPE
+━━━━━━━━━━━━━━━━━━━━━━
+Translate:
+- Navigation menu
+- Buttons
+- Page titles
+- Descriptions
+- Forms labels
+- System messages
+- Footer content
+
+Do NOT translate:
+- Proper hotel names
+- Brand name "Protels"
+
+━━━━━━━━━━━━━━━━━━━━━━
+6️⃣ TECHNICAL RULES
+━━━━━━━━━━━━━━━━━━━━━━
+- Do NOT break existing Arabic & English.
+- Do NOT modify backend or EmailJS logic.
+- No console errors or warnings.
+- Production-ready, clean code.
+- Fully responsive.
+
+━━━━━━━━━━━━━━━━━━━━━━
+DELIVERABLES
+━━━━━━━━━━━━━━━━━━━━━━
+- Updated React code.
+- Translation files or objects for all languages.
+- Language switcher component.
+- RTL-safe implementation.

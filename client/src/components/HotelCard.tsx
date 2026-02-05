@@ -48,7 +48,7 @@ export default function HotelCard({ hotel, featured = false }: HotelCardProps) {
         </h3>
         
         <p className="text-gray-600 mb-6 line-clamp-3 flex-1 text-sm leading-relaxed">
-          {hotel.description[language]}
+          {hotel.description[language] || hotel.description.en}
         </p>
 
         <div className="flex flex-col gap-3 mt-auto">

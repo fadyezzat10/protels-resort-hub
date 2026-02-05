@@ -32,12 +32,12 @@ export default function HotelDetails() {
 
   // Tabs Configuration
   const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "accommodation", label: "Accommodation" },
-    { id: "dining", label: "Dining" },
-    { id: "facilities", label: "Facilities" },
-    { id: "gallery", label: "Gallery" },
-    { id: "contact", label: "Contact" },
+    { id: "overview", label: t("hotel.overview") },
+    { id: "accommodation", label: t("hotel.accommodation") },
+    { id: "dining", label: t("hotel.dining") },
+    { id: "facilities", label: t("hotel.facilities") },
+    { id: "gallery", label: t("nav.gallery") },
+    { id: "contact", label: t("nav.contact") },
   ];
 
   // Feature Icons mapping
@@ -131,15 +131,15 @@ export default function HotelDetails() {
             {/* Overview */}
             {(activeSection === "overview" || !params?.section) && (
               <section className="animate-in fade-in duration-500 py-6">
-                <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>Overview</h2>
+                <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>{t("hotel.overview")}</h2>
                 <p className={cn("text-gray-600 leading-loose text-lg", isLaPlage && "text-[#5D4E40]")}>
-                  {hotel.description[language]}
+                  {hotel.description[language] || hotel.description.en}
                 </p>
                 
                 {/* Review Links */}
                 {hotel.id === "crystal-beach" && (
                   <div className="mt-8 pt-8 border-t border-gray-100">
-                    <h3 className="text-xl font-serif text-brand-blue mb-6">Share Your Experience</h3>
+                    <h3 className="text-xl font-serif text-brand-blue mb-6">{t("hotel.reviews")}</h3>
                     <div className="flex flex-wrap gap-4">
                       {/* Google Review */}
                       <Button 
@@ -204,7 +204,7 @@ export default function HotelDetails() {
                 {/* Review Links for Beach Club */}
                 {hotel.id === "beach-club" && (
                   <div className="mt-8 pt-8 border-t border-gray-100">
-                    <h3 className="text-xl font-serif text-brand-blue mb-6">Share Your Experience</h3>
+                    <h3 className="text-xl font-serif text-brand-blue mb-6">{t("hotel.reviews")}</h3>
                     <div className="flex flex-wrap gap-4">
                       {/* Google Review */}
                       <Button 
@@ -252,7 +252,7 @@ export default function HotelDetails() {
                 {/* Review Links for La Plage */}
                 {hotel.id === "la-plage" && (
                   <div className="mt-8 pt-8 border-t border-[#8B5A2B]/10">
-                    <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-6">Share Your Experience</h3>
+                    <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-6">{t("hotel.reviews")}</h3>
                     <div className="flex flex-wrap gap-4">
                       {/* Google Review */}
                       <Button 

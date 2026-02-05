@@ -1,11 +1,17 @@
 import { Link, useLocation } from "wouter";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type Language } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { bookingLink } from "@/lib/data";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import logo from "@assets/سش.pngش_1770193463633.png";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
@@ -30,9 +36,14 @@ export default function Navbar() {
     { href: "/contact", label: "nav.contact" },
   ];
 
-  const toggleLanguage = () => {
-    setLanguage(language === "en" ? "ar" : "en");
-  };
+  const languages: { code: Language; label: string }[] = [
+    { code: "en", label: "English" },
+    { code: "ar", label: "العربية" },
+    { code: "fr", label: "Français" },
+    { code: "de", label: "Deutsch" },
+    { code: "es", label: "Español" },
+    { code: "ru", label: "Русский" },
+  ];
 
   return (
     <nav
@@ -40,6 +51,7 @@ export default function Navbar() {
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full",
         isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-2" : "bg-transparent py-4"
       )}
+      dir={dir}
     >
       <div className="container-padding flex items-center justify-between">
         {/* Logo */}
@@ -74,15 +86,37 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleLanguage}
-            className={cn("flex items-center gap-2 text-xs tracking-widest uppercase font-medium", isScrolled ? "text-brand-blue" : "text-white")}
-          >
-            <Globe className="w-4 h-4" />
-            {language === "en" ? "AR" : "EN"}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "flex items-center gap-2 text-xs tracking-widest uppercase font-medium hover:bg-white/10",
+                  isScrolled ? "text-brand-blue hover:bg-brand-blue/5" : "text-white"
+                )}
+              >
+                <Globe className="w-4 h-4" />
+                {language.toUpperCase()}
+                <ChevronDown className="w-3 h-3 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32 bg-white/95 backdrop-blur-md border-none shadow-lg">
+              {languages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={cn(
+                    "text-xs font-medium uppercase tracking-wider cursor-pointer",
+                    language === lang.code ? "bg-brand-gold/10 text-brand-gold" : "text-gray-700 hover:text-brand-blue"
+                  )}
+                >
+                  <span className="w-6">{lang.code.toUpperCase()}</span>
+                  <span className="opacity-70 ml-2 text-[10px] capitalize hidden">{lang.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Button 
             asChild 
@@ -116,21 +150,35 @@ export default function Navbar() {
               </a>
             </Link>
           ))}
-          <div className="flex flex-col gap-3 mt-4">
-             <Button
-              variant="outline"
-              onClick={() => {
-                toggleLanguage();
-                setMobileMenuOpen(false);
-              }}
-              className="justify-start gap-2 uppercase tracking-widest text-xs rounded-none"
-            >
-              <Globe className="w-4 h-4" />
-              {language === "en" ? "العربية" : "English"}
-            </Button>
+          
+          {/* Mobile Language Switcher */}
+          <div className="py-4 border-b border-gray-100">
+            <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Language</p>
+            <div className="grid grid-cols-3 gap-2">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setLanguage(lang.code);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={cn(
+                    "px-2 py-2 text-xs font-medium uppercase tracking-wider rounded border transition-colors",
+                    language === lang.code 
+                      ? "bg-brand-gold text-white border-brand-gold" 
+                      : "bg-gray-50 text-gray-600 border-gray-200 hover:border-brand-gold/50"
+                  )}
+                >
+                  {lang.code}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 mt-2">
             <Button 
               asChild 
-              className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue w-full rounded-none uppercase tracking-widest text-xs"
+              className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue w-full rounded-none uppercase tracking-widest text-xs h-10"
             >
               <a href={bookingLink} target="_blank" rel="noopener noreferrer">
                 {t("nav.book")}
