@@ -1,0 +1,157 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Roboto",
+      "role": "body"
+    },
+    {
+      "family": "Arial",
+      "role": "body"
+    },
+    {
+      "family": "Noto Naskh Arabic UI",
+      "role": "body"
+    },
+    {
+      "family": "Google Sans",
+      "role": "heading"
+    }
+  ],
+  "colors": {
+    "primary": "#007B8B",
+    "accent": "#EFF5F6",
+    "background": "#FFFFFF",
+    "textPrimary": "#000000",
+    "link": "#6200EE"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Roboto",
+      "heading": "Google Sans"
+    },
+    "fontStacks": {
+      "heading": [
+        "Google Sans",
+        "Roboto",
+        "Arial",
+        "sans-serif"
+      ],
+      "body": [
+        "Roboto",
+        "Noto Naskh Arabic UI",
+        "Arial",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Roboto",
+        "Noto Naskh Arabic UI",
+        "Arial",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "22px",
+      "h2": "16px",
+      "body": "16px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "8px"
+  },
+  "components": {
+    "input": {
+      "background": "transparent",
+      "textColor": "#1F1F1F",
+      "borderColor": null,
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonPrimary": {
+      "background": "#EFF5F6",
+      "textColor": "#1F1F1F",
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "#666666",
+      "textColor": "#000000",
+      "borderRadius": "6px",
+      "borderRadiusCorners": {
+        "topLeft": "6px",
+        "topRight": "6px",
+        "bottomRight": "6px",
+        "bottomLeft": "6px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "https://www.google.com/images/branding/mapslogo/1x/GoogleMaps_Logo_WithLightOutline.png",
+    "favicon": "https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico",
+    "ogImage": "File saved at: attached_assets/ogImage.png"
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Selected #0 because it is visible, medium-sized, and matches the Google Maps branding, aligning with the favicon and typical Google logo style.",
+    "confidence": 0.95,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "تسجيل الدخول",
+      "reasoning": "Button #0 ('تسجيل الدخول') is likely the primary CTA as it is action-oriented ('Sign In') and uses a distinct blue color (#EFF5F6), which is more vibrant compared to the neutral and white buttons."
+    },
+    "secondary": {
+      "index": 4,
+      "text": "عرض الصور",
+      "reasoning": "Button #4 ('عرض الصور') is selected as secondary because it has a different background color (#666666) and offers a supportive action ('View Photos')."
+    },
+    "confidence": 0.9
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "general public"
+  },
+  "designSystem": {
+    "framework": "custom",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.9,
+    "colors": 0.95,
+    "overall": 0.925
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 0,
+        "selectedLogoReasoning": "Selected #0 because it is visible, medium-sized, and matches the Google Maps branding, aligning with the favicon and typical Google logo style.",
+        "confidence": 0.95
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}
