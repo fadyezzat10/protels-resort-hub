@@ -4,7 +4,7 @@ import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import { hotels } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
-import heroImg from "@/assets/images/hotel-crystal-beach.jpg";
+import siteHeroImg from "@/assets/images/site-hero.png";
 
 export default function Hotels() {
   const { t } = useI18n();
@@ -14,7 +14,7 @@ export default function Hotels() {
       <Navbar />
       
       <Hero 
-        image={heroImg}
+        image={siteHeroImg}
         title={t("nav.hotels")}
         subtitle="Our Collection"
         height="half"
