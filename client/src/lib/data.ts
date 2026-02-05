@@ -218,16 +218,20 @@ export const hotels: Hotel[] = [
     },
     discount: "15% OFF",
     features: ["White Sand Beach", "Water Sports", "Cultural Tours", "Oceanfront Dining", "Tropical Gardens"],
-    rooms: ["Superior Room", "Bungalow", "Family Bungalow"],
+    rooms: ["Superior Twin Room", "Bungalow", "Family Bungalow"],
     roomDetails: [
       {
-        name: "Superior Room",
+        name: "Superior Twin Room",
         size: "40 m²",
-        bed: "King or Twin Beds",
-        view: "Pool & Ocean View",
-        amenities: ["Private Balcony", "Air Conditioning", "Ocean Breeze", "Walk-in Shower", "Wi-Fi", "Minibar"],
-        description: "A spacious and airy retreat blending Swahili charm with modern comfort. Enjoy sweeping views of the turquoise pool and Indian Ocean from your private balcony.",
-        images: [laPlage1, laPlage2, laPlage3]
+        bed: "Two Single Beds",
+        view: "Garden or Pool View",
+        amenities: ["Air Conditioning", "Seating Area", "Soft Lighting", "Modern Amenities", "Wooden Furniture", "Wi-Fi"],
+        description: "A bright and spacious Superior Twin Room featuring two comfortable single beds, elegant wooden furniture, and crisp white linens accented with colorful African-inspired textiles. The room offers a calm and welcoming atmosphere with soft lighting, a cozy seating area, air conditioning, and modern amenities. Designed with warm neutral tones and subtle local artwork, it’s ideal for couples or friends seeking comfort and relaxation in a stylish coastal resort setting.",
+        images: [
+          "/images/la-plage/rooms/superior-twin/room-1.jpg",
+          "/images/la-plage/rooms/superior-twin/room-2.jpg",
+          "/images/la-plage/rooms/superior-twin/room-3.jpg"
+        ]
       },
       {
         name: "Bungalow",
