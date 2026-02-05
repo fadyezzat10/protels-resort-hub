@@ -10,7 +10,7 @@ import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.
 import beachClubImg from "@assets/DSC05597.png11_1770196278235.png";
 import royalBayImg from "@assets/WhatsApp_Image_2025-12-22_at_12.58.16_PM_(1)_1770197117342.jpeg";
 import laPlageImg from "@assets/22_1770196761222.png";
-import heroImg from "@/assets/images/hotel-royal-bay.jpg";
+import aboutHeroImg from "@/assets/images/about-hero-aerial.jpg";
 
 export default function About() {
   const { t } = useI18n();
@@ -80,30 +80,33 @@ export default function About() {
       <Navbar />
       
       {/* Hero Section */}
-      <div className="relative h-[70vh] w-full overflow-hidden">
-        <div className="absolute inset-0 bg-black/40 z-10" />
+      <div className="relative h-screen w-full overflow-hidden">
+        {/* Subtle dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 z-10" />
+        
         <motion.img 
-          src={heroImg} 
-          alt="Protels Luxury"
+          src={aboutHeroImg} 
+          alt="Protels Luxury Aerial View"
           className="absolute inset-0 w-full h-full object-cover"
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 10 }}
+          initial={{ scale: 1.15, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 2.5, ease: "easeOut" }}
         />
+        
         <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="max-w-4xl"
+            transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
+            className="max-w-5xl"
           >
-            <span className="text-white/90 text-sm md:text-base uppercase tracking-[0.2em] font-medium mb-6 block">
+            <span className="text-white/80 text-sm md:text-base tracking-[0.3em] uppercase font-light mb-8 block drop-shadow-sm">
               Welcome to Protels
             </span>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight drop-shadow-lg">
               Crafting Unforgettable <br className="hidden md:block" /> Seaside Experiences
             </h1>
-            <p className="text-white/80 text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed">
+            <p className="text-white/90 text-lg md:text-xl font-sans font-light max-w-2xl mx-auto leading-relaxed tracking-wide drop-shadow-md">
               Where authentic hospitality meets the timeless beauty of the coast.
             </p>
           </motion.div>
