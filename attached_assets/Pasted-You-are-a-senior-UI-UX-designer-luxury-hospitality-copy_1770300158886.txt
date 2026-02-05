@@ -1,0 +1,141 @@
+You are a senior UI/UX designer, luxury hospitality copywriter, and front-end developer.
+
+Context:
+I am building the About Us page for PROTELS Hotels & Resorts, a luxury hospitality brand operating premium resorts in Egypt and Zanzibar.
+Use a luxury, elegant, calm, and premium tone suitable for high-end hotels.
+
+Base your content and structure on the provided Company Profile, and reflect the brand’s identity:
+
+Luxury
+
+Authentic hospitality
+
+Beachfront resorts
+
+Exceptional guest experience
+
+🏨 Resorts to Include (ONLY THESE – IMPORTANT)
+
+Protels Crystal Beach Resort – Marsa Alam, Egypt
+
+Protels Beach Club & Spa – Marsa Alam, Egypt
+
+Protels Royal Bay Resort & Spa – Hurghada, Egypt
+
+Protels La Plage – Zanzibar, Tanzania
+
+⚠️ Do NOT mention QDT anywhere.
+
+🎯 What You Need to Deliver
+1️⃣ Page Structure (About Us)
+
+Create a clean, premium layout with the following sections:
+
+Hero Section (full-width image + overlay text)
+
+Brand Story (About PROTELS)
+
+Vision & Values
+
+Our Resorts (cards or sections for each hotel)
+
+Guest Experience Philosophy
+
+Closing Statement (emotional, inspirational)
+
+2️⃣ Copywriting (VERY IMPORTANT)
+
+Write professional luxury hotel copy, not generic text.
+
+Tone:
+
+Elegant
+
+Confident
+
+Warm
+
+International hospitality level (similar to Four Seasons / Kempinski style)
+
+Each resort should have:
+
+Short luxury description (2–3 lines)
+
+Location reference
+
+Experience highlight (beach, spa, privacy, lifestyle)
+
+3️⃣ Hero Section Text (Example Style)
+
+Provide text like:
+
+Small subtitle (uppercase)
+
+Large elegant heading
+
+Short refined paragraph
+
+Example style (don’t copy literally):
+
+“Crafting unforgettable seaside experiences through authentic hospitality.”
+
+4️⃣ Animations (Framer Motion – REQUIRED)
+
+Add subtle scroll-based animations using Framer Motion:
+
+Fade-in + slight upward movement on scroll
+
+Delay between sections
+
+Cards animate individually when entering viewport
+
+Use:
+
+initial={{ opacity: 0, y: 40 }}
+whileInView={{ opacity: 1, y: 0 }}
+transition={{ duration: 0.8, ease: "easeOut" }}
+viewport={{ once: true }}
+
+5️⃣ Images
+
+For each resort:
+
+One high-quality hero image
+
+Images should feel:
+
+Natural light
+
+Beachfront
+
+Calm
+
+Premium lifestyle
+
+Mention where images should be placed in the layout.
+
+6️⃣ Technical Notes
+
+React / Next.js compatible
+
+Clean semantic HTML
+
+No unnecessary libraries
+
+Framer Motion only for animation
+
+Fully responsive (desktop first, mobile optimized)
+
+✅ Final Output Should Include
+
+Final About Us page text
+
+Section-by-section structure
+
+Suggested animation usage
+
+Clear resort descriptions
+
+Premium hospitality tone
+
+NO QDT mentioned anywhere
