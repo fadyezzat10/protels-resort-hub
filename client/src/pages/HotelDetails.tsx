@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine, Maximize2, Bed, Mountain, Dumbbell, Sparkles, Umbrella } from "lucide-react";
+import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine, Maximize2, Bed, Mountain, Dumbbell, Sparkles, Umbrella, GlassWater } from "lucide-react";
 import NotFound from "@/pages/not-found";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -686,6 +686,57 @@ export default function HotelDetails() {
                                   <img 
                                     src={`/images/la-plage/lounge/${img}`}
                                     alt={`The Lounge Detail ${i + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                  />
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                </div>
+                              ))}
+                            </div>
+                         </div>
+                      </div>
+                    )}
+
+                    {/* La Plage Specific - Blu Pool Bar Section */}
+                    {isLaPlage && (
+                      <div className="bg-[#F9F6F0] border border-[#8B5A2B]/10 rounded-lg overflow-hidden shadow-sm mt-12">
+                         <div className="p-8 md:p-10">
+                            <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
+                               <div className="w-full md:w-5/12 order-1">
+                                  <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md -rotate-1 hover:rotate-0 transition-transform duration-500">
+                                    <img src="/images/la-plage/blu-bar/blu-1.jpg" alt="Blu Pool Bar" className="w-full h-full object-cover" />
+                                  </div>
+                               </div>
+                               <div className="flex-1 order-2">
+                                  <div className="flex items-center gap-3 mb-6">
+                                     <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
+                                        <GlassWater className="w-6 h-6 text-[#8B5A2B]" />
+                                     </div>
+                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Blu Pool Bar</h3>
+                                  </div>
+                                  <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-6 max-w-3xl">
+                                    Immerse yourself in the vibrant energy of island life at Blu Pool Bar. Surrounded by swaying palms and caressed by the ocean breeze, this lively poolside spot invites you to unwind with refreshing cocktails, tropical drinks, and handcrafted mocktails. Whether you're soaking up the sun or enjoying a casual moment in the shade, it's the perfect setting for laid-back indulgence and unforgettable sun-soaked memories.
+                                  </p>
+                                  
+                                  <div className="flex flex-wrap gap-4 mt-6">
+                                     {["Poolside Cocktails", "Tropical Drinks", "Ocean Breeze", "Sun-Soaked Vibes"].map((item, i) => (
+                                       <span key={i} className="px-3 py-1 bg-white text-[#8B5A2B] text-xs font-bold uppercase tracking-wider rounded-full border border-[#8B5A2B]/10">
+                                         {item}
+                                       </span>
+                                     ))}
+                                  </div>
+                               </div>
+                            </div>
+
+                            {/* Blu Pool Bar Gallery */}
+                            <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                              {[
+                                "blu-2.jpg", "blu-3.png", "blu-4.png", "blu-5.png", 
+                                "blu-6.png", "blu-7.png", "blu-8.png", "blu-9.png"
+                              ].map((img, i) => (
+                                <div key={i} className="snap-center shrink-0 w-[240px] md:w-[280px] aspect-square rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                                  <img 
+                                    src={`/images/la-plage/blu-bar/${img}`}
+                                    alt={`Blu Bar Detail ${i + 1}`}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                   />
                                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
