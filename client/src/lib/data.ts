@@ -272,7 +272,27 @@ export const hotels: Hotel[] = [
       "/images/la-plage/gallery/gallery-new-17.png",
       "/images/la-plage/gallery/gallery-new-18.png",
       "/images/la-plage/gallery/gallery-new-19.png",
-      "/images/la-plage/gallery/gallery-new-20.png"
+      "/images/la-plage/gallery/gallery-new-20.png",
+      "/images/la-plage/gallery/gallery-new-21.png",
+      "/images/la-plage/gallery/gallery-new-22.png",
+      "/images/la-plage/gallery/gallery-new-23.png",
+      "/images/la-plage/gallery/gallery-new-24.png",
+      "/images/la-plage/gallery/gallery-new-25.png",
+      "/images/la-plage/gallery/gallery-new-26.png",
+      "/images/la-plage/gallery/gallery-new-27.png",
+      "/images/la-plage/gallery/gallery-new-28.png",
+      "/images/la-plage/gallery/gallery-new-29.png",
+      "/images/la-plage/gallery/gallery-new-30.png",
+      "/images/la-plage/gallery/gallery-new-31.jpg",
+      "/images/la-plage/gallery/gallery-new-32.jpg",
+      "/images/la-plage/gallery/gallery-new-33.jpg",
+      "/images/la-plage/gallery/gallery-new-34.jpg",
+      "/images/la-plage/gallery/gallery-new-35.jpg",
+      "/images/la-plage/gallery/gallery-new-36.jpg",
+      "/images/la-plage/gallery/gallery-new-37.png",
+      "/images/la-plage/gallery/gallery-new-38.png",
+      "/images/la-plage/gallery/gallery-new-39.png",
+      "/images/la-plage/gallery/gallery-new-40.png"
     ],
     dining: {
       main: {
