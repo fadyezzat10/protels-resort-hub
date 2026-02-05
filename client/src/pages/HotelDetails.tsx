@@ -313,6 +313,96 @@ export default function HotelDetails() {
                     </div>
                   </div>
                 )}
+
+                {/* All-Inclusive Plan Section for La Plage */}
+                {isLaPlage && (
+                  <div className="mt-16 pt-12 border-t border-[#8B5A2B]/10">
+                    <h2 className="text-3xl font-serif text-[var(--color-brand-blue)] mb-4">The All-Inclusive Experience</h2>
+                    <p className="text-[#5D4E40] text-lg mb-10 max-w-3xl">
+                      Indulge in a carefree escape where every detail is taken care of. Our comprehensive all-inclusive plan is designed to let you fully immerse yourself in the island's rhythm without a worry.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {/* Dining Column */}
+                      <div className="bg-[#F9F6F0] p-8 rounded-xl border border-[#8B5A2B]/10 hover:border-[#8B5A2B]/30 transition-colors duration-300">
+                        <div className="w-12 h-12 rounded-full bg-[var(--color-brand-gold)]/10 flex items-center justify-center mb-6 text-[var(--color-brand-gold)]">
+                           <Utensils className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">Dining & Drinks</h3>
+                        <ul className="space-y-3 text-[#5D4E40]">
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-gold)] mt-2 shrink-0" />
+                            <span>Breakfast, Lunch, and Dinner at La Cabana</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-gold)] mt-2 shrink-0" />
+                            <span>Afternoon tea and snacks at The Lounge</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-gold)] mt-2 shrink-0" />
+                            <span>Unlimited soft drinks, juices, and local spirits (10:00 - 23:00)</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-gold)] mt-2 shrink-0" />
+                            <span>Daily replenished minibar</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Activities Column */}
+                      <div className="bg-[#F9F6F0] p-8 rounded-xl border border-[#8B5A2B]/10 hover:border-[#8B5A2B]/30 transition-colors duration-300">
+                        <div className="w-12 h-12 rounded-full bg-[var(--color-brand-blue)]/10 flex items-center justify-center mb-6 text-[var(--color-brand-blue)]">
+                           <Waves className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">Activities & Wellness</h3>
+                        <ul className="space-y-3 text-[#5D4E40]">
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-blue)] mt-2 shrink-0" />
+                            <span>Daily yoga and stretching sessions</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-blue)] mt-2 shrink-0" />
+                            <span>Access to the fitness center</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-blue)] mt-2 shrink-0" />
+                            <span>Kayaks & Paddleboards</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-blue)] mt-2 shrink-0" />
+                            <span>Evening cultural shows</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Services Column */}
+                      <div className="bg-[#F9F6F0] p-8 rounded-xl border border-[#8B5A2B]/10 hover:border-[#8B5A2B]/30 transition-colors duration-300">
+                        <div className="w-12 h-12 rounded-full bg-[#8B5A2B]/10 flex items-center justify-center mb-6 text-[#8B5A2B]">
+                           <Sparkles className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">Services</h3>
+                        <ul className="space-y-3 text-[#5D4E40]">
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B] mt-2 shrink-0" />
+                            <span>Complimentary High-Speed Wi-Fi</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B] mt-2 shrink-0" />
+                            <span>Kids Club (Ages 4-12)</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B] mt-2 shrink-0" />
+                            <span>24-Hour Concierge</span>
+                          </li>
+                          <li className="flex items-start gap-3 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B] mt-2 shrink-0" />
+                            <span>Beach Towel Service</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 
