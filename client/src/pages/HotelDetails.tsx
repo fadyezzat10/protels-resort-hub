@@ -747,6 +747,57 @@ export default function HotelDetails() {
                       </div>
                     )}
 
+                    {/* La Plage Specific - Jazz Lobby Bar Section */}
+                    {isLaPlage && (
+                      <div className="bg-white border border-[#8B5A2B]/10 rounded-lg overflow-hidden shadow-sm mt-12">
+                         <div className="p-8 md:p-10">
+                            <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
+                               <div className="flex-1 order-2 md:order-1">
+                                  <div className="flex items-center gap-3 mb-6">
+                                     <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
+                                        <div className="text-[#8B5A2B] font-serif italic text-2xl px-2">♪</div>
+                                     </div>
+                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Jazz Lobby Bar</h3>
+                                  </div>
+                                  <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-6 max-w-3xl">
+                                    Step into a timeless atmosphere at the Jazz Lobby Bar, where African elegance meets the soulful spirit of classic jazz. With warm lighting, rich wooden finishes, and artistic murals, this indoor sanctuary offers a refined setting for relaxation. Whether you're starting your day with a rich espresso, enjoying a light afternoon snack, or winding down with a classic evening cocktail, the cozy ambiance invites you to linger and unwind in style.
+                                  </p>
+                                  
+                                  <div className="flex flex-wrap gap-4 mt-6">
+                                     {["Classic Cocktails", "Artisan Coffee", "Jazz Vibes", "Elegant Lounge"].map((item, i) => (
+                                       <span key={i} className="px-3 py-1 bg-[#F9F6F0] text-[#8B5A2B] text-xs font-bold uppercase tracking-wider rounded-full border border-[#8B5A2B]/10">
+                                         {item}
+                                       </span>
+                                     ))}
+                                  </div>
+                               </div>
+                               <div className="w-full md:w-5/12 order-1 md:order-2">
+                                  <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md rotate-1 hover:rotate-0 transition-transform duration-500">
+                                    <img src="/images/la-plage/jazz-bar/jazz-1.jpg" alt="Jazz Lobby Bar" className="w-full h-full object-cover" />
+                                  </div>
+                               </div>
+                            </div>
+
+                            {/* Jazz Bar Gallery */}
+                            <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                              {[
+                                "jazz-4.jpg", "jazz-5.jpg", "jazz-2.jpg", "jazz-3.jpg", 
+                                "jazz-6.jpg", "jazz-7.jpg", "jazz-8.jpg"
+                              ].map((img, i) => (
+                                <div key={i} className="snap-center shrink-0 w-[240px] md:w-[280px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                                  <img 
+                                    src={`/images/la-plage/jazz-bar/${img}`}
+                                    alt={`Jazz Bar Detail ${i + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                  />
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                </div>
+                              ))}
+                            </div>
+                         </div>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Specialty Restaurants */}
                       {hotel.dining.specialty?.map((rest, idx) => (

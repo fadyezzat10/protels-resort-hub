@@ -258,7 +258,7 @@ export const hotels: Hotel[] = [
       specialty: [
         { name: "Beach Bar", desc: "Unwind with refreshing cocktails and cold drinks while soaking in direct beachfront views. The perfect spot to watch the dhows sail by. (09:00 AM – 12:00 AM)" },
         { name: "Blu Pool Bar", desc: "A vibrant poolside escape surrounded by palm trees and ocean breeze. Enjoy refreshing cocktails, tropical mocktails, and light snacks in a laid-back African beach setting suitable for sun-soaked relaxation. (10:00 AM – 06:00 PM)" },
-        { name: "Jazz Lobby Bar", desc: "An elegant space to enjoy hot and cold beverages in a sophisticated atmosphere. Perfect for a quiet morning coffee or an evening aperitif. (10:00 AM – 08:00 PM)" },
+        { name: "Jazz Lobby Bar", desc: "A sophisticated indoor retreat inspired by classic jazz vibes. Relax in a warm, elegant setting featuring rich wooden finishes and soft lighting. Offering a curated selection of hot beverages, classic cocktails, and light snacks—ideal for quiet mornings or evening aperitifs. (10:00 AM – 08:00 PM)" },
         { name: "The Lounge", desc: "An open-air sanctuary designed with natural materials and a relaxed African coastal vibe. Sip on refreshing handcrafted cocktails and savor light snacks in a calm, breezy atmosphere. (10:00 AM – 11:00 PM)" }
       ]
     }
