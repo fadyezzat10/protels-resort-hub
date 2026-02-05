@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Upload, Briefcase, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -54,10 +55,11 @@ export default function Careers() {
     department: "",
     location: "",
     experience: "",
+    message: "",
     cv: null as File | null
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -98,8 +100,6 @@ export default function Careers() {
 
     try {
       // Prepare data for EmailJS
-      // Note: For file attachments to work with EmailJS, you typically need to pass the base64 string
-      // and configure your EmailJS template to accept an attachment variable.
       let cvBase64 = null;
       if (formData.cv) {
         cvBase64 = await convertToBase64(formData.cv);
@@ -114,34 +114,23 @@ export default function Careers() {
         department: formData.department,
         location: formData.location,
         experience: formData.experience,
-        // The parameter name 'my_file' (or similar) must match what is set in your EmailJS template settings
+        message: formData.message || "No cover message provided.",
         content: cvBase64, 
         file_name: formData.cv?.name
       };
 
-      // REPLACE THESE WITH YOUR ACTUAL EMAILJS CREDENTIALS
-      // 1. Create an account at https://www.emailjs.com/
-      // 2. Create a service (e.g., Gmail) -> Get Service ID
-      // 3. Create a template -> Get Template ID
-      // 4. Go to Account -> Get Public Key
-      const SERVICE_ID = "YOUR_SERVICE_ID";
-      const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-      const PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+      const SERVICE_ID = "service_38p8y24";
+      const TEMPLATE_ID = "template_gmryc8";
+      // Using import.meta.env for Vite environment variables if available, falling back to placeholder as requested
+      const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY";
 
-      if (SERVICE_ID === "YOUR_SERVICE_ID") {
-        console.log("EmailJS is not configured with real keys yet. Simulating success.");
-        console.log("Payload:", templateParams);
-        // Simulate delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        toast({
-          title: "Setup Required",
-          description: "EmailJS keys are missing. Application simulated successfully! Check console for data.",
-          duration: 5000,
-        });
-      } else {
-        await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+      if (PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
+         console.warn("EmailJS Public Key is missing. Please set VITE_EMAILJS_PUBLIC_KEY environment variable.");
+         // We'll try to send anyway, which might fail if key is invalid, or if the user intends to replace the placeholder manually.
+         // However, EmailJS client SDK throws error if public key is missing/invalid usually.
       }
+
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
 
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -338,6 +327,18 @@ export default function Careers() {
                             ))}
                           </SelectContent>
                         </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="message" className="text-sm font-medium text-gray-700">Cover Message</Label>
+                        <Textarea 
+                          id="message" 
+                          name="message" 
+                          placeholder="Tell us why you are a great fit for this role..." 
+                          value={formData.message} 
+                          onChange={handleInputChange} 
+                          className="bg-gray-50 focus:bg-white transition-colors min-h-[100px]"
+                        />
                       </div>
                     </div>
 
