@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Upload, Briefcase, MapPin, Users } from "lucide-react";
+import { Check, Upload, Briefcase, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import emailjs from '@emailjs/browser';
 
 const jobCategories = [
   "Front Office",
@@ -72,6 +72,15 @@ export default function Careers() {
     }
   };
 
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -87,17 +96,66 @@ export default function Careers() {
       return;
     }
 
-    // Simulate API call / Email submission
-    // Note: In a real full-stack app, this would be a POST request to the backend
-    // which would then handle SMTP email sending.
-    console.log("Submitting Application:", formData);
-    
-    // Simulate network delay
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Prepare data for EmailJS
+      // Note: For file attachments to work with EmailJS, you typically need to pass the base64 string
+      // and configure your EmailJS template to accept an attachment variable.
+      let cvBase64 = null;
+      if (formData.cv) {
+        cvBase64 = await convertToBase64(formData.cv);
+      }
+
+      const templateParams = {
+        to_name: "Protels HR Team",
+        from_name: formData.fullName,
+        from_email: formData.email,
+        phone: formData.phone,
+        position: formData.position,
+        department: formData.department,
+        location: formData.location,
+        experience: formData.experience,
+        // The parameter name 'my_file' (or similar) must match what is set in your EmailJS template settings
+        content: cvBase64, 
+        file_name: formData.cv?.name
+      };
+
+      // REPLACE THESE WITH YOUR ACTUAL EMAILJS CREDENTIALS
+      // 1. Create an account at https://www.emailjs.com/
+      // 2. Create a service (e.g., Gmail) -> Get Service ID
+      // 3. Create a template -> Get Template ID
+      // 4. Go to Account -> Get Public Key
+      const SERVICE_ID = "YOUR_SERVICE_ID";
+      const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+      const PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+
+      if (SERVICE_ID === "YOUR_SERVICE_ID") {
+        console.log("EmailJS is not configured with real keys yet. Simulating success.");
+        console.log("Payload:", templateParams);
+        // Simulate delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        toast({
+          title: "Setup Required",
+          description: "EmailJS keys are missing. Application simulated successfully! Check console for data.",
+          duration: 5000,
+        });
+      } else {
+        await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+      }
+
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 1500);
+
+    } catch (error) {
+      console.error("EmailJS Error:", error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error sending your application. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
