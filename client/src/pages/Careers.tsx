@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check, Upload, Briefcase, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import emailjs from '@emailjs/browser';
+
+// Initialize EmailJS with the Public Key from environment variables
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+if (PUBLIC_KEY) {
+  emailjs.init(PUBLIC_KEY);
+}
 
 const jobCategories = [
   "Front Office",
@@ -121,13 +127,12 @@ export default function Careers() {
 
       const SERVICE_ID = "service_38p8y24";
       const TEMPLATE_ID = "template_gmryc8";
-      // Using import.meta.env for Vite environment variables if available, falling back to placeholder as requested
-      const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY";
-
-      if (PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-         console.warn("EmailJS Public Key is missing. Please set VITE_EMAILJS_PUBLIC_KEY environment variable.");
+      
+      if (!PUBLIC_KEY) {
+        throw new Error("EmailJS Public Key is missing. Please check your environment configuration.");
       }
 
+      // We pass the public key explicitly to send as well, ensuring it's used
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
 
       setIsSuccess(true);
