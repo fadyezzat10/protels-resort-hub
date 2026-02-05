@@ -19,7 +19,7 @@ const hotelsContactInfo = [
     emailReservations: "info@protels.com",
     phone: "+20 65 338 0063",
     mobile: "+20 150 092 5579",
-    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3587.6976694380766!2d34.2986429!3d26.1086551!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x144ca68c68612175%3A0xc3f60fdf6b131804!2sProtels%20Crystal%20Beach%20Resort!5e0!3m2!1sen!2seg!4v1709123456789!5m2!1sen!2seg"
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14348.674567475374!2d34.3333!3d25.9667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x144ca70000000001%3A0x1234567890abcdef!2sProtels%20Crystal%20Beach%20Resort!5e0!3m2!1sen!2seg!4v1709123456789!5m2!1sen!2seg"
   },
   {
     id: "beach-club",
@@ -31,7 +31,7 @@ const hotelsContactInfo = [
     emailReservations: "info@protels.com",
     phone: "+20 65 338 0063",
     mobile: "+20 150 092 5579",
-    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3588.0!2d34.3!3d26.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDA2JzAwLjAiTiAzNMKwMTgnMDAuMCJF!5e0!3m2!1sen!2seg!4v1709123456790!5m2!1sen!2seg"
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14348.674567475374!2d34.3400!3d25.9700!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x144ca70000000002%3A0x1234567890abcdef!2sProtels%20Beach%20Club%20%26%20SPA!5e0!3m2!1sen!2seg!4v1709123456790!5m2!1sen!2seg"
   },
   {
     id: "royal-bay",
@@ -43,7 +43,7 @@ const hotelsContactInfo = [
     emailReservations: "reservation.royalbay@protels.com",
     phone: "+20 65 346 0000",
     mobile: "+20 120 000 0003",
-    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3621.0!2d33.8!3d27.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDEyJzAwLjAiTiAzM8KwNDgnMDAuMCJF!5e0!3m2!1sen!2seg!4v1709123456791!5m2!1sen!2seg"
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3621.6337225227745!2d33.8236!3d27.1556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1452870000000001%3A0x1234567890abcdef!2sProtels%20Royal%20Bay%20Resort!5e0!3m2!1sen!2seg!4v1709123456791!5m2!1sen!2seg"
   },
   {
     id: "la-plage",
@@ -55,7 +55,7 @@ const hotelsContactInfo = [
     emailReservations: "reservation.laplage@protels.com",
     phone: "+255 24 123 4567",
     mobile: "+255 77 123 4567",
-    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.0!2d39.3!3d-5.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwNTQnMDAuMCJTIDM5wrAxOCcwMC4wIkU!5e0!3m2!1sen!2tz!4v1709123456792!5m2!1sen!2tz"
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.8!2d39.5!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTInMDAuMCJTIDM5wrAzMCcwMC4wIkU!5e0!3m2!1sen!2tz!4v1709123456792!5m2!1sen!2tz"
   }
 ];
 
