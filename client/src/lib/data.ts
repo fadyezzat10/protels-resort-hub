@@ -250,11 +250,14 @@ export const hotels: Hotel[] = [
       {
         name: "Family Bungalow",
         size: "55 m²",
-        bed: "King Bed + 2 Single Beds",
-        view: "Garden View",
-        amenities: ["Two Sleeping Areas", "Large Terrace", "Family Bathroom", "Air Conditioning", "Mini Fridge", "Easy Beach Access"],
-        description: "Ideal for families, this expansive bungalow provides ample space and comfort. Located close to the beach and pool, it offers a peaceful garden setting with separate sleeping areas for privacy.",
-        images: [laPlage2, laPlage3, laPlage4]
+        bed: "King Bed",
+        view: "Garden or Resort View",
+        amenities: ["King-size bed", "Air Conditioning", "Wardrobe", "Safe Box", "Mini Fridge", "Spacious Layout", "African-inspired Design"],
+        description: "A spacious and welcoming Family Bungalow, designed for families seeking comfort and privacy in a relaxed coastal setting. The bungalow features a large king-size bed with elegant mosquito net draping, warm wooden furniture, and tasteful African-inspired décor. Soft lighting, vibrant textiles, and thoughtful details create a cozy yet refined atmosphere. Ideal for families, this bungalow offers ample space to unwind, modern amenities for a comfortable stay, and a serene ambiance that blends island charm with home-like convenience.",
+        images: [
+          "/images/la-plage/rooms/family-bungalow/room-detail-1.png",
+          "/images/la-plage/rooms/family-bungalow/room-detail-2.png"
+        ]
       }
     ],
     gallery: [
