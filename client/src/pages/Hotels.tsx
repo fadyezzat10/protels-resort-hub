@@ -4,7 +4,7 @@ import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import { hotels } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
-import heroImg from "@/assets/images/hotels-hero.png";
+import heroImg from "@/assets/images/hotels-hero-aerial.jpg";
 
 export default function Hotels() {
   const { t } = useI18n();
