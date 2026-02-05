@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import HotelGallery from "@/components/HotelGallery";
 import RoomModal from "@/components/RoomModal";
 
-import tribalPattern from "@/assets/images/tribal-pattern.png";
+import tribalPattern from "@/assets/images/tribal-pattern.webp";
 
 export default function HotelDetails() {
   const [location, setLocation] = useLocation();
