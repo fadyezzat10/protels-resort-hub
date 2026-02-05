@@ -14,11 +14,11 @@ const hotelsContactInfo = [
     name: "Protels Crystal Beach Resort",
     country: "Egypt",
     city: "Marsa Alam",
-    address: "Km 19, South El Quseir, Marsa Alam Road",
-    emailSales: "sales.crystal@protels.com",
-    emailReservations: "reservation.crystal@protels.com",
-    phone: "+20 65 339 0021",
-    mobile: "+20 120 000 0001",
+    address: "20 Km North of Marsa Alam Red Sea 84721, Egypt",
+    emailSales: null,
+    emailReservations: "info@protels.com",
+    phone: "+20 65 338 0063",
+    mobile: "+20 150 092 5579",
     mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3587.6976694380766!2d34.2986429!3d26.1086551!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x144ca68c68612175%3A0xc3f60fdf6b131804!2sProtels%20Crystal%20Beach%20Resort!5e0!3m2!1sen!2seg!4v1709123456789!5m2!1sen!2seg"
   },
   {
