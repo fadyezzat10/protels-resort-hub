@@ -10,7 +10,7 @@ import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.
 import beachClubImg from "@assets/DSC05597.png11_1770196278235.png";
 import royalBayImg from "@assets/WhatsApp_Image_2025-12-22_at_12.58.16_PM_(1)_1770197117342.jpeg";
 import laPlageImg from "@assets/22_1770196761222.png";
-import siteHeroImg from "@/assets/images/site-hero.png";
+import aboutHeroImg from "@/assets/images/about-hero-aerial.jpg";
 
 export default function About() {
   const { t } = useI18n();
@@ -85,7 +85,7 @@ export default function About() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 z-10" />
         
         <motion.img 
-          src={siteHeroImg} 
+          src={aboutHeroImg} 
           alt="Protels Luxury Aerial View"
           className="absolute inset-0 w-full h-full object-cover"
           initial={{ scale: 1.15, opacity: 0 }}

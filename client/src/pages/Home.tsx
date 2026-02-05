@@ -4,7 +4,14 @@ import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import { hotels } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
-import siteHeroImg from "@/assets/images/site-hero.png";
+import heroImg from "@/assets/images/hero-main.jpg";
+
+// Slider Images
+import slider1 from "@assets/Gemini_Generated_Image_g6moaog6moaog6mo_1770195209224.png";
+import slider2 from "@assets/DSC05597.png11_1770195240514.png";
+import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.png";
+import slider4 from "@assets/1_1770195252319.png";
+import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.png";
 
 export default function Home() {
   const { t } = useI18n();
@@ -14,7 +21,7 @@ export default function Home() {
       <Navbar />
       
       <Hero 
-        image={siteHeroImg}
+        images={[slider1, slider2, slider3, slider4, slider5]}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />
