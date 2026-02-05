@@ -559,20 +559,92 @@ export default function HotelDetails() {
                 )}
 
                 {hotel.dining ? (
-                  <div className="space-y-8">
+                  <div className="space-y-12">
                     {/* Main Restaurant */}
                     {hotel.dining.main && (
-                      <div className="bg-gray-50 p-8 border border-gray-100">
-                        <div className="flex items-start gap-4">
-                          <Utensils className="w-8 h-8 text-brand-gold shrink-0" />
-                          <div>
-                            <h3 className="font-serif text-2xl font-bold text-brand-blue mb-2">{hotel.dining.main.name}</h3>
-                            <p className="text-gray-600 mb-4">{hotel.dining.main.desc}</p>
-                            <div className="inline-block bg-white px-4 py-2 text-xs font-bold text-brand-blue uppercase tracking-wider border border-gray-200">
-                              {hotel.dining.main.hours}
-                            </div>
+                      <div className={cn(
+                        "bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm flex flex-col md:flex-row",
+                        isLaPlage && "bg-[#F9F6F0] border-[#8B5A2B]/10"
+                      )}>
+                        <div className="md:w-2/5 h-64 md:h-auto relative">
+                           {/* Using specific image for La Plage main restaurant if available, otherwise general hotel image */}
+                           <img 
+                            src={isLaPlage ? "/images/la-plage/dining/dining-1.jpg" : hotel.image} 
+                            alt={hotel.dining.main.name} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-8 md:w-3/5 flex flex-col justify-center">
+                          <div className="flex items-center gap-4 mb-4">
+                            <Utensils className={cn("w-6 h-6 text-brand-gold shrink-0", isLaPlage && "text-[#8B5A2B]")} />
+                            <h3 className={cn("text-2xl font-serif text-brand-blue", isLaPlage && "text-[var(--color-brand-blue)]")}>{hotel.dining.main.name}</h3>
+                          </div>
+                          <p className={cn("text-gray-600 mb-6 leading-relaxed", isLaPlage && "text-[#5D4E40]")}>{hotel.dining.main.desc}</p>
+                          <div className={cn(
+                            "inline-block bg-gray-50 px-4 py-2 rounded-md text-sm font-medium text-gray-800 border border-gray-200",
+                            isLaPlage && "bg-white border-[#8B5A2B]/10 text-[#8B5A2B]"
+                          )}>
+                            {hotel.dining.main.hours}
                           </div>
                         </div>
+                      </div>
+                    )}
+
+                    {/* La Plage Specific - Beachfront Dining Section */}
+                    {isLaPlage && (
+                      <div className="bg-[#F9F6F0] border border-[#8B5A2B]/10 rounded-lg overflow-hidden shadow-sm mt-12">
+                         <div className="p-8 md:p-10">
+                            <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
+                               <div className="flex-1">
+                                  <div className="flex items-center gap-3 mb-6">
+                                     <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
+                                        <Wine className="w-6 h-6 text-[#8B5A2B]" />
+                                     </div>
+                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Beachfront Dining Experience</h3>
+                                  </div>
+                                  <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-8 max-w-3xl">
+                                    Indulge in a romantic barefoot luxury dining experience right on the soft white sands of Zanzibar. Savor fresh, locally sourced seafood and Swahili-inspired cuisine under the shade of palms or beneath a canopy of stars. With the sound of gentle waves as your soundtrack, our beachfront setting offers an unforgettable culinary journey.
+                                  </p>
+                                  
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6">
+                                     {[
+                                       "Romantic Private Tables", 
+                                       "Fresh Seafood Catch", 
+                                       "Swahili Fusion Cuisine", 
+                                       "Sunset Cocktails", 
+                                       "Barefoot Luxury Vibe"
+                                     ].map((item, i) => (
+                                       <div key={i} className="flex items-center gap-3 text-sm text-[#8B5A2B]">
+                                          <div className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B]" />
+                                          {item}
+                                       </div>
+                                     ))}
+                                  </div>
+                               </div>
+                            </div>
+
+                            {/* Dining Gallery Slider */}
+                            <div className="pt-8 border-t border-[#8B5A2B]/10">
+                              <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                                {[
+                                  "dining-2.jpg", "dining-3.jpg", "dining-4.jpg", "dining-5.jpg", 
+                                  "dining-6.jpg", "dining-7.jpg", "dining-8.jpg", "dining-9.jpg",
+                                  "dining-10.jpg", "dining-11.jpg", "dining-12.jpg", "dining-13.jpg",
+                                  "dining-14.jpg", "dining-15.jpg", "dining-16.jpg", "dining-17.jpg",
+                                  "dining-18.jpg", "dining-19.jpg", "dining-20.jpg"
+                                ].map((img, i) => (
+                                  <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                                    <img 
+                                      src={`/images/la-plage/dining/${img}`}
+                                      alt={`La Plage Dining ${i + 1}`}
+                                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                         </div>
                       </div>
                     )}
 
