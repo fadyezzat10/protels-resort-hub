@@ -3,10 +3,64 @@ import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hotel-beach-club.jpg";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Smartphone, Globe } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+// Configuration object for hotel contact details
+const hotelsContactInfo = [
+  {
+    id: "crystal-beach",
+    name: "Protels Crystal Beach Resort",
+    country: "Egypt",
+    city: "Marsa Alam",
+    address: "Km 19, South El Quseir, Marsa Alam Road",
+    emailSales: "sales.crystal@protels.com",
+    emailReservations: "reservation.crystal@protels.com",
+    phone: "+20 65 339 0021",
+    mobile: "+20 120 000 0001",
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3587.6976694380766!2d34.2986429!3d26.1086551!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x144ca68c68612175%3A0xc3f60fdf6b131804!2sProtels%20Crystal%20Beach%20Resort!5e0!3m2!1sen!2seg!4v1709123456789!5m2!1sen!2seg"
+  },
+  {
+    id: "beach-club",
+    name: "Protels Beach Club & SPA",
+    country: "Egypt",
+    city: "Marsa Alam",
+    address: "Km 21, South El Quseir, Marsa Alam Road",
+    emailSales: "sales.beachclub@protels.com",
+    emailReservations: "reservation.beachclub@protels.com",
+    phone: "+20 65 339 0025",
+    mobile: "+20 120 000 0002",
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3588.0!2d34.3!3d26.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDA2JzAwLjAiTiAzNMKwMTgnMDAuMCJF!5e0!3m2!1sen!2seg!4v1709123456790!5m2!1sen!2seg"
+  },
+  {
+    id: "royal-bay",
+    name: "Protels Royal Bay Resort & Spa",
+    country: "Egypt",
+    city: "Hurghada",
+    address: "Safaga Road, Hurghada",
+    emailSales: "sales.royalbay@protels.com",
+    emailReservations: "reservation.royalbay@protels.com",
+    phone: "+20 65 346 0000",
+    mobile: "+20 120 000 0003",
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3621.0!2d33.8!3d27.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDEyJzAwLjAiTiAzM8KwNDgnMDAuMCJF!5e0!3m2!1sen!2seg!4v1709123456791!5m2!1sen!2seg"
+  },
+  {
+    id: "la-plage",
+    name: "Protels La Plage",
+    country: "Tanzania",
+    city: "Zanzibar",
+    address: "Kiwengwa Beach, Zanzibar Island",
+    emailSales: "sales.laplage@protels.com",
+    emailReservations: "reservation.laplage@protels.com",
+    phone: "+255 24 123 4567",
+    mobile: "+255 77 123 4567",
+    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.0!2d39.3!3d-5.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwNTQnMDAuMCJTIDM5wrAxOCcwMC4wIkU!5e0!3m2!1sen!2tz!4v1709123456792!5m2!1sen!2tz"
+  }
+];
 
 export default function Contact() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   return (
     <div className="min-h-screen bg-brand-white">
@@ -20,50 +74,120 @@ export default function Contact() {
       />
       
       <div className="container-padding py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-          
-          <div>
-            <h2 className="text-3xl font-serif text-brand-blue mb-8">{t("contact.title")}</h2>
-            
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-brand-gold/10 flex items-center justify-center text-brand-gold">
-                  <MapPin className="w-6 h-6" />
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-4xl font-serif text-brand-blue mb-4">{t("contact.title")}</h2>
+          <div className="w-24 h-1 bg-brand-gold mx-auto" />
+        </div>
+
+        <div className="grid grid-cols-1 gap-12">
+          {hotelsContactInfo.map((hotel) => (
+            <Card key={hotel.id} className="overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+              <div className="grid grid-cols-1 lg:grid-cols-3">
+                {/* Contact Details */}
+                <div className="p-8 lg:p-10 lg:col-span-2 bg-white">
+                  <div className="flex flex-col h-full">
+                    <div className="mb-8">
+                      <span className="text-brand-gold text-sm font-bold tracking-widest uppercase mb-2 block">
+                        {hotel.city}, {hotel.country}
+                      </span>
+                      <h3 className="text-2xl md:text-3xl font-serif text-brand-blue font-medium">
+                        {hotel.name}
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 flex-grow">
+                      {/* Address */}
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
+                          <MapPin className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wide mb-1">{t("contact.address")}</h4>
+                          <p className="text-gray-600 leading-relaxed">{hotel.address}</p>
+                        </div>
+                      </div>
+
+                      {/* Phone & Mobile */}
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
+                          <Phone className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wide mb-1">{t("contact.phone")}</h4>
+                          <div className="text-gray-600 space-y-1">
+                            <a href={`tel:${hotel.phone}`} className="block hover:text-brand-blue transition-colors">
+                              {hotel.phone}
+                            </a>
+                            {hotel.mobile && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400 uppercase">{t("contact.mobile")}:</span>
+                                <a href={`tel:${hotel.mobile}`} className="hover:text-brand-blue transition-colors">
+                                  {hotel.mobile}
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Emails */}
+                      <div className="flex items-start gap-4 md:col-span-2">
+                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
+                          <Mail className="w-5 h-5" />
+                        </div>
+                        <div className="w-full">
+                          <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wide mb-1">{t("contact.email")}</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                            {hotel.emailReservations && (
+                              <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between group hover:border-brand-gold/30 transition-colors">
+                                <div>
+                                  <span className="text-xs text-gray-500 block mb-0.5">{t("contact.reservations")}</span>
+                                  <a href={`mailto:${hotel.emailReservations}`} className="text-brand-blue font-medium hover:underline text-sm break-all">
+                                    {hotel.emailReservations}
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                            {hotel.emailSales && (
+                              <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between group hover:border-brand-gold/30 transition-colors">
+                                <div>
+                                  <span className="text-xs text-gray-500 block mb-0.5">{t("contact.sales")}</span>
+                                  <a href={`mailto:${hotel.emailSales}`} className="text-brand-blue font-medium hover:underline text-sm break-all">
+                                    {hotel.emailSales}
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-brand-blue mb-1">{t("contact.address")}</h3>
-                  <p className="text-gray-600">Head Office: Cairo, Egypt<br/>Resorts in Marsa Alam, Hurghada, Zanzibar</p>
+
+                {/* Map Section */}
+                <div className="bg-gray-100 min-h-[300px] lg:min-h-full border-l border-gray-100 relative group">
+                  <iframe 
+                    src={hotel.mapUrl}
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 0, minHeight: "300px" }} 
+                    allowFullScreen 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="grayscale group-hover:grayscale-0 transition-all duration-500"
+                  />
+                  <div className="absolute bottom-4 right-4">
+                    <Button size="sm" variant="secondary" className="bg-white shadow-md hover:bg-brand-blue hover:text-white" asChild>
+                      <a href={hotel.mapUrl.replace("embed", "search")} target="_blank" rel="noopener noreferrer">
+                        Open in Google Maps
+                      </a>
+                    </Button>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-brand-gold/10 flex items-center justify-center text-brand-gold">
-                  <Phone className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-brand-blue mb-1">{t("contact.phone")}</h3>
-                  <p className="text-gray-600">+20 123 456 7890<br/>+20 100 000 0000</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-brand-gold/10 flex items-center justify-center text-brand-gold">
-                  <Mail className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-brand-blue mb-1">{t("contact.email")}</h3>
-                  <p className="text-gray-600">reservations@protels.com<br/>info@protels.com</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 p-8 border border-gray-100">
-             {/* Simple Google Maps Placeholder */}
-             <div className="w-full h-full min-h-[400px] bg-gray-200 flex items-center justify-center">
-               <span className="text-gray-500 font-medium">Google Map Embed</span>
-             </div>
-          </div>
+            </Card>
+          ))}
         </div>
       </div>
       <Footer />
