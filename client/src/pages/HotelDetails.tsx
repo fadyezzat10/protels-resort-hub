@@ -648,6 +648,54 @@ export default function HotelDetails() {
                       </div>
                     )}
 
+                    {/* La Plage Specific - The Lounge Section */}
+                    {isLaPlage && (
+                      <div className="bg-white border border-[#8B5A2B]/10 rounded-lg overflow-hidden shadow-sm mt-12">
+                         <div className="p-8 md:p-10">
+                            <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
+                               <div className="flex-1 order-2 md:order-1">
+                                  <div className="flex items-center gap-3 mb-6">
+                                     <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
+                                        <Coffee className="w-6 h-6 text-[#8B5A2B]" />
+                                     </div>
+                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">The Lounge – Bar & Terrace</h3>
+                                  </div>
+                                  <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-6 max-w-3xl">
+                                    Embrace the slow rhythm of island life at The Lounge – Bar & Terrace, an open-air sanctuary designed with natural materials and a relaxed African coastal vibe. Sip on refreshing handcrafted cocktails and savor light snacks in a calm, breezy atmosphere perfect for daytime relaxation. As golden hour approaches, this elegant yet laid-back space becomes the ultimate setting for unforgettable sunset moments.
+                                  </p>
+                                  
+                                  <div className="flex flex-wrap gap-4 mt-6">
+                                     {["Handcrafted Cocktails", "Light Snacks", "Sunset Views", "Open-Air Design"].map((item, i) => (
+                                       <span key={i} className="px-3 py-1 bg-[#F9F6F0] text-[#8B5A2B] text-xs font-bold uppercase tracking-wider rounded-full border border-[#8B5A2B]/10">
+                                         {item}
+                                       </span>
+                                     ))}
+                                  </div>
+                               </div>
+                               <div className="w-full md:w-5/12 order-1 md:order-2">
+                                  <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md rotate-1 hover:rotate-0 transition-transform duration-500">
+                                    <img src="/images/la-plage/lounge/lounge-1.png" alt="The Lounge Bar" className="w-full h-full object-cover" />
+                                  </div>
+                               </div>
+                            </div>
+
+                            {/* Lounge Gallery */}
+                            <div className="grid grid-cols-3 gap-4">
+                              {["lounge-2.png", "lounge-3.png", "lounge-4.png"].map((img, i) => (
+                                <div key={i} className="aspect-square rounded-lg overflow-hidden relative group cursor-pointer shadow-sm">
+                                  <img 
+                                    src={`/images/la-plage/lounge/${img}`}
+                                    alt={`The Lounge Detail ${i + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                  />
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                </div>
+                              ))}
+                            </div>
+                         </div>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Specialty Restaurants */}
                       {hotel.dining.specialty?.map((rest, idx) => (
