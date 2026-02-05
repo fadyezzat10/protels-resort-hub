@@ -252,7 +252,23 @@ export const hotels: Hotel[] = [
         images: [laPlage2, laPlage3, laPlage4]
       }
     ],
-    gallery: [laPlage, laPlage1, laPlage2, laPlage3, laPlage4, laPlage5],
+    gallery: [
+      "/images/la-plage/facilities/pools/pool-hero.png",
+      "/images/la-plage/dining/dining-1.jpg",
+      "/images/la-plage/dining/dining-11.jpg",
+      "/images/la-plage/lounge/lounge-1.png",
+      "/images/la-plage/blu-bar/blu-1.jpg",
+      "/images/la-plage/jazz-bar/jazz-1.jpg",
+      "/images/la-plage/rooms/superior-twin/room-1.jpg",
+      "/images/la-plage/facilities/pools/pool-1.jpg",
+      "/images/la-plage/facilities/pools/pool-7.png",
+      "/images/la-plage/facilities/aerial-1.png",
+      "/images/la-plage/facilities/pool-palm-1.png",
+      "/images/la-plage/dining/dining-6.jpg",
+      "/images/la-plage/lounge/lounge-2.png",
+      "/images/la-plage/blu-bar/blu-2.jpg",
+      "/images/la-plage/jazz-bar/jazz-2.jpg"
+    ],
     dining: {
       main: {
         name: "La Cabana – Main Restaurant",
