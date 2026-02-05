@@ -115,7 +115,7 @@ export default function Careers() {
         location: formData.location,
         experience: formData.experience,
         message: formData.message || "No cover message provided.",
-        content: cvBase64, 
+        file: cvBase64, 
         file_name: formData.cv?.name
       };
 
@@ -126,8 +126,6 @@ export default function Careers() {
 
       if (PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
          console.warn("EmailJS Public Key is missing. Please set VITE_EMAILJS_PUBLIC_KEY environment variable.");
-         // We'll try to send anyway, which might fail if key is invalid, or if the user intends to replace the placeholder manually.
-         // However, EmailJS client SDK throws error if public key is missing/invalid usually.
       }
 
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
@@ -135,11 +133,11 @@ export default function Careers() {
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("EmailJS Error:", error);
       toast({
         title: "Submission Failed",
-        description: "There was an error sending your application. Please try again later.",
+        description: `There was an error sending your application: ${error?.text || error.message || "Unknown error"}. Please try again later.`,
         variant: "destructive"
       });
     } finally {
