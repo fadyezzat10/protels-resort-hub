@@ -1,0 +1,159 @@
+Create a professional Careers / Join Our Team page for Protels Hotels & Resorts, following international hotel HR standards.
+
+🔹 1. Page Placement
+
+Add a new page titled Careers
+
+Place it in the main navigation bar next to “Contact”
+
+URL example: /careers
+
+🔹 2. Page Content (Professional HR Copy – Hospitality Tone)
+
+Page Headline:
+
+Join Our Team
+
+Intro Text (Professional Hotel HR Style):
+
+At Protels Hotels & Resorts, we believe that exceptional hospitality starts with exceptional people.
+We are always looking for passionate, talented individuals who are eager to grow and deliver memorable guest experiences across our destinations.
+
+🔹 3. Job Categories Section
+
+Display selectable job categories (no job listings required for now):
+
+Front Office
+
+Food & Beverage
+
+Housekeeping
+
+Kitchen
+
+Engineering & Maintenance
+
+Spa & Wellness
+
+Sales & Marketing
+
+Finance
+
+Human Resources
+
+IT
+
+Security
+
+Other
+
+🔹 4. Application Form (REQUIRED)
+
+Create a job application form with the following fields:
+
+Personal Information
+
+Full Name (required)
+
+Email Address (required)
+
+Phone Number (required)
+
+Job Details
+
+Position Applied For (required)
+
+Preferred Department (dropdown – job categories)
+
+Preferred Hotel / Location (dropdown):
+
+Protels Crystal Beach Resort – Marsa Alam
+
+Protels Beach Club & Spa – Marsa Alam
+
+Protels La Plage – Zanzibar
+
+Protels Royal Bay Resort & Spa – Hurghada
+
+Years of Experience (dropdown)
+
+Attachments
+
+Upload CV (required)
+
+Accepted formats: PDF / DOC / DOCX
+
+Max file size enforced
+
+🔹 5. Email Submission Logic (CRITICAL)
+
+When the applicant submits the form:
+
+Send an automatic email to:
+📧 marketing@protels.com
+
+The email must include:
+
+All submitted form data clearly formatted
+
+CV attached as a file
+
+Email Subject Format:
+
+New Job Application – [Position Applied For] – [Applicant Full Name]
+
+Email Body Example Structure:
+
+Name:
+
+Email:
+
+Phone:
+
+Position Applied For:
+
+Department:
+
+Preferred Hotel:
+
+Years of Experience:
+
+CV: (attached)
+
+⚠️ Do NOT store applications publicly
+⚠️ Email delivery must be reliable (SMTP / backend email service)
+
+🔹 6. Confirmation Message (Frontend)
+
+After successful submission, show this message:
+
+Thank you for applying to Protels Hotels & Resorts.
+Our HR team will review your application, and we will contact you if your profile matches our current needs.
+
+🔹 7. Design & UX Guidelines
+
+Clean, professional hospitality look
+
+Matches Protels brand identity
+
+Mobile responsive
+
+Clear call-to-action: Apply Now
+
+Accessible and user-friendly
+
+🔹 8. Technical Notes (IMPORTANT)
+
+CV upload must be secure
+
+Prevent spam (basic validation)
+
+No public database listing
+
+Backend email handling required
+
+Works across all browsers
+
+🔹 9. Final Requirement
+
+This page must function as a direct HR inbox system, where every job application is delivered via email to the Protels team with full details and CV attachment.

@@ -26,6 +26,7 @@ export default function Navbar() {
     { href: "/hotels", label: "nav.hotels" },
     { href: "/gallery", label: "nav.gallery" },
     { href: "/about", label: "nav.about" },
+    { href: "/careers", label: "nav.careers" },
     { href: "/contact", label: "nav.contact" },
   ];
 

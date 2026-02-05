@@ -10,6 +10,7 @@ import Hotels from "@/pages/Hotels";
 import HotelDetails from "@/pages/HotelDetails";
 import Gallery from "@/pages/Gallery";
 import Contact from "@/pages/Contact";
+import Careers from "@/pages/Careers";
 import About from "@/pages/About";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/hotels" component={Hotels} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/contact" component={Contact} />
+      <Route path="/careers" component={Careers} />
       <Route path="/about" component={About} />
       
       {/* Dynamic hotel page routing with sections */}
