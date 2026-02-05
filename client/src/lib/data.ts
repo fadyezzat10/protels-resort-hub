@@ -292,7 +292,27 @@ export const hotels: Hotel[] = [
       "/images/la-plage/gallery/gallery-new-37.png",
       "/images/la-plage/gallery/gallery-new-38.png",
       "/images/la-plage/gallery/gallery-new-39.png",
-      "/images/la-plage/gallery/gallery-new-40.png"
+      "/images/la-plage/gallery/gallery-new-40.png",
+      "/images/la-plage/gallery/gallery-new-41.png",
+      "/images/la-plage/gallery/gallery-new-42.png",
+      "/images/la-plage/gallery/gallery-new-43.png",
+      "/images/la-plage/gallery/gallery-new-44.jpg",
+      "/images/la-plage/gallery/gallery-new-45.jpg",
+      "/images/la-plage/gallery/gallery-new-46.jpg",
+      "/images/la-plage/gallery/gallery-new-47.jpg",
+      "/images/la-plage/gallery/gallery-new-48.jpg",
+      "/images/la-plage/gallery/gallery-new-49.jpg",
+      "/images/la-plage/gallery/gallery-new-50.jpg",
+      "/images/la-plage/gallery/gallery-new-51.jpg",
+      "/images/la-plage/gallery/gallery-new-52.jpg",
+      "/images/la-plage/gallery/gallery-new-53.jpg",
+      "/images/la-plage/gallery/gallery-new-54.jpg",
+      "/images/la-plage/gallery/gallery-new-55.jpg",
+      "/images/la-plage/gallery/gallery-new-56.jpg",
+      "/images/la-plage/gallery/gallery-new-57.jpg",
+      "/images/la-plage/gallery/gallery-new-58.jpg",
+      "/images/la-plage/gallery/gallery-new-59.jpg",
+      "/images/la-plage/gallery/gallery-new-60.png"
     ],
     dining: {
       main: {
