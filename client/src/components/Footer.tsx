@@ -88,8 +88,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-6 text-center text-white/20 text-[0.65rem] uppercase tracking-[0.3em]">
+          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center text-white/20 text-[0.65rem] uppercase tracking-[0.3em] gap-4">
           <p>&copy; {currentYear} PROTELS Hotels & Resorts. {t("footer.rights")}.</p>
+          <div className="flex gap-4">
+            <Link href="/admin">
+              <a className="hover:text-brand-gold transition-colors">Admin Login</a>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
