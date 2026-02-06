@@ -15,6 +15,7 @@ import About from "@/pages/About";
 import Dashboard from "@/pages/admin/Dashboard";
 import UsersPage from "@/pages/admin/Users";
 import NewsletterPage from "@/pages/admin/Newsletter";
+import Login from "@/pages/admin/Login";
 
 function Router() {
   return (
@@ -27,7 +28,8 @@ function Router() {
       <Route path="/about" component={About} />
 
       {/* Admin Routes */}
-      <Route path="/admin" component={Dashboard} />
+      <Route path="/admin" component={Login} />
+      <Route path="/admin/dashboard" component={Dashboard} />
       <Route path="/admin/users" component={UsersPage} />
       <Route path="/admin/newsletter" component={NewsletterPage} />
       
