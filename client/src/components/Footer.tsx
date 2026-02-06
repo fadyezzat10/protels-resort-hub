@@ -92,7 +92,7 @@ export default function Footer() {
           <p>&copy; {currentYear} PROTELS Hotels & Resorts. {t("footer.rights")}.</p>
           <div className="flex gap-4">
             <Link href="/admin">
-              <a className="hover:text-brand-gold transition-colors">Admin Login</a>
+              <a className="hover:text-brand-gold transition-colors">Admin</a>
             </Link>
           </div>
         </div>
