@@ -49,6 +49,26 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Newsletter */}
+          <div>
+            <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">Newsletter</h3>
+            <p className="text-white/60 text-sm mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
+            <form className="space-y-3" onSubmit={(e) => {
+              e.preventDefault();
+              alert("Thank you for subscribing!");
+            }}>
+              <input 
+                type="email" 
+                placeholder="Your email address" 
+                className="w-full bg-white/5 border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-brand-gold/50 transition-colors placeholder:text-white/20"
+                required
+              />
+              <button type="submit" className="w-full bg-brand-gold text-brand-blue font-bold text-xs uppercase tracking-widest py-3 hover:bg-white transition-colors">
+                Subscribe
+              </button>
+            </form>
+          </div>
+
           {/* Social */}
           <div>
             <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">Connect</h3>

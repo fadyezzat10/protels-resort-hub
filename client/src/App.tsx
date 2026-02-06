@@ -12,6 +12,9 @@ import Gallery from "@/pages/Gallery";
 import Contact from "@/pages/Contact";
 import Careers from "@/pages/Careers";
 import About from "@/pages/About";
+import Dashboard from "@/pages/admin/Dashboard";
+import UsersPage from "@/pages/admin/Users";
+import NewsletterPage from "@/pages/admin/Newsletter";
 
 function Router() {
   return (
@@ -22,6 +25,11 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/careers" component={Careers} />
       <Route path="/about" component={About} />
+
+      {/* Admin Routes */}
+      <Route path="/admin" component={Dashboard} />
+      <Route path="/admin/users" component={UsersPage} />
+      <Route path="/admin/newsletter" component={NewsletterPage} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/:hotelId" component={HotelDetails} />
