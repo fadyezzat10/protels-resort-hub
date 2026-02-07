@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Lock, Mail, ArrowRight } from "lucide-react";
-import logo from "@assets/سش.pngش_1770193463633.png";
+import logo from "@/assets/images/logo-icon.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
