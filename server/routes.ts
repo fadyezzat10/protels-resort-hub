@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { pool } from "./db";
-import { seedAdmin, verifyPassword, hashPassword } from "./auth";
+import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
 
 declare module "express-session" {
   interface SessionData {
@@ -68,6 +68,7 @@ export async function registerRoutes(
   });
 
   await seedAdmin();
+  await seedContent();
 
   // Health
   app.get("/api/health", (_req, res) => {
