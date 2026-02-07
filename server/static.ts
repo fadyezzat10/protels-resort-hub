@@ -12,8 +12,7 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // Explicitly handle /admin and other client-side routes
-  app.get("/{*splat}", (_req, res) => {
+  app.use((_req, res, _next) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
