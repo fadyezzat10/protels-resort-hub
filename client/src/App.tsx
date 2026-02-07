@@ -12,9 +12,10 @@ import Gallery from "@/pages/Gallery";
 import Contact from "@/pages/Contact";
 import Careers from "@/pages/Careers";
 import About from "@/pages/About";
-import Dashboard from "@/pages/admin/Dashboard";
-import UsersPage from "@/pages/admin/Users";
-import NewsletterPage from "@/pages/admin/Newsletter";
+import CMSDashboard from "@/pages/admin/CMSDashboard";
+import CMSPages from "@/pages/admin/CMSPages";
+import CMSHotels from "@/pages/admin/CMSHotels";
+import CMSSettings from "@/pages/admin/CMSSettings";
 import Login from "@/pages/admin/Login";
 
 function Router() {
@@ -28,10 +29,11 @@ function Router() {
       <Route path="/about" component={About} />
 
       {/* Admin Routes */}
-      <Route path="/admin" component={Login} />
-      <Route path="/admin/dashboard" component={Dashboard} />
-      <Route path="/admin/users" component={UsersPage} />
-      <Route path="/admin/newsletter" component={NewsletterPage} />
+      <Route path="/controlpanal" component={Login} />
+      <Route path="/controlpanal/dashboard" component={CMSDashboard} />
+      <Route path="/controlpanal/pages" component={CMSPages} />
+      <Route path="/controlpanal/hotels" component={CMSHotels} />
+      <Route path="/controlpanal/settings" component={CMSSettings} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/:hotelId" component={HotelDetails} />
