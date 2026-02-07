@@ -5,23 +5,19 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/images/logo-icon.png";
+import logo from "@assets/سش.pngش_1770193463633.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCMSStore } from "@/lib/store";
-
-import Artboard_1_100x from "@assets/Artboard 1@100x.png";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { settings } = useCMSStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +48,7 @@ export default function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full",
-        isScrolled ? "bg-white shadow-sm py-2" : "bg-transparent py-4"
+        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-2" : "bg-transparent py-4"
       )}
       dir={dir}
     >
@@ -62,10 +58,10 @@ export default function Navbar() {
           <a className="flex items-center gap-4 group">
             <img 
               src={logo} 
-              alt={settings.name} 
+              alt="PROTELS" 
               className={cn(
                 "transition-all duration-300 object-contain h-auto",
-                isScrolled ? "w-[50px] md:w-[70px] brightness-0" : "w-[60px] md:w-[85px] brightness-0 invert"
+                isScrolled ? "w-[100px] md:w-[140px] invert" : "w-[115px] md:w-[160px]"
               )} 
             />
           </a>
@@ -77,8 +73,8 @@ export default function Navbar() {
             <Link key={link.href} href={link.href}>
               <a
                 className={cn(
-                  "text-xs font-medium transition-colors uppercase tracking-widest",
-                  location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue hover:text-brand-gold" : "text-white hover:text-brand-gold"
+                  "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
+                  location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
                 )}
               >
                 {t(link.label)}
@@ -139,6 +135,7 @@ export default function Navbar() {
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
+
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-t p-6 md:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">

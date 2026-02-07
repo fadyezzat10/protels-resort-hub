@@ -16,28 +16,6 @@ import Dashboard from "@/pages/admin/Dashboard";
 import UsersPage from "@/pages/admin/Users";
 import NewsletterPage from "@/pages/admin/Newsletter";
 import Login from "@/pages/admin/Login";
-import GlobalSettings from "@/pages/admin/GlobalSettings";
-import Resorts from "@/pages/admin/Resorts";
-import Pages from "@/pages/admin/Pages";
-import Media from "@/pages/admin/Media";
-import Seo from "@/pages/admin/Seo";
-import { useLocation } from "wouter";
-import { useEffect } from "react";
-
-// Redirect component for /controlpanal
-function AdminRedirect() {
-  const [, setLocation] = useLocation();
-  useEffect(() => {
-    // Check if logged in
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
-    if (isAdmin) {
-      setLocation("/admin/dashboard");
-    } else {
-      setLocation("/admin");
-    }
-  }, [setLocation]);
-  return null;
-}
 
 function Router() {
   return (
@@ -50,16 +28,10 @@ function Router() {
       <Route path="/about" component={About} />
 
       {/* Admin Routes */}
-      <Route path="/controlpanal" component={AdminRedirect} />
       <Route path="/admin" component={Login} />
       <Route path="/admin/dashboard" component={Dashboard} />
       <Route path="/admin/users" component={UsersPage} />
       <Route path="/admin/newsletter" component={NewsletterPage} />
-      <Route path="/admin/global-settings" component={GlobalSettings} />
-      <Route path="/admin/resorts" component={Resorts} />
-      <Route path="/admin/pages" component={Pages} />
-      <Route path="/admin/media" component={Media} />
-      <Route path="/admin/seo" component={Seo} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/:hotelId" component={HotelDetails} />

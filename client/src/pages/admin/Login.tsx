@@ -17,8 +17,7 @@ export default function Login() {
 
     // Mock authentication
     setTimeout(() => {
-      if ((email === "admin@protels.com" && password === "admin123") || 
-          (email === "Fezzat" && password === "Fezzat246810")) {
+      if (email === "admin@protels.com" && password === "admin123") {
         localStorage.setItem("isAdmin", "true");
         setLocation("/admin/dashboard");
       } else {
@@ -47,16 +46,16 @@ export default function Login() {
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 block">Email / Username</label>
+              <label className="text-sm font-medium text-gray-700 block">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="text" 
+                  type="email" 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all"
-                  placeholder="admin@protels.com or Fezzat"
+                  placeholder="admin@protels.com"
                 />
               </div>
             </div>
