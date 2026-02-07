@@ -1,5 +1,6 @@
 import CMSLayout from "./CMSLayout";
-import { useCMSStore, Hotel } from "@/lib/cms-store";
+import { useCMSStore } from "@/lib/cms-store";
+import { Hotel } from "@/lib/data";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,11 +59,11 @@ export default function CMSHotels() {
   };
 
   const handleChange = (field: keyof Hotel, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: Hotel) => ({ ...prev, [field]: value }));
   };
 
   const handleDescChange = (lang: 'en' | 'ar', value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: Hotel) => ({
       ...prev,
       description: { ...prev.description, [lang]: value }
     }));

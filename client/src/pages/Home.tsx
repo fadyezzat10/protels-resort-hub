@@ -2,19 +2,20 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
-import { hotels } from "@/lib/data";
+import { useCMSStore } from "@/lib/cms-store";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hero-main.jpg";
 
 // Slider Images
-import slider1 from "@assets/Gemini_Generated_Image_g6moaog6moaog6mo_1770195209224.png";
-import slider2 from "@assets/DSC05597.png11_1770195240514.png";
-import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.png";
-import slider4 from "@assets/1_1770195252319.png";
-import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.png";
+import slider1 from "@/assets/images/hero-main.jpg";
+import slider2 from "@/assets/images/hotel-crystal-beach.jpg";
+import slider3 from "@/assets/images/hotel-beach-club.jpg";
+import slider4 from "@/assets/images/hotel-la-plage.jpg";
+import slider5 from "@/assets/images/hotel-royal-bay.jpg";
 
 export default function Home() {
   const { t } = useI18n();
+  const { hotels } = useCMSStore();
 
   return (
     <div className="min-h-screen bg-brand-white">

@@ -1,5 +1,6 @@
 import { useLocation, Link, useRoute } from "wouter";
-import { hotels, bookingLink, RoomDetail } from "@/lib/data";
+import { bookingLink, RoomDetail } from "@/lib/data";
+import { useCMSStore } from "@/lib/cms-store";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -25,6 +26,7 @@ export default function HotelDetails() {
   const hotelId = params?.hotelId || location.split('/')[1];
   const activeSection = params?.section || "overview";
   
+  const { hotels } = useCMSStore();
   const hotel = hotels.find(h => h.id === hotelId);
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
 
