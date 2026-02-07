@@ -52,7 +52,7 @@ export default function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full",
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-2" : "bg-transparent py-4"
+        isScrolled ? "bg-white shadow-sm py-2" : "bg-transparent py-4"
       )}
       dir={dir}
     >
@@ -61,11 +61,11 @@ export default function Navbar() {
         <Link href="/">
           <a className="flex items-center gap-4 group">
             <img 
-              src={Artboard_1_100x} 
+              src={logo} 
               alt={settings.name} 
               className={cn(
                 "transition-all duration-300 object-contain h-auto",
-                isScrolled ? "w-[40px] md:w-[60px]" : "w-[50px] md:w-[70px]"
+                isScrolled ? "w-[50px] md:w-[70px] brightness-0" : "w-[60px] md:w-[85px] brightness-0 invert"
               )} 
             />
           </a>
@@ -77,8 +77,8 @@ export default function Navbar() {
             <Link key={link.href} href={link.href}>
               <a
                 className={cn(
-                  "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
-                  location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
+                  "text-xs font-medium transition-colors uppercase tracking-widest",
+                  location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue hover:text-brand-gold" : "text-white hover:text-brand-gold"
                 )}
               >
                 {t(link.label)}
