@@ -1,15 +1,22 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
-import { hotels } from "@/lib/data";
+import { useMergedHotels, useCMSMedia } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hotel-la-plage.jpg";
 
 export default function Gallery() {
   const { t } = useI18n();
+  const { hotels } = useMergedHotels();
+  const { data: cmsMedia } = useCMSMedia();
   
-  // Combine all images
-  const allImages = hotels.map(h => ({ src: h.image, title: h.name }));
+  const hotelImages = hotels.map(h => ({ src: h.image, title: h.name }));
+
+  const mediaImages = (cmsMedia || [])
+    .filter((m: any) => m.mimeType?.startsWith("image/"))
+    .map((m: any) => ({ src: m.url, title: m.alt || m.originalName }));
+
+  const allImages = [...hotelImages, ...mediaImages];
 
   return (
     <div className="min-h-screen bg-brand-white">
@@ -25,7 +32,7 @@ export default function Gallery() {
       <div className="container-padding py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
            {allImages.map((img, i) => (
-             <div key={i} className="aspect-square relative group overflow-hidden cursor-pointer">
+             <div key={i} className="aspect-square relative group overflow-hidden cursor-pointer" data-testid={`gallery-image-${i}`}>
                <img 
                  src={img.src} 
                  alt={img.title}
@@ -36,8 +43,7 @@ export default function Gallery() {
                </div>
              </div>
            ))}
-           {/* Duplicate some for the gallery feel since we only have 4 main images */}
-           {allImages.map((img, i) => (
+           {allImages.length <= 4 && allImages.map((img, i) => (
              <div key={`dup-${i}`} className="aspect-square relative group overflow-hidden cursor-pointer">
                <img 
                  src={img.src} 

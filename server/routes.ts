@@ -284,6 +284,11 @@ export async function registerRoutes(
     res.json(seo);
   });
 
+  app.get("/api/public/media", async (_req, res) => {
+    const files = await storage.getMediaFiles();
+    res.json(files);
+  });
+
   // Dashboard stats
   app.get("/api/cms/dashboard", requireAuth, async (_req, res) => {
     const [allPages, allHotels, allMedia, allUsers] = await Promise.all([

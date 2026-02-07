@@ -1,5 +1,6 @@
 import { useLocation, Link, useRoute } from "wouter";
-import { hotels, bookingLink, RoomDetail } from "@/lib/data";
+import { hotels as staticHotels, bookingLink, RoomDetail } from "@/lib/data";
+import { useMergedHotel } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -25,7 +26,8 @@ export default function HotelDetails() {
   const hotelId = params?.hotelId || location.split('/')[1];
   const activeSection = params?.section || "overview";
   
-  const hotel = hotels.find(h => h.id === hotelId);
+  const { hotel: mergedHotel } = useMergedHotel(hotelId || "");
+  const hotel = mergedHotel || staticHotels.find(h => h.id === hotelId);
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
 
   if (!hotel) return <NotFound />;

@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useI18n } from "@/lib/i18n";
+import { useCMSPage } from "@/lib/cms";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Anchor, Sun, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,10 @@ import laPlageImg from "@assets/22_1770196761222.png";
 import aboutHeroImg from "@/assets/images/about-hero-aerial.jpg";
 
 export default function About() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const { data: cmsAbout } = useCMSPage("about");
+
+  const cmsContent = cmsAbout?.content?.[language] || cmsAbout?.content?.en;
 
   const fadeIn = {
     initial: { opacity: 0, y: 40 },
@@ -126,7 +130,7 @@ export default function About() {
             </h2>
             <div className="w-24 h-1 bg-brand-gold mx-auto mb-10" />
             <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto font-light">
-              At PROTELS Hotels & Resorts, we believe that true luxury lies in the feeling of belonging. Born from a passion for the sea and a dedication to authentic hospitality, our collection of beachfront resorts offers more than just a stay—we offer a journey into the extraordinary. From the vibrant coral reefs of the Red Sea to the spice-scented breezes of Zanzibar, each property is a gateway to its unique destination.
+              {cmsContent || "At PROTELS Hotels & Resorts, we believe that true luxury lies in the feeling of belonging. Born from a passion for the sea and a dedication to authentic hospitality, our collection of beachfront resorts offers more than just a stay—we offer a journey into the extraordinary. From the vibrant coral reefs of the Red Sea to the spice-scented breezes of Zanzibar, each property is a gateway to its unique destination."}
             </p>
           </motion.div>
         </div>

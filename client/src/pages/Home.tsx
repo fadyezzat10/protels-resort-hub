@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
-import { hotels } from "@/lib/data";
+import { useMergedHotels } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hero-main.jpg";
 
@@ -15,6 +15,7 @@ import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.png";
 
 export default function Home() {
   const { t } = useI18n();
+  const { hotels } = useMergedHotels();
 
   return (
     <div className="min-h-screen bg-brand-white">
@@ -66,8 +67,8 @@ export default function Home() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <img src={hotels[0].image} className="rounded-none w-full h-64 object-cover mt-8" alt="Resort" />
-            <img src={hotels[2].image} className="rounded-none w-full h-64 object-cover" alt="Resort" />
+            {hotels[0] && <img src={hotels[0].image} className="rounded-none w-full h-64 object-cover mt-8" alt="Resort" />}
+            {hotels[2] && <img src={hotels[2].image} className="rounded-none w-full h-64 object-cover" alt="Resort" />}
           </div>
         </div>
       </section>
