@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCMSStore } from "@/lib/store";
 
+import Artboard_1_100x from "@assets/Artboard 1@100x.png";
+
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
   const [location] = useLocation();
@@ -59,7 +61,7 @@ export default function Navbar() {
         <Link href="/">
           <a className="flex items-center gap-4 group">
             <img 
-              src={logo} 
+              src={Artboard_1_100x} 
               alt={settings.name} 
               className={cn(
                 "transition-all duration-300 object-contain h-auto",
@@ -137,7 +139,6 @@ export default function Navbar() {
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
-
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-t p-6 md:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">
