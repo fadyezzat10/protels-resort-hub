@@ -65,7 +65,7 @@ export default function Navbar() {
               alt={settings.name} 
               className={cn(
                 "transition-all duration-300 object-contain h-auto",
-                isScrolled ? "w-[40px] md:w-[60px]" : "w-[50px] md:w-[70px] brightness-0 invert"
+                isScrolled ? "w-[40px] md:w-[60px]" : "w-[50px] md:w-[70px]"
               )} 
             />
           </a>
