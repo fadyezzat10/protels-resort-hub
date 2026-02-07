@@ -30,14 +30,23 @@ export default function CMSLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { username: string; password: string }) => {
-      const res = await apiRequest("POST", "/api/auth/login", data);
-      return res.json();
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Login failed");
+      }
+      return json;
     },
     onSuccess: () => {
-      setLocation("/controlpanal/dashboard");
+      window.location.href = "/controlpanal/dashboard";
     },
     onError: (err: Error) => {
-      setError(err.message.includes("401") ? "Invalid username or password" : err.message);
+      setError(err.message || "Invalid username or password");
     },
   });
 
