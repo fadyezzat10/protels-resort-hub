@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
-import { useCMSStore } from "@/lib/cms-store";
+import { hotels } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hero-main.jpg";
 
@@ -15,7 +15,6 @@ import slider5 from "@/assets/images/hotel-royal-bay.jpg";
 
 export default function Home() {
   const { t } = useI18n();
-  const { hotels } = useCMSStore();
 
   return (
     <div className="min-h-screen bg-brand-white">
