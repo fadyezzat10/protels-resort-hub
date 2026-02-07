@@ -229,13 +229,13 @@ export async function registerRoutes(
   });
 
   app.get("/api/cms/settings/:key", requireAuth, async (req, res) => {
-    const setting = await storage.getSetting(req.params.key);
+    const setting = await storage.getSetting(req.params.key as string);
     if (!setting) return res.status(404).json({ message: "Not found" });
     res.json(setting);
   });
 
   app.put("/api/cms/settings/:key", requireAuth, async (req, res) => {
-    const setting = await storage.upsertSetting(req.params.key, req.body.value);
+    const setting = await storage.upsertSetting(req.params.key as string, req.body.value);
     res.json(setting);
   });
 

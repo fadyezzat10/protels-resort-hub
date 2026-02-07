@@ -16,6 +16,13 @@ import Dashboard from "@/pages/admin/Dashboard";
 import UsersPage from "@/pages/admin/Users";
 import NewsletterPage from "@/pages/admin/Newsletter";
 import Login from "@/pages/admin/Login";
+import CMSLogin from "@/pages/cms/CMSLogin";
+import CMSDashboard from "@/pages/cms/CMSDashboard";
+import CMSPages from "@/pages/cms/CMSPages";
+import CMSHotels from "@/pages/cms/CMSHotels";
+import CMSMedia from "@/pages/cms/CMSMedia";
+import CMSSeo from "@/pages/cms/CMSSeo";
+import CMSSettings from "@/pages/cms/CMSSettings";
 
 function Router() {
   return (
@@ -32,6 +39,15 @@ function Router() {
       <Route path="/admin/dashboard" component={Dashboard} />
       <Route path="/admin/users" component={UsersPage} />
       <Route path="/admin/newsletter" component={NewsletterPage} />
+
+      {/* CMS Routes */}
+      <Route path="/controlpanal" component={CMSLogin} />
+      <Route path="/controlpanal/dashboard" component={CMSDashboard} />
+      <Route path="/controlpanal/pages" component={CMSPages} />
+      <Route path="/controlpanal/hotels" component={CMSHotels} />
+      <Route path="/controlpanal/media" component={CMSMedia} />
+      <Route path="/controlpanal/seo" component={CMSSeo} />
+      <Route path="/controlpanal/settings" component={CMSSettings} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/:hotelId" component={HotelDetails} />
