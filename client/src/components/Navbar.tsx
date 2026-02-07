@@ -5,7 +5,7 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/images/logo-icon.png";
+import logo from "@assets/سش.pngش_1770193463633.png";
 import {
   DropdownMenu,
   DropdownMenuContent,

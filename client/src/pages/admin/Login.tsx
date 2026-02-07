@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Lock, User, ArrowRight } from "lucide-react";
-import logo from "@/assets/images/logo-icon.png";
+import { Lock, Mail, ArrowRight } from "lucide-react";
+import logo from "@assets/سش.pngش_1770193463633.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,28 +15,25 @@ export default function Login() {
     setIsLoading(true);
     setError("");
 
-    // Mock authentication based on requirement
-    // Username: Fezzat
-    // Password: Fezzat246810
+    // Mock authentication
     setTimeout(() => {
-      if (username === "Fezzat" && password === "Fezzat246810") {
-        localStorage.setItem("cms_authenticated", "true");
-        localStorage.setItem("cms_user", JSON.stringify({ name: "Fezzat", role: "Super Admin" }));
-        setLocation("/controlpanal/dashboard");
+      if (email === "admin@protels.com" && password === "admin123") {
+        localStorage.setItem("isAdmin", "true");
+        setLocation("/admin/dashboard");
       } else {
-        setError("Invalid username or password");
+        setError("Invalid email or password");
         setIsLoading(false);
       }
-    }, 800);
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 font-sans">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white w-full max-w-md rounded-xl shadow-lg overflow-hidden border border-gray-200">
         <div className="p-8 bg-brand-blue text-center">
           <img src={logo} alt="PROTELS" className="h-16 mx-auto mb-4 object-contain invert brightness-0 filter" />
-          <h2 className="text-2xl font-serif text-brand-gold">CMS Login</h2>
-          <p className="text-white/60 text-sm mt-2">Content Management System</p>
+          <h2 className="text-2xl font-serif text-brand-gold">Admin Portal</h2>
+          <p className="text-white/60 text-sm mt-2">Secure access for authorized personnel only</p>
         </div>
 
         <div className="p-8">
@@ -49,16 +46,16 @@ export default function Login() {
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 block">Username</label>
+              <label className="text-sm font-medium text-gray-700 block">Email Address</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="text" 
+                  type="email" 
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all"
-                  placeholder="Enter username"
+                  placeholder="admin@protels.com"
                 />
               </div>
             </div>
@@ -73,7 +70,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all"
-                  placeholder="Enter password"
+                  placeholder="••••••••"
                 />
               </div>
             </div>
@@ -85,11 +82,17 @@ export default function Login() {
             >
               {isLoading ? "Authenticating..." : (
                 <>
-                  Access Panel <ArrowRight className="w-4 h-4" />
+                  Sign In <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <a href="/" className="text-sm text-gray-500 hover:text-brand-blue transition-colors">
+              &larr; Back to Website
+            </a>
+          </div>
         </div>
       </div>
     </div>
