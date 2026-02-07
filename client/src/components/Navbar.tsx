@@ -62,7 +62,7 @@ export default function Navbar() {
               src={logo} 
               alt={settings.name} 
               className={cn(
-                "transition-all duration-300 object-contain h-auto invert brightness-0 filter",
+                "transition-all duration-300 object-contain h-auto",
                 isScrolled ? "w-[40px] md:w-[60px]" : "w-[50px] md:w-[70px] brightness-0 invert"
               )} 
             />
