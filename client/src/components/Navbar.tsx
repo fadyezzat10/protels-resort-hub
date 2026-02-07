@@ -5,19 +5,21 @@ import { bookingLink } from "@/lib/data";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logo from "@assets/سش.pngش_1770193463633.png";
+import logo from "@/assets/images/logo-icon.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCMSStore } from "@/lib/store";
 
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { settings } = useCMSStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,10 +60,10 @@ export default function Navbar() {
           <a className="flex items-center gap-4 group">
             <img 
               src={logo} 
-              alt="PROTELS" 
+              alt={settings.name} 
               className={cn(
-                "transition-all duration-300 object-contain h-auto",
-                isScrolled ? "w-[100px] md:w-[140px] invert" : "w-[115px] md:w-[160px]"
+                "transition-all duration-300 object-contain h-auto invert brightness-0 filter",
+                isScrolled ? "w-[40px] md:w-[60px]" : "w-[50px] md:w-[70px] brightness-0 invert"
               )} 
             />
           </a>
