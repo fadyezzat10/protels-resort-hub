@@ -30,7 +30,6 @@ export default function CMSSettings() {
   const [socialLinks, setSocialLinks] = useState({
     facebook: "",
     instagram: "",
-    twitter: "",
     linkedin: "",
   });
 
@@ -78,7 +77,6 @@ export default function CMSSettings() {
         setSocialLinks({
           facebook: social.facebook || "",
           instagram: social.instagram || "",
-          twitter: social.twitter || "",
           linkedin: social.linkedin || "",
         });
       }
@@ -307,10 +305,6 @@ export default function CMSSettings() {
               <div>
                 <label className="text-sm font-medium mb-1 block">Instagram</label>
                 <Input data-testid="input-setting-social-instagram" value={socialLinks.instagram} onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })} placeholder="https://instagram.com/..." />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Twitter</label>
-                <Input data-testid="input-setting-social-twitter" value={socialLinks.twitter} onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })} placeholder="https://twitter.com/..." />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">LinkedIn</label>

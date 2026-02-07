@@ -1,6 +1,6 @@
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 import { useFooterContent, useHeaderLogo, useMergedHotels } from "@/lib/cms";
 import defaultLogo from "@assets/سش.pngش_1770193463633.png";
 
@@ -15,8 +15,7 @@ export default function Footer() {
   const socialIcons: Record<string, any> = {
     facebook: Facebook,
     instagram: Instagram,
-    twitter: Twitter,
-    youtube: Youtube,
+    linkedin: Linkedin,
   };
 
   return (
@@ -65,7 +64,8 @@ export default function Footer() {
             <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">Connect</h3>
             <div className="flex gap-6">
               {Object.entries(socialLinks).map(([platform, url]) => {
-                const Icon = socialIcons[platform] || Facebook;
+                const Icon = socialIcons[platform];
+                if (!Icon || !url) return null;
                 return (
                   <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-brand-gold transition-all transform hover:scale-110">
                     <Icon className="w-6 h-6" />
