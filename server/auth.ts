@@ -149,10 +149,18 @@ export async function seedContent() {
   const defaultSettings: Record<string, any> = {
     site_name: "PROTELS Hotels & Resorts",
     contact_email: "info@protels.com",
+    contact_phone: "+20 123 456 7890",
+    contact_address: "Marsa Alam, Red Sea, Egypt",
     social_links: {
       facebook: "https://facebook.com/protels",
       instagram: "https://instagram.com/protels",
     },
+    hero_title: { en: "PROTELS Hotels & Resorts", ar: "بروتلز للفنادق والمنتجعات", fr: "PROTELS Hôtels & Resorts", de: "PROTELS Hotels & Resorts", es: "PROTELS Hoteles y Resorts", ru: "PROTELS Отели и Курорты" },
+    hero_subtitle: { en: "Luxury Coastal Living", ar: "حياة ساحلية فاخرة", fr: "Vie Côtière de Luxe", de: "Luxuriöses Küstenleben", es: "Vida Costera de Lujo", ru: "Роскошная Прибрежная Жизнь" },
+    hero_images: [],
+    booking_link: "https://protels.book-onlinenow.net/index.aspx?Page=22&portal=259",
+    header_logo: "",
+    footer_description: { en: "Experience the pinnacle of coastal luxury across our exclusive portfolio of premium beach resorts.", ar: "استمتع بقمة الفخامة الساحلية عبر مجموعتنا الحصرية من المنتجعات الشاطئية المتميزة." },
   };
   let seededSettings = 0;
   for (const [key, value] of Object.entries(defaultSettings)) {

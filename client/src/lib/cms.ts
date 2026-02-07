@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { hotels as staticHotels, type Hotel as StaticHotel } from "@/lib/data";
+import { hotels as staticHotels, type Hotel as StaticHotel, bookingLink as staticBookingLink } from "@/lib/data";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/800x600/1a2744/c4a97d?text=Hotel";
 
@@ -14,6 +14,23 @@ export function useCMSSetting(key: string) {
         return data.value;
       } catch {
         return null;
+      }
+    },
+    staleTime: 60000,
+    retry: false,
+  });
+}
+
+export function useCMSAllSettings() {
+  return useQuery<Record<string, any>>({
+    queryKey: ["/api/public/settings"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/public/settings");
+        if (!res.ok) return {};
+        return await res.json();
+      } catch {
+        return {};
       }
     },
     staleTime: 60000,
@@ -190,4 +207,37 @@ export function useMergedHotel(hotelId: string): { hotel: StaticHotel | null; is
   }
 
   return { hotel: staticHotel || null, isLoading };
+}
+
+export function useBookingLink(): string {
+  const { data: settings } = useCMSAllSettings();
+  return settings?.booking_link || staticBookingLink;
+}
+
+export function useHeaderLogo(): string | null {
+  const { data: settings } = useCMSAllSettings();
+  return settings?.header_logo || null;
+}
+
+export function useHeroContent(language: string) {
+  const { data: settings } = useCMSAllSettings();
+
+  const heroTitle = settings?.hero_title?.[language] || settings?.hero_title?.en || null;
+  const heroSubtitle = settings?.hero_subtitle?.[language] || settings?.hero_subtitle?.en || null;
+  const heroImages: string[] = settings?.hero_images?.length ? settings.hero_images : [];
+
+  return { heroTitle, heroSubtitle, heroImages };
+}
+
+export function useFooterContent(language: string) {
+  const { data: settings } = useCMSAllSettings();
+
+  return {
+    address: settings?.contact_address || "Marsa Alam, Red Sea, Egypt",
+    phone: settings?.contact_phone || "+20 123 456 7890",
+    email: settings?.contact_email || "info@protels.com",
+    socialLinks: settings?.social_links || {},
+    description: settings?.footer_description?.[language] || settings?.footer_description?.en || "",
+    siteName: settings?.site_name || "PROTELS Hotels & Resorts",
+  };
 }

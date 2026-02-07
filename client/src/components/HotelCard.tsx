@@ -1,4 +1,5 @@
-import { Hotel, bookingLink } from "@/lib/data";
+import { Hotel } from "@/lib/data";
+import { useBookingLink } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ interface HotelCardProps {
 
 export default function HotelCard({ hotel, featured = false, index = 0 }: HotelCardProps) {
   const { t, language } = useI18n();
+  const bookingLink = useBookingLink();
 
   return (
     <motion.div
@@ -74,12 +76,10 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
             </div>
             
             <div className="flex gap-3 mt-2">
-              <Link href={`/${hotel.id}`}>
-                <a className="flex-1">
-                  <Button variant="outline" className="w-full border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none">
-                    {t("hotel.view")}
-                  </Button>
-                </a>
+              <Link href={`/${hotel.id}`} className="flex-1">
+                <Button variant="outline" className="w-full border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none">
+                  {t("hotel.view")}
+                </Button>
               </Link>
               {hotel.id === "royal-bay" ? (
                 <Button disabled className="flex-1 bg-gray-200 text-gray-400 font-bold rounded-none cursor-not-allowed uppercase text-xs tracking-wider">

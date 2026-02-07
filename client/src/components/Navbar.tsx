@@ -1,11 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { useI18n, type Language } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { bookingLink } from "@/lib/data";
+import { useBookingLink, useHeaderLogo } from "@/lib/cms";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import logo from "@assets/سش.pngش_1770193463633.png";
+import defaultLogo from "@assets/سش.pngش_1770193463633.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,9 @@ export default function Navbar() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const bookingLink = useBookingLink();
+  const cmsLogo = useHeaderLogo();
+  const logoSrc = cmsLogo || defaultLogo;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,11 +56,10 @@ export default function Navbar() {
       dir={dir}
     >
       <div className="container-padding flex items-center justify-between">
-        {/* Logo */}
         <Link href="/">
           <a className="flex items-center gap-4 group">
             <img 
-              src={logo} 
+              src={logoSrc} 
               alt="PROTELS" 
               className={cn(
                 "transition-all duration-300 object-contain h-auto",
@@ -67,7 +69,6 @@ export default function Navbar() {
           </a>
         </Link>
 
-        {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}>
@@ -83,7 +84,6 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -127,7 +127,6 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* Mobile Menu Toggle */}
         <button
           className={cn("md:hidden", isScrolled ? "text-brand-blue" : "text-white")}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -136,7 +135,6 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-t p-6 md:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">
           {navLinks.map((link) => (
@@ -150,7 +148,6 @@ export default function Navbar() {
             </Link>
           ))}
           
-          {/* Mobile Language Switcher */}
           <div className="py-4 border-b border-gray-100">
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Language</p>
             <div className="grid grid-cols-3 gap-2">

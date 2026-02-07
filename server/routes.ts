@@ -273,6 +273,15 @@ export async function registerRoutes(
     res.json(hotel);
   });
 
+  app.get("/api/public/settings", async (_req, res) => {
+    const settings = await storage.getSettings();
+    const result: Record<string, any> = {};
+    for (const s of settings) {
+      result[s.key] = s.value;
+    }
+    res.json(result);
+  });
+
   app.get("/api/public/settings/:key", async (req, res) => {
     const setting = await storage.getSetting(req.params.key);
     if (!setting) return res.status(404).json({ message: "Not found" });

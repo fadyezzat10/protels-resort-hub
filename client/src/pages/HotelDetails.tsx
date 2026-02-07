@@ -1,6 +1,6 @@
 import { useLocation, Link, useRoute } from "wouter";
-import { hotels as staticHotels, bookingLink, RoomDetail } from "@/lib/data";
-import { useMergedHotel } from "@/lib/cms";
+import { hotels as staticHotels, RoomDetail } from "@/lib/data";
+import { useMergedHotel, useBookingLink } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -28,6 +28,7 @@ export default function HotelDetails() {
   
   const { hotel: mergedHotel } = useMergedHotel(hotelId || "");
   const hotel = mergedHotel || staticHotels.find(h => h.id === hotelId);
+  const bookingLink = useBookingLink();
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
 
   if (!hotel) return <NotFound />;

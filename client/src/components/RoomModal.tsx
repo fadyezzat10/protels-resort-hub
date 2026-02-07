@@ -2,7 +2,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, Maximize2, Bed, Mountain, Wind, Tv, Wifi, Coffee, Shirt, Ban, Bath, ShowerHead, Home } from "lucide-react";
 import { useState, useEffect } from "react";
-import { RoomDetail, bookingLink } from "@/lib/data";
+import { RoomDetail } from "@/lib/data";
+import { useBookingLink } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
 interface RoomModalProps {
@@ -12,6 +13,7 @@ interface RoomModalProps {
 }
 
 export default function RoomModal({ room, isOpen, onClose }: RoomModalProps) {
+  const bookingLink = useBookingLink();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const images = room.images || [];
 

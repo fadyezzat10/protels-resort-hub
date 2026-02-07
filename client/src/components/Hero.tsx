@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import { bookingLink } from "@/lib/data";
+import { useBookingLink } from "@/lib/cms";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
@@ -11,6 +11,7 @@ interface HeroProps {
   subtitle?: string;
   showButton?: boolean;
   height?: "full" | "half" | "large";
+  bookingLink?: string;
 }
 
 export default function Hero({ 
@@ -19,12 +20,14 @@ export default function Hero({
   title, 
   subtitle, 
   showButton = true,
-  height = "full"
+  height = "full",
+  bookingLink: bookingLinkProp,
 }: HeroProps) {
   const { t } = useI18n();
+  const cmsBookingLink = useBookingLink();
+  const finalBookingLink = bookingLinkProp || cmsBookingLink;
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Use provided image as fallback if images array is empty
   const heroImages = images.length > 0 ? images : (image ? [image] : []);
 
   useEffect(() => {
@@ -41,22 +44,21 @@ export default function Hero({
     switch (height) {
       case "full": return "h-[100vh]";
       case "large": return "h-[90vh]";
-      case "half": return "h-[50vh] min-h-[500px]"; // Increased min-height for better look
+      case "half": return "h-[50vh] min-h-[500px]";
       default: return "h-[100vh]";
     }
   };
 
   return (
     <div className={`relative w-full ${getHeightClass()} overflow-hidden bg-brand-dark`}>
-      {/* Background Slider */}
       <AnimatePresence mode="popLayout">
         <motion.div 
           key={currentIndex}
           className="absolute inset-0 w-full h-full"
-          initial={{ opacity: 0, scale: 1.05 }} // Subtler scale
+          initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 2, ease: "easeInOut" }} // Slower, smoother transition
+          transition={{ duration: 2, ease: "easeInOut" }}
         >
           <img 
             src={heroImages[currentIndex]} 
@@ -66,13 +68,9 @@ export default function Hero({
         </motion.div>
       </AnimatePresence>
       
-      {/* Refined Luxury Overlay */}
-      {/* Base darken */}
       <div className="absolute inset-0 bg-black/20 z-10" /> 
-      {/* Gradient for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40 z-10" />
 
-      {/* Content */}
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center container-padding pt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -98,7 +96,7 @@ export default function Hero({
                 size="lg"
                 className="bg-[#C8A97E] hover:bg-[#b8966c] text-white font-bold px-8 py-3 text-lg rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 transform"
               >
-                <a href={bookingLink} target="_blank" rel="noopener noreferrer">
+                <a href={finalBookingLink} target="_blank" rel="noopener noreferrer">
                   {t("nav.book")}
                 </a>
               </Button>
@@ -107,7 +105,6 @@ export default function Hero({
         </motion.div>
       </div>
 
-      {/* Slider Indicators (Optional but nice for UX) */}
       {heroImages.length > 1 && (
         <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-3">
           {heroImages.map((_, idx) => (
