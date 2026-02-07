@@ -17,7 +17,8 @@ export default function Login() {
 
     // Mock authentication
     setTimeout(() => {
-      if (email === "admin@protels.com" && password === "admin123") {
+      if ((email === "admin@protels.com" && password === "admin123") || 
+          (email === "Fezzat" && password === "Fezzat246810")) {
         localStorage.setItem("isAdmin", "true");
         setLocation("/admin/dashboard");
       } else {
