@@ -23,6 +23,7 @@ import CMSHotels from "@/pages/cms/CMSHotels";
 import CMSMedia from "@/pages/cms/CMSMedia";
 import CMSSeo from "@/pages/cms/CMSSeo";
 import CMSSettings from "@/pages/cms/CMSSettings";
+import CMSHead from "@/components/CMSHead";
 
 function Router() {
   return (
@@ -63,6 +64,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <I18nProvider>
+          <CMSHead />
           <Toaster />
           <Router />
         </I18nProvider>
