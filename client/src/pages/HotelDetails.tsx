@@ -19,12 +19,13 @@ export default function HotelDetails() {
   const [location, setLocation] = useLocation();
   const { t, language } = useI18n();
 
-  // Match the dynamic route to get parameters
-  const [match, params] = useRoute("/:hotelId/:section?");
-  
-  // Extract hotelId and section from the route parameters
-  const hotelId = params?.hotelId || location.split('/')[1];
+  const [matchHotels, paramsHotels] = useRoute("/hotels/:hotelId/:section?");
+  const [matchRoot, paramsRoot] = useRoute("/:hotelId/:section?");
+
+  const params = matchHotels ? paramsHotels : paramsRoot;
+  const hotelId = params?.hotelId || location.split('/').filter(Boolean).pop() || "";
   const activeSection = params?.section || "overview";
+  const basePath = matchHotels ? `/hotels/${hotelId}` : `/${hotelId}`;
   
   const { hotel: mergedHotel } = useMergedHotel(hotelId || "");
   const hotel = mergedHotel || staticHotels.find(h => h.id === hotelId);
@@ -105,7 +106,7 @@ export default function HotelDetails() {
         <div className="container-padding">
           <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap py-2 thin-scrollbar">
             {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.id === "overview" ? `/${hotelId}` : `/${hotelId}/${tab.id}`}>
+              <Link key={tab.id} href={tab.id === "overview" ? basePath : `${basePath}/${tab.id}`}>
                 <a
                   className={cn(
                     "py-2 px-3 text-[13px] font-medium tracking-[0.5px] transition-all border-b-2 text-center shrink-0",
