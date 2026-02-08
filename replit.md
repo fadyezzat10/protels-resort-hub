@@ -170,3 +170,13 @@ The CMS injects dynamic metadata via `CMSHead` component (GTM scripts, SEO tags,
 - `GET /api/public/hotels/:slug` – Get published hotel by slug
 - `GET /api/public/settings/:key` – Get global setting value
 - `GET /api/public/seo/:path` – Get SEO settings for a page path
+- `POST /api/booking-assistant` – Streaming chatbot endpoint (SSE)
+
+### Booking Assistant Chatbot
+- **Component:** `client/src/components/BookingAssistant.tsx` – Floating chat widget on all public pages
+- **Backend:** `POST /api/booking-assistant` in `server/routes.ts` – Streaming SSE endpoint using OpenAI (via Replit AI Integrations)
+- **Model:** gpt-4o-mini with luxury concierge system prompt
+- **Features:** Auto-detects English/Arabic from user's first message, RTL support, bilingual greeting, guides visitors to Book Now
+- **Rate limiting:** 10 requests/minute per IP, max 20 messages per conversation, 500 char max per message
+- **Hidden on:** Admin (`/admin/*`) and CMS (`/controlpanal/*`) routes via `ChatbotWrapper` in App.tsx
+- **OpenAI credentials:** `AI_INTEGRATIONS_OPENAI_API_KEY` and `AI_INTEGRATIONS_OPENAI_BASE_URL` (auto-configured by Replit AI Integrations)
