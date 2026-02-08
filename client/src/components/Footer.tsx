@@ -12,11 +12,11 @@ export default function Footer() {
   const cmsLogo = useHeaderLogo();
   const logoSrc = cmsLogo || defaultLogo;
 
-  const socialIcons: Record<string, any> = {
-    facebook: Facebook,
-    instagram: Instagram,
-    linkedin: Linkedin,
-  };
+  const socialIconList: { key: string; Icon: any; fallbackUrl: string }[] = [
+    { key: "facebook", Icon: Facebook, fallbackUrl: "https://www.facebook.com/ProtelsResorts/" },
+    { key: "instagram", Icon: Instagram, fallbackUrl: "https://www.instagram.com/protelsresorts" },
+    { key: "linkedin", Icon: Linkedin, fallbackUrl: "https://www.linkedin.com/company/protelsresorts/" },
+  ];
 
   return (
     <footer className="bg-brand-blue text-white pt-12 pb-6 border-t border-brand-gold/10">
@@ -34,9 +34,7 @@ export default function Footer() {
             <ul className="space-y-4 font-sans text-sm">
               {hotels.map((hotel) => (
                 <li key={hotel.id}>
-                  <Link href={`/hotels/${hotel.id}`}>
-                    <a className="text-white/60 hover:text-brand-gold transition-colors tracking-wide">{hotel.name}</a>
-                  </Link>
+                  <Link href={`/hotels/${hotel.id}`} className="text-white/60 hover:text-brand-gold transition-colors tracking-wide">{hotel.name}</Link>
                 </li>
               ))}
             </ul>
@@ -63,11 +61,10 @@ export default function Footer() {
           <div>
             <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">Connect</h3>
             <div className="flex gap-6">
-              {Object.entries(socialLinks).map(([platform, url]) => {
-                const Icon = socialIcons[platform];
-                if (!Icon || !url) return null;
+              {socialIconList.map(({ key, Icon, fallbackUrl }) => {
+                const url = (socialLinks as Record<string, string>)[key] || fallbackUrl;
                 return (
-                  <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-brand-gold transition-all transform hover:scale-110">
+                  <a key={key} href={url} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-brand-gold transition-all transform hover:scale-110">
                     <Icon className="w-6 h-6" />
                   </a>
                 );

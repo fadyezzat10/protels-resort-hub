@@ -21,8 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <a className={cn(
+            <Link key={item.href} href={item.href} className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-md transition-colors",
                 location === item.href 
                   ? "bg-brand-gold text-brand-blue font-medium" 
@@ -30,7 +29,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}>
                 <item.icon className="w-5 h-5" />
                 {item.label}
-              </a>
             </Link>
           ))}
         </nav>

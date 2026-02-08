@@ -56,8 +56,7 @@ export default function Navbar() {
       dir={dir}
     >
       <div className="container-padding flex items-center justify-between">
-        <Link href="/">
-          <a className="flex items-center gap-4 group">
+        <Link href="/" className="flex items-center gap-4 group">
             <img 
               src={logoSrc} 
               alt="PROTELS" 
@@ -66,20 +65,17 @@ export default function Navbar() {
                 isScrolled ? "w-[100px] md:w-[140px] invert" : "w-[115px] md:w-[160px]"
               )} 
             />
-          </a>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <a
-                className={cn(
-                  "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
-                  location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
-                )}
-              >
-                {t(link.label)}
-              </a>
+            <Link key={link.href} href={link.href}
+              className={cn(
+                "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
+                location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
+              )}
+            >
+              {t(link.label)}
             </Link>
           ))}
         </div>
@@ -138,13 +134,11 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-t p-6 md:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <a 
-                className="text-brand-blue font-medium text-lg py-2 border-b border-gray-100 uppercase tracking-widest text-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t(link.label)}
-              </a>
+            <Link key={link.href} href={link.href}
+              className="text-brand-blue font-medium text-lg py-2 border-b border-gray-100 uppercase tracking-widest text-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {t(link.label)}
             </Link>
           ))}
           

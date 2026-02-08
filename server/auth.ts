@@ -152,8 +152,9 @@ export async function seedContent() {
     contact_phone: "+20 123 456 7890",
     contact_address: "Marsa Alam, Red Sea, Egypt",
     social_links: {
-      facebook: "https://facebook.com/protels",
-      instagram: "https://instagram.com/protels",
+      facebook: "https://www.facebook.com/ProtelsResorts/",
+      instagram: "https://www.instagram.com/protelsresorts",
+      linkedin: "https://www.linkedin.com/company/protelsresorts/",
     },
     hero_title: { en: "PROTELS Hotels & Resorts", ar: "بروتلز للفنادق والمنتجعات", fr: "PROTELS Hôtels & Resorts", de: "PROTELS Hotels & Resorts", es: "PROTELS Hoteles y Resorts", ru: "PROTELS Отели и Курорты" },
     hero_subtitle: { en: "Luxury Coastal Living", ar: "حياة ساحلية فاخرة", fr: "Vie Côtière de Luxe", de: "Luxuriöses Küstenleben", es: "Vida Costera de Lujo", ru: "Роскошная Прибрежная Жизнь" },
