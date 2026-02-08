@@ -7,8 +7,8 @@ interface ChatMessage {
   isGreeting?: boolean;
 }
 
-const GREETING_EN = "Welcome to Protels Hotels & Resorts. I'm your personal booking assistant. How may I help you find the perfect getaway today?";
-const GREETING_AR = "أهلاً وسهلاً بكم في فنادق ومنتجعات بروتلز. أنا مساعدكم الشخصي للحجز. كيف يمكنني مساعدتكم في إيجاد العطلة المثالية اليوم؟";
+const GREETING_EN = "Hi, I'm Protels Booking Assistant. How can I help you today?";
+const GREETING_AR = "أهلًا! أنا مساعد الحجز لفنادق بروتيلز. إزاي أقدر أساعدك اليوم؟";
 
 function detectArabic(text: string): boolean {
   const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
