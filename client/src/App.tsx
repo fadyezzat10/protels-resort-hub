@@ -52,6 +52,8 @@ function Router() {
       <Route path="/controlpanal/settings" component={CMSSettings} />
       
       {/* Dynamic hotel page routing with sections */}
+      <Route path="/hotels/:hotelId" component={HotelDetails} />
+      <Route path="/hotels/:hotelId/:section" component={HotelDetails} />
       <Route path="/:hotelId" component={HotelDetails} />
       <Route path="/:hotelId/:section" component={HotelDetails} />
       
