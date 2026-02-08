@@ -141,3 +141,33 @@
     background-clip: content-box;
   }
 }
+
+@media (max-width: 768px) {
+  .chatbot-fab {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 0;
+  }
+
+  .chatbot-fab-label {
+    display: none;
+  }
+
+  .chatbot-fab-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .chatbot-window {
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    max-width: 100vw;
+    height: calc(100vh - 3rem);
+    max-height: calc(100vh - 3rem);
+    border-radius: 1rem 1rem 0 0;
+  }
+}

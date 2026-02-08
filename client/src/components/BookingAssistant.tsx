@@ -167,13 +167,13 @@ export default function BookingAssistant() {
         <button
           data-testid="button-open-chatbot"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#1a2744] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-full pl-5 pr-3 py-3"
+          className="chatbot-fab fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#1a2744] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-full pl-5 pr-3 py-3"
           style={{ direction: siteIsArabic ? "rtl" : "ltr" }}
         >
-          <span className="text-sm font-medium whitespace-nowrap" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+          <span className="chatbot-fab-label text-sm font-medium whitespace-nowrap" style={{ fontFamily: "'Montserrat', sans-serif" }}>
             {siteIsArabic ? "تواصل معنا" : "Need help booking?"}
           </span>
-          <div className="w-10 h-10 rounded-full bg-[#C8A97E]/20 flex items-center justify-center flex-shrink-0">
+          <div className="chatbot-fab-icon w-10 h-10 rounded-full bg-[#C8A97E]/20 flex items-center justify-center flex-shrink-0">
             <MessageCircle className="w-5 h-5 text-[#C8A97E]" />
           </div>
         </button>
@@ -181,7 +181,7 @@ export default function BookingAssistant() {
 
       {isOpen && (
         <div
-          className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[540px] max-h-[calc(100vh-3rem)] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#C8A97E]/20"
+          className="chatbot-window fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[540px] max-h-[calc(100vh-3rem)] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#C8A97E]/20"
           style={{ direction: isRTL ? "rtl" : "ltr" }}
         >
           <div className="bg-[#1a2744] text-white px-5 py-4 flex items-center justify-between flex-shrink-0">
