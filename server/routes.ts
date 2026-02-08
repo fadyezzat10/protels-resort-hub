@@ -9,6 +9,7 @@ import { storage } from "./storage";
 import { pool } from "./db";
 import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
 import OpenAI from "openai";
+import { findRuleBasedResponse, detectArabicText } from "@shared/chatResponses";
 
 declare module "express-session" {
   interface SessionData {
@@ -408,6 +409,22 @@ Help guests feel confident, informed, and ready to book by clicking "Book Now".`
         role: m.role as "user" | "assistant",
         content: typeof m.content === "string" ? m.content.slice(0, MAX_CONTENT_LENGTH) : "",
       }));
+
+      const lastUserMsg = trimmedMessages.filter((m: any) => m.role === "user").pop();
+      const userText = lastUserMsg?.content || "";
+      const isArabic = detectArabicText(userText);
+
+      const ruleMatch = findRuleBasedResponse(userText);
+      if (ruleMatch) {
+        const reply = isArabic ? ruleMatch.ar : ruleMatch.en;
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        res.write(`data: ${JSON.stringify({ content: reply })}\n\n`);
+        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+        res.end();
+        return;
+      }
 
       const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
         { role: "system", content: BOOKING_ASSISTANT_SYSTEM },

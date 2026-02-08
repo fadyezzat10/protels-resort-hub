@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -7,8 +8,8 @@ interface ChatMessage {
   isGreeting?: boolean;
 }
 
-const GREETING_EN = "Hi, I'm Protels Booking Assistant. How can I help you today?";
-const GREETING_AR = "أهلًا! أنا مساعد الحجز لفنادق بروتيلز. إزاي أقدر أساعدك اليوم؟";
+const GREETING_EN = "\u{1F44B} Hi, I'm Protels Booking Assistant. How can I help you today?";
+const GREETING_AR = "\u{1F44B} أهلًا، أنا مساعد الحجز الخاص بـ Protels. أقدر أساعدك في إيه؟";
 
 function detectArabic(text: string): boolean {
   const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
@@ -16,14 +17,18 @@ function detectArabic(text: string): boolean {
 }
 
 export default function BookingAssistant() {
+  const { language } = useI18n();
+  const siteIsArabic = language === "ar";
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isRTL, setIsRTL] = useState(false);
+  const [chatLang, setChatLang] = useState<"en" | "ar">(siteIsArabic ? "ar" : "en");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [hasGreeted, setHasGreeted] = useState(false);
+
+  const isRTL = chatLang === "ar";
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,13 +40,12 @@ export default function BookingAssistant() {
 
   useEffect(() => {
     if (isOpen && !hasGreeted) {
-      setMessages([
-        { role: "assistant", content: GREETING_EN, isGreeting: true },
-        { role: "assistant", content: GREETING_AR, isGreeting: true },
-      ]);
+      const greeting = siteIsArabic ? GREETING_AR : GREETING_EN;
+      setChatLang(siteIsArabic ? "ar" : "en");
+      setMessages([{ role: "assistant", content: greeting, isGreeting: true }]);
       setHasGreeted(true);
     }
-  }, [isOpen, hasGreeted]);
+  }, [isOpen, hasGreeted, siteIsArabic]);
 
   useEffect(() => {
     if (isOpen) {
@@ -55,7 +59,7 @@ export default function BookingAssistant() {
 
     const userIsArabic = detectArabic(trimmed);
     if (messages.every((m) => m.isGreeting)) {
-      setIsRTL(userIsArabic);
+      setChatLang(userIsArabic ? "ar" : "en");
     }
 
     const userMessage: ChatMessage = { role: "user", content: trimmed };
@@ -108,7 +112,6 @@ export default function BookingAssistant() {
                   });
                 }
                 if (data.error) {
-                  assistantContent = data.error;
                   setMessages((prev) => {
                     const updated = [...prev];
                     updated[updated.length - 1] = { role: "assistant", content: data.error };
@@ -134,11 +137,6 @@ export default function BookingAssistant() {
           } catch {}
         }
       }
-
-      if (assistantContent && !isRTL) {
-        const responseIsArabic = detectArabic(assistantContent);
-        if (responseIsArabic) setIsRTL(true);
-      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -161,13 +159,7 @@ export default function BookingAssistant() {
     }
   };
 
-  const displayMessages = messages.filter((m) => {
-    if (!m.isGreeting) return true;
-    if (messages.some((msg) => !msg.isGreeting)) {
-      return isRTL ? detectArabic(m.content) : !detectArabic(m.content);
-    }
-    return true;
-  });
+  const displayMessages = messages.filter((m) => !m.isGreeting || true);
 
   return (
     <>
@@ -175,16 +167,21 @@ export default function BookingAssistant() {
         <button
           data-testid="button-open-chatbot"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1a2744] text-[#C8A97E] shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center"
-          aria-label="Open booking assistant"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#1a2744] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-full pl-5 pr-3 py-3"
+          style={{ direction: siteIsArabic ? "rtl" : "ltr" }}
         >
-          <MessageCircle className="w-6 h-6" />
+          <span className="text-sm font-medium whitespace-nowrap" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+            {siteIsArabic ? "تواصل معنا" : "Need help booking?"}
+          </span>
+          <div className="w-10 h-10 rounded-full bg-[#C8A97E]/20 flex items-center justify-center flex-shrink-0">
+            <MessageCircle className="w-5 h-5 text-[#C8A97E]" />
+          </div>
         </button>
       )}
 
       {isOpen && (
         <div
-          className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-3rem)] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#C8A97E]/20"
+          className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[540px] max-h-[calc(100vh-3rem)] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#C8A97E]/20"
           style={{ direction: isRTL ? "rtl" : "ltr" }}
         >
           <div className="bg-[#1a2744] text-white px-5 py-4 flex items-center justify-between flex-shrink-0">
