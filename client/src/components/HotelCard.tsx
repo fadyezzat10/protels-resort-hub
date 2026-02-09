@@ -62,7 +62,7 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
             {hotel.name}
           </h3>
           
-          <p className="text-gray-600 mb-4 line-clamp-3 flex-1 text-[0.8125rem] leading-[1.75]">
+          <p className="text-gray-600 mb-4 line-clamp-3 flex-1 text-[0.8125rem] leading-[1.75] pt-[11px] pb-[11px]">
             {hotel.description[language] || hotel.description.en}
           </p>
 
