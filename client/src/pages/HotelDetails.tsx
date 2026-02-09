@@ -1315,7 +1315,7 @@ export default function HotelDetails() {
                          <Phone className="w-5 h-5 text-brand-gold mt-1" />
                          <div>
                            <span className="block font-bold text-brand-blue mb-1">Phone</span>
-                           <span className="text-gray-600">+20 123 456 7890</span>
+                           <span className="text-gray-600">+20 65 3380063</span>
                            <span className="text-gray-600">+20 150 092 5579</span>
                          </div>
                        </div>
