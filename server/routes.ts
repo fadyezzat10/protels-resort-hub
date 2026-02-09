@@ -344,24 +344,69 @@ SCOPE OF KNOWLEDGE:
 You can answer questions about:
 - Protels Hotels & Resorts
 - Destinations (Egypt / Zanzibar)
-- Available resorts and general facilities
-- Children policy
+- Available resorts, facilities, dining, bars, rooms, activities
+- Children policy, check-in/out, dress code
 - Cancellation policy
 - General stay experience
 
-PROPERTIES YOU KNOW:
-1. Protels Crystal Beach Resort — Marsa Alam, Egypt. All-inclusive luxury. Private beach, PADI diving center, spa, kids club, infinity pools. Room types: Standard, Superior, Family, Suite. Great for families and couples.
-2. Protels Beach Club & SPA — Marsa Alam, Egypt. Vibrant all-inclusive resort. Aquapark, multiple pools, private beach, wellness center. Perfect for families, couples and friends.
-3. Protels Royal Bay Resort & Spa — Hurghada, Egypt. Premium beachfront resort with full spa, private beach, and lively entertainment. Ideal for a Red Sea holiday.
-4. Protels La Plage — Zanzibar, Tanzania. Boutique beachfront escape on the Indian Ocean. Intimate, serene, perfect for couples and honeymooners seeking tropical luxury.
+PROPERTIES (DETAILED FACTSHEET DATA):
 
-CHILDREN POLICY (SAFE RESPONSE):
-- Children are welcome in most Protels resorts.
-- Family-friendly facilities are available.
+1. PROTELS CRYSTAL BEACH RESORT — Marsa Alam, Egypt.
+All-inclusive luxury resort. Private sandy beach, PADI diving center, spa and wellness center, kids club, infinity pools.
+Dining: Main Restaurant serving Oriental food (breakfast 07:00-10:00, lunch 13:00-15:00, dinner 19:00-22:00). Italian Restaurant (pizza, pasta, etc.).
+Room types: Standard, Superior, Family, Suite. Great for families and couples.
+
+2. PROTELS BEACH CLUB & SPA — Marsa Alam, Egypt. 4-star Ultra All-Inclusive resort.
+Location: 35 mins from Marsa Alam International Airport, 30 mins to Port Ghalib, 15 mins from Marsa Alam city.
+112 Rooms & Suites. 350-meter private sandy beach (beach walks up to 2km). Near Dolphin House and sea turtle habitats.
+Ultra All-Inclusive includes: premium alcoholic beverages, house wine, soft drinks, juices, beer, cocktails, coffee & tea, 24-hour Lobby Bar, half an hour free massage per stay.
+DINING:
+- SeaBreeze Main Restaurant: Breakfast 07:00-10:00, Lunch 13:00-15:00, Dinner 19:00-22:00, Late Dinner 22:00-00:00
+- El Dokka International Restaurant: Breakfast 07:00-10:00, Lunch 13:00-15:00, Dinner 19:00-22:00, Late Dinner 22:00-00:00
+- Il Forno Italian Pizzeria: A la Carte, Dinner 19:00-22:00, Reservation Required
+- Genghis Khan Mongolian Restaurant: Dinner 19:00-22:00, Reservation Required
+BARS:
+- Lobby Bar: 24 Hours. Snacks 10:30-12:00
+- Pool Bar: 10:00-Sunset. Snacks 15:00-17:00
+- Beach Bar: 10:00-Sunset. Snacks 13:00-Sunset
+RECREATION:
+- Aqua Park: 6 slides for adults & kids, 10:00-12:00 and 15:00-17:00
+- 6 Swimming Pools: 09:00-Sunset
+- Private Sandy Beach
+- Spa (+16, extra charge): Sauna, Jacuzzi, Steam Bath & Massage, 10:00-19:00
+- Gym (+16): 10:00-19:00
+- Kids Club: 10:00-12:00 and 15:00-17:00, ages 3-9, English/German/Russian/Polish staff
+- Evening Entertainment: Daily animation shows at Romanian Theater with weekly program
+ACCOMMODATION: All rooms include A/C, private balcony/terrace, satellite TV, direct dial telephone, private bathroom, minibar (refilled daily), safe box. All non-smoking, 220V.
+Room Types: Standard (garden/pool/partial sea view), Superior (sea view), Family (garden/pool/partial sea view), Junior Suite (garden/pool/partial sea view)
+HOTEL FACILITIES: Free Wi-Fi, 24h Front Desk, Express Check-in/Out, Multilingual Staff, Concierge, Guest Service, Luggage Room, Mini-Market, Taxi/Limousine, Parking, Laundry & Valet, ATM/Exchange, 24h Doctor & Pharmacy, Beauty Salon & Barber, Gift/Jewelry Shop, Disabled Rooms, Room Service (extra charge)
+
+3. PROTELS ROYAL BAY RESORT & SPA — Hurghada, Egypt.
+Premium beachfront resort with full spa, private beach, and lively entertainment. Ideal for a Red Sea holiday.
+
+4. PROTELS LA PLAGE — Zanzibar, Tanzania. 4-star All-Inclusive beachfront resort.
+Location: East coast of Zanzibar, white sandy shores with breathtaking ocean views and direct beach access.
+DINING:
+- La Cabana Main Restaurant: Breakfast 07:00-10:00, Lunch 12:30-14:30, Dinner 19:30-21:30, daily theme night dinners
+- Ocean Breeze Beach Restaurant: Reservation Only
+BARS:
+- Beach Bar: 10:00-18:30 (cocktails, cold drinks, beachfront view)
+- Pool Bar: 10:00-18:30 (swim-up bar)
+- Jaz Bar: 16:00-00:00 (hot & cold beverages, cozy evening spot)
+- Terrace Bar: 10:00-23:00
+ALL-INCLUSIVE PACKAGE: Check-in 14:00, Check-out 12:00 (late check-out available, extra charge). All beverages served by glass. Minibar refilled daily with soft drinks & mineral water.
+FREE ACTIVITIES: Animation programs, Swimming pool access (08:00-18:00), Beach access (08:00-18:00)
+EXTRA CHARGE: Doctor, Laundry, Limousine, International calls, Massage, Shisha, Imported alcoholic beverages
+FACILITIES: Free Wi-Fi all areas, 24h Reception, In-room safe free of charge, Breakfast boxes on request (24h advance), Luggage service (call 100), Taxi daily 10:00-21:00
+DRESS CODE: Swimming wear outdoors only, proper attire indoors, proper swimwear in pools, rubber shoes recommended on beach
+GENERAL: Sunbeds cannot be reserved before 07:00. Lost room key charge $50. Lost towel card charge $20.
+
+CHILDREN POLICY:
+- Children are welcome in Protels resorts, especially at Beach Club & Spa with Kids Club (ages 3-9) and Family rooms.
 - Policies may vary by resort and room type.
 - Exact details are shown during booking.
 
-CANCELLATION POLICY (SAFE RESPONSE):
+CANCELLATION POLICY:
 - Cancellation policies depend on the selected resort and rate.
 - Some rates are flexible, others may be non-refundable.
 - Exact cancellation rules are always displayed during booking.
