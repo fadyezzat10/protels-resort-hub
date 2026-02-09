@@ -77,6 +77,46 @@ export async function registerRoutes(
     res.json({ status: "ok" });
   });
 
+  app.get("/sitemap.xml", async (_req, res) => {
+    const baseUrl = "https://protels.com";
+    const staticPages = [
+      { path: "/", priority: "1.0", changefreq: "weekly" },
+      { path: "/hotels", priority: "0.9", changefreq: "weekly" },
+      { path: "/about", priority: "0.7", changefreq: "monthly" },
+      { path: "/contact", priority: "0.7", changefreq: "monthly" },
+      { path: "/careers", priority: "0.6", changefreq: "monthly" },
+      { path: "/gallery", priority: "0.6", changefreq: "monthly" },
+    ];
+    const hotelSlugs = ["crystal-beach", "beach-club", "la-plage", "royal-bay"];
+    const today = new Date().toISOString().split("T")[0];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+    for (const page of staticPages) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}${page.path}</loc>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
+      xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+      xml += `    <priority>${page.priority}</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    for (const slug of hotelSlugs) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/hotels/${slug}</loc>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    xml += `</urlset>`;
+
+    res.set("Content-Type", "application/xml");
+    res.send(xml);
+  });
+
   // ──────── AUTH ────────
   app.post("/api/auth/login", async (req, res) => {
     try {
