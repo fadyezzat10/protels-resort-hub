@@ -1323,7 +1323,8 @@ export default function HotelDetails() {
                          <Mail className="w-5 h-5 text-brand-gold mt-1" />
                          <div>
                            <span className="block font-bold text-brand-blue mb-1">Email</span>
-                           <span className="text-gray-600">reservations@protels.com</span>
+                           <span className="text-gray-600">res.cb@protels.com
+</span>
                          </div>
                        </div>
                      </div>
