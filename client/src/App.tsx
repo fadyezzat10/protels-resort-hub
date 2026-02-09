@@ -25,6 +25,9 @@ import CMSHotels from "@/pages/cms/CMSHotels";
 import CMSMedia from "@/pages/cms/CMSMedia";
 import CMSSeo from "@/pages/cms/CMSSeo";
 import CMSSettings from "@/pages/cms/CMSSettings";
+import CMSBlog from "@/pages/cms/CMSBlog";
+import Blog from "@/pages/Blog";
+import BlogArticle from "@/pages/BlogArticle";
 import CMSHead from "@/components/CMSHead";
 
 function Router() {
@@ -36,6 +39,8 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/careers" component={Careers} />
       <Route path="/about" component={About} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogArticle} />
 
       {/* Admin Routes */}
       <Route path="/admin" component={Login} />
@@ -51,6 +56,7 @@ function Router() {
       <Route path="/controlpanal/media" component={CMSMedia} />
       <Route path="/controlpanal/seo" component={CMSSeo} />
       <Route path="/controlpanal/settings" component={CMSSettings} />
+      <Route path="/controlpanal/blog" component={CMSBlog} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/hotels/:hotelId" component={HotelDetails} />

@@ -1,13 +1,14 @@
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import {
-  users, pages, hotels, media, globalSettings, seoSettings,
+  users, pages, hotels, media, globalSettings, seoSettings, blogPosts,
   type User, type InsertUser,
   type Page, type InsertPage,
   type Hotel, type InsertHotel,
   type Media, type InsertMedia,
   type GlobalSetting, type InsertGlobalSetting,
   type SeoSetting, type InsertSeoSetting,
+  type BlogPost, type InsertBlogPost,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -52,6 +53,14 @@ export interface IStorage {
   getSeoByPath(path: string): Promise<SeoSetting | undefined>;
   upsertSeo(data: InsertSeoSetting): Promise<SeoSetting>;
   deleteSeo(id: number): Promise<void>;
+
+  // Blog Posts
+  getBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: number, data: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -190,6 +199,30 @@ export class DatabaseStorage implements IStorage {
   }
   async deleteSeo(id: number) {
     await db.delete(seoSettings).where(eq(seoSettings.id, id));
+  }
+
+  // Blog Posts
+  async getBlogPosts() {
+    return db.select().from(blogPosts);
+  }
+  async getBlogPost(id: number) {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post;
+  }
+  async getBlogPostBySlug(slug: string) {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post;
+  }
+  async createBlogPost(post: InsertBlogPost) {
+    const [created] = await db.insert(blogPosts).values(post).returning();
+    return created;
+  }
+  async updateBlogPost(id: number, data: Partial<InsertBlogPost>) {
+    const [updated] = await db.update(blogPosts).set({ ...data, updatedAt: new Date() }).where(eq(blogPosts.id, id)).returning();
+    return updated;
+  }
+  async deleteBlogPost(id: number) {
+    await db.delete(blogPosts).where(eq(blogPosts.id, id));
   }
 }
 

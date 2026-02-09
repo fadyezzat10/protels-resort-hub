@@ -8,6 +8,7 @@ import fs from "fs";
 import { storage } from "./storage";
 import { pool } from "./db";
 import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
+import { insertBlogPostSchema } from "@shared/schema";
 import OpenAI from "openai";
 import { findRuleBasedResponse, detectArabicText } from "@shared/chatResponses";
 
@@ -86,6 +87,7 @@ export async function registerRoutes(
       { path: "/contact", priority: "0.7", changefreq: "monthly" },
       { path: "/careers", priority: "0.6", changefreq: "monthly" },
       { path: "/gallery", priority: "0.6", changefreq: "monthly" },
+      { path: "/blog", priority: "0.8", changefreq: "weekly" },
     ];
     const hotelSlugs = ["crystal-beach", "beach-club", "la-plage", "royal-bay"];
     const today = new Date().toISOString().split("T")[0];
@@ -108,6 +110,16 @@ export async function registerRoutes(
       xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.8</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
+    for (const post of publishedPosts) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
+      xml += `    <lastmod>${post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.7</priority>\n`;
       xml += `  </url>\n`;
     }
 
@@ -297,6 +309,43 @@ export async function registerRoutes(
     res.json({ ok: true });
   });
 
+  // ──────── BLOG POSTS ────────
+  app.get("/api/cms/blog", requireAuth, async (_req, res) => {
+    res.json(await storage.getBlogPosts());
+  });
+
+  app.get("/api/cms/blog/:id", requireAuth, async (req, res) => {
+    const post = await storage.getBlogPost(Number(req.params.id));
+    if (!post) return res.status(404).json({ message: "Not found" });
+    res.json(post);
+  });
+
+  app.post("/api/cms/blog", requireAuth, async (req, res) => {
+    try {
+      const parsed = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost(parsed);
+      res.json(post);
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+
+  app.patch("/api/cms/blog/:id", requireAuth, async (req, res) => {
+    try {
+      const parsed = insertBlogPostSchema.partial().parse(req.body);
+      const post = await storage.updateBlogPost(Number(req.params.id), parsed);
+      if (!post) return res.status(404).json({ message: "Not found" });
+      res.json(post);
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+
+  app.delete("/api/cms/blog/:id", requireAuth, async (req, res) => {
+    await storage.deleteBlogPost(Number(req.params.id));
+    res.json({ ok: true });
+  });
+
   // ──────── PUBLIC API (for website consumption) ────────
   app.get("/api/public/pages/:slug", async (req, res) => {
     const page = await storage.getPageBySlug(req.params.slug);
@@ -341,19 +390,32 @@ export async function registerRoutes(
     res.json(files);
   });
 
+  app.get("/api/public/blog", async (_req, res) => {
+    const all = await storage.getBlogPosts();
+    res.json(all.filter(p => p.status === "published"));
+  });
+
+  app.get("/api/public/blog/:slug", async (req, res) => {
+    const post = await storage.getBlogPostBySlug(req.params.slug);
+    if (!post || post.status !== "published") return res.status(404).json({ message: "Not found" });
+    res.json(post);
+  });
+
   // Dashboard stats
   app.get("/api/cms/dashboard", requireAuth, async (_req, res) => {
-    const [allPages, allHotels, allMedia, allUsers] = await Promise.all([
+    const [allPages, allHotels, allMedia, allUsers, allBlogPosts] = await Promise.all([
       storage.getPages(),
       storage.getHotels(),
       storage.getMediaFiles(),
       storage.getUsers(),
+      storage.getBlogPosts(),
     ]);
     res.json({
       pages: { total: allPages.length, published: allPages.filter(p => p.status === "published").length, draft: allPages.filter(p => p.status === "draft").length },
       hotels: { total: allHotels.length, published: allHotels.filter(h => h.status === "published").length },
       media: { total: allMedia.length, totalSize: allMedia.reduce((s, m) => s + m.size, 0) },
       users: { total: allUsers.length },
+      blogPosts: { total: allBlogPosts.length, published: allBlogPosts.filter(p => p.status === "published").length, draft: allBlogPosts.filter(p => p.status === "draft").length },
     });
   });
 

@@ -48,8 +48,10 @@ Preferred communication style: Simple, everyday language.
 - `/careers` – Careers/job application page
 - `/contact` – Contact page
 - `/gallery` – Photo gallery
+- `/blog` – Blog articles listing
+- `/blog/:slug` – Individual blog article page
 - `/admin` – Legacy admin login
-- `/controlpanal` – CMS login and management routes (pages, hotels, media, SEO, settings)
+- `/controlpanal` – CMS login and management routes (pages, hotels, blog, media, SEO, settings)
 
 **Key Frontend Files:**
 - `client/src/App.tsx` – Main router and providers
@@ -89,6 +91,7 @@ Preferred communication style: Simple, everyday language.
 - `pages` – CMS-managed pages with multilingual content (title/content stored as JSONB `Record<string, string>`)
 - `hotels` – Hotel entries with descriptions (JSONB), features, rooms, gallery, dining details, map links
 - `media` – Uploaded media file metadata
+- `blogPosts` – Blog articles with multilingual title/content/excerpt (JSONB), SEO fields, hotel linking, featured image
 - `globalSettings` – Key-value settings store
 - `seoSettings` – Per-path SEO metadata (meta titles, descriptions, OG tags, robots, canonical URLs)
 

@@ -8,6 +8,7 @@ import {
   Users,
   Plus,
   Upload,
+  Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,31 +37,38 @@ export default function CMSDashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <StatsCard
               title="Total Pages"
-              value={stats?.totalPages ?? 0}
-              subtitle={`${stats?.publishedPages ?? 0} published · ${stats?.draftPages ?? 0} draft`}
+              value={stats?.pages?.total ?? 0}
+              subtitle={`${stats?.pages?.published ?? 0} published · ${stats?.pages?.draft ?? 0} draft`}
               icon={FileText}
               color="blue"
             />
             <StatsCard
               title="Hotels"
-              value={stats?.totalHotels ?? 0}
+              value={stats?.hotels?.total ?? 0}
               subtitle="Resorts & properties"
               icon={Building2}
               color="green"
             />
             <StatsCard
+              title="Blog Posts"
+              value={stats?.blogPosts?.total ?? 0}
+              subtitle={`${stats?.blogPosts?.published ?? 0} published · ${stats?.blogPosts?.draft ?? 0} draft`}
+              icon={Newspaper}
+              color="orange"
+            />
+            <StatsCard
               title="Media Files"
-              value={stats?.totalMedia ?? 0}
+              value={stats?.media?.total ?? 0}
               subtitle="Images & documents"
               icon={Image}
               color="purple"
             />
             <StatsCard
               title="Users"
-              value={stats?.totalUsers ?? 0}
+              value={stats?.users?.total ?? 0}
               subtitle="Admin accounts"
               icon={Users}
               color="yellow"
@@ -126,6 +134,7 @@ function StatsCard({
     green: "bg-green-100 text-green-700",
     purple: "bg-purple-100 text-purple-700",
     yellow: "bg-yellow-100 text-yellow-700",
+    orange: "bg-orange-100 text-orange-700",
   };
 
   return (

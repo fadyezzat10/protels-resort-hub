@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   User,
+  Newspaper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/controlpanal/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/controlpanal/pages", label: "Pages", icon: FileText },
   { href: "/controlpanal/hotels", label: "Hotels", icon: Building2 },
+  { href: "/controlpanal/blog", label: "Blog", icon: Newspaper },
   { href: "/controlpanal/media", label: "Media Library", icon: Image },
   { href: "/controlpanal/seo", label: "SEO", icon: Search },
   { href: "/controlpanal/settings", label: "Settings", icon: Settings },

@@ -74,6 +74,21 @@ export const seoSettings = pgTable("seo_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: jsonb("title").notNull().$type<Record<string, string>>(),
+  content: jsonb("content").notNull().$type<Record<string, string>>(),
+  excerpt: jsonb("excerpt").$type<Record<string, string>>(),
+  featuredImage: text("featured_image"),
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  hotelSlug: text("hotel_slug"),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
@@ -81,6 +96,7 @@ export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, cre
 export const insertMediaSchema = createInsertSchema(media).omit({ id: true, createdAt: true });
 export const insertGlobalSettingSchema = createInsertSchema(globalSettings).omit({ id: true, updatedAt: true });
 export const insertSeoSettingSchema = createInsertSchema(seoSettings).omit({ id: true, updatedAt: true });
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -95,3 +111,5 @@ export type InsertGlobalSetting = z.infer<typeof insertGlobalSettingSchema>;
 export type GlobalSetting = typeof globalSettings.$inferSelect;
 export type InsertSeoSetting = z.infer<typeof insertSeoSettingSchema>;
 export type SeoSetting = typeof seoSettings.$inferSelect;
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
