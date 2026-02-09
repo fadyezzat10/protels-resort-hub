@@ -1,4 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -62,6 +63,14 @@ function Router() {
   );
 }
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location]);
+  return null;
+}
+
 function ChatbotWrapper() {
   const [location] = useLocation();
   const isAdminOrCMS = location.startsWith("/admin") || location.startsWith("/controlpanal");
@@ -76,6 +85,7 @@ function App() {
         <I18nProvider>
           <CMSHead />
           <Toaster />
+          <ScrollToTop />
           <Router />
           <ChatbotWrapper />
         </I18nProvider>
