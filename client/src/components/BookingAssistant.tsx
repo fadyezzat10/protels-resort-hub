@@ -184,16 +184,16 @@ export default function BookingAssistant() {
           className="chatbot-window fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[540px] max-h-[calc(100vh-3rem)] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#C8A97E]/20"
           style={{ direction: isRTL ? "rtl" : "ltr" }}
         >
-          <div className="bg-[#1a2744] text-white px-5 py-4 flex items-center justify-between flex-shrink-0">
+          <div className="chatbot-header bg-[#1a2744] text-white px-5 py-4 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#C8A97E]/20 flex items-center justify-center">
+              <div className="chatbot-header-icon w-9 h-9 rounded-full bg-[#C8A97E]/20 flex items-center justify-center">
                 <MessageCircle className="w-5 h-5 text-[#C8A97E]" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm tracking-wide" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                <h3 className="chatbot-header-title font-semibold text-sm tracking-wide" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                   {isRTL ? "مساعد الحجز" : "Booking Assistant"}
                 </h3>
-                <p className="text-[10px] text-[#C8A97E] tracking-wider uppercase">
+                <p className="chatbot-header-subtitle text-[10px] text-[#C8A97E] tracking-wider uppercase">
                   {isRTL ? "بروتلز للفنادق والمنتجعات" : "Protels Hotels & Resorts"}
                 </p>
               </div>
@@ -208,7 +208,7 @@ export default function BookingAssistant() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto bg-[#f8f6f3] px-4 py-4 space-y-3">
+          <div className="chatbot-messages flex-1 overflow-y-auto bg-[#f8f6f3] px-4 py-4 space-y-3">
             {displayMessages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
@@ -238,7 +238,7 @@ export default function BookingAssistant() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="bg-white border-t border-[#e8e2d8] px-3 py-3 flex-shrink-0">
+          <div className="chatbot-input-bar bg-white border-t border-[#e8e2d8] px-3 py-3 flex-shrink-0">
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
