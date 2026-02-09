@@ -82,7 +82,7 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
                 </Button>
               </Link>
               {hotel.id === "royal-bay" ? (
-                <Button disabled className="flex-1 bg-gray-200 text-gray-400 font-bold rounded-none cursor-not-allowed uppercase text-xs tracking-wider">
+                <Button disabled className="flex-1 bg-gray-200 text-gray-400 font-bold rounded-none cursor-not-allowed uppercase text-xs tracking-wider pl-0 pr-0">
                   Available Soon
                 </Button>
               ) : (
