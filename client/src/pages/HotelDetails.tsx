@@ -77,7 +77,6 @@ export default function HotelDetails() {
           }
         `}</style>
       )}
-
       {/* Tribal Pattern Overlay for La Plage */}
       {isLaPlage && (
         <div 
@@ -85,7 +84,6 @@ export default function HotelDetails() {
           style={{ backgroundImage: `url(${tribalPattern})`, backgroundSize: '400px' }}
         />
       )}
-
       <div className={cn("relative z-10", isLaPlage && "la-plage-theme")}>
       <Navbar />
       
@@ -920,20 +918,20 @@ export default function HotelDetails() {
                   </div>
                 ) : (
                   // Default Fallback Layout for other hotels
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div className="bg-gray-50 p-6">
-                        <Utensils className="w-8 h-8 text-brand-gold mb-4" />
-                        <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
-                        <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
-                        <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
-                     </div>
-                     <div className="bg-gray-50 p-6">
-                        <Utensils className="w-8 h-8 text-brand-gold mb-4" />
-                        <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
-                        <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
-                        <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
-                     </div>
-                  </div>
+                  (<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-6">
+                       <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                       <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Main Restaurant</h3>
+                       <p className="text-gray-600 text-sm mb-4">International buffet serving breakfast, lunch, and dinner with live cooking stations.</p>
+                       <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">07:00 - 22:00</div>
+                    </div>
+                    <div className="bg-gray-50 p-6">
+                       <Utensils className="w-8 h-8 text-brand-gold mb-4" />
+                       <h3 className="font-serif text-xl font-bold text-brand-blue mb-2">Beach Bar</h3>
+                       <p className="text-gray-600 text-sm mb-4">Refreshing cocktails and light snacks served right on the sandy beach.</p>
+                       <div className="text-xs font-bold text-brand-blue uppercase tracking-wider">10:00 - Sunset</div>
+                    </div>
+                  </div>)
                 )}
               </section>
             )}
@@ -1318,7 +1316,7 @@ export default function HotelDetails() {
                          <div>
                            <span className="block font-bold text-brand-blue mb-1">Phone</span>
                            <span className="text-gray-600">+20 123 456 7890</span>
-                           <span className="text-gray-600">+20 123 456 7890</span>
+                           <span className="text-gray-600">+20 150 092 5579</span>
                          </div>
                        </div>
                        <div className="flex items-start gap-3">
