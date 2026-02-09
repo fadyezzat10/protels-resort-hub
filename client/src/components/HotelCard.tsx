@@ -76,7 +76,7 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
             </div>
             
             <div className="flex gap-3 mt-2">
-              <Link href={`/${hotel.id}`} className="flex-1">
+              <Link href={`/hotels/${hotel.id}`} className="flex-1">
                 <Button variant="outline" className="w-full border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none">
                   {t("hotel.view")}
                 </Button>
