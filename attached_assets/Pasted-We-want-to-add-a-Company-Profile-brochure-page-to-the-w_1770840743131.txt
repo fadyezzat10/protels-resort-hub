@@ -1,0 +1,130 @@
+We want to add a "Company Profile" brochure page to the website.
+
+CRITICAL:
+- DO NOT modify any existing website pages.
+- DO NOT change any routes currently working.
+- DO NOT change layout, styling, or structure of existing pages.
+- Only ADD new functionality.
+
+--------------------------------------------------
+STEP 1: Add Navigation Link
+--------------------------------------------------
+
+1) Add a new menu item in the main navigation.
+2) Place it next to "Contact".
+3) Label:
+   - English: "Company Profile"
+   - Arabic: "الملف التعريفي"
+4) It must auto-switch based on site language.
+5) Route: /company-profile
+6) Do NOT alter any other navigation items.
+
+--------------------------------------------------
+STEP 2: Create New Page
+--------------------------------------------------
+
+Create a new page at:
+
+/company-profile
+
+This page must:
+
+- Keep the same header and footer.
+- Keep same fonts and luxury theme.
+- Be fully responsive.
+
+--------------------------------------------------
+STEP 3: Flipbook Viewer
+--------------------------------------------------
+
+On the page:
+
+1) Add a professional flipbook viewer.
+2) It must:
+   - Show PDF with real page flip animation.
+   - Be responsive.
+   - Look modern and luxury.
+3) On desktop: full width centered container.
+4) On mobile: optimized and smooth scrolling.
+5) Background color: light beige or very light gray.
+6) Add page loading animation.
+
+--------------------------------------------------
+STEP 4: Download PDF Button
+--------------------------------------------------
+
+Add a "Download PDF" button.
+
+REQUIREMENTS:
+
+1) Label:
+   - English: "Download PDF"
+   - Arabic: "تحميل الملف"
+
+2) Language auto-switch based on site language.
+
+3) Design:
+   - Background: Gold (#C6A45A)
+   - Text: Dark navy (#0f1b2d)
+   - Rounded corners
+   - Small download icon on left
+   - Hover effect: slightly darker gold
+
+4) Placement:
+   - Desktop: Top-right of flipbook container
+   - Mobile: Below flipbook
+
+5) Functionality:
+   - Download original uploaded PDF file.
+   - Open in new tab if needed.
+   - File name should match brochure title.
+
+6) Security:
+   - Only downloadable if status = Published.
+   - Draft files must not be accessible publicly.
+
+--------------------------------------------------
+STEP 5: CMS Integration
+--------------------------------------------------
+
+In CMS:
+
+Add new module:
+
+Brochures / Company Profile
+
+Fields:
+- Title
+- Slug (default: company-profile)
+- Upload PDF
+- Status (Draft / Published)
+- Last updated by
+- Last updated at
+
+When status = Published:
+- It appears at /company-profile
+- Flipbook loads automatically from uploaded PDF
+- Download button downloads same file
+
+--------------------------------------------------
+STEP 6: Tracking (Optional but recommended)
+--------------------------------------------------
+
+When user clicks Download:
+
+Push to dataLayer:
+
+event: "brochure_download"
+brochure_title: [title]
+
+--------------------------------------------------
+FINAL REQUIREMENTS
+--------------------------------------------------
+
+✔ Existing website unchanged
+✔ No routing conflicts
+✔ Luxury styling preserved
+✔ Fully responsive
+✔ SEO friendly
+✔ Clean code
+✔ Secure access
