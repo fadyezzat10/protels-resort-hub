@@ -11,6 +11,7 @@ import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
 import { insertBlogPostSchema } from "@shared/schema";
 import OpenAI from "openai";
 import { findRuleBasedResponse, detectArabicText } from "@shared/chatResponses";
+import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
 
 declare module "express-session" {
   interface SessionData {
@@ -72,6 +73,8 @@ export async function registerRoutes(
 
   await seedAdmin();
   await seedContent();
+
+  registerObjectStorageRoutes(app);
 
   // Health
   app.get("/api/health", (_req, res) => {
@@ -349,13 +352,7 @@ export async function registerRoutes(
 
   // ──────── COMPANY PROFILE PDF UPLOAD (50MB limit) ────────
   const pdfUpload = multer({
-    storage: multer.diskStorage({
-      destination: (_req, _file, cb) => cb(null, uploadDir),
-      filename: (_req, file, cb) => {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-        cb(null, uniqueName);
-      },
-    }),
+    storage: multer.memoryStorage(),
     limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
       if (file.mimetype === "application/pdf") {
@@ -369,11 +366,50 @@ export async function registerRoutes(
   app.post("/api/cms/company-profile/upload", requireAuth, pdfUpload.single("file"), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-      const url = `/uploads/${req.file.filename}`;
-      await storage.upsertSetting("company_profile_pdf", url);
-      res.json({ url });
+
+      const objService = new ObjectStorageService();
+      const searchPaths = objService.getPublicObjectSearchPaths();
+      const publicPath = searchPaths[0];
+      const sanitizedName = req.file.originalname
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .replace(/_+/g, "_");
+      const fileName = `company-profile-${Date.now()}-${sanitizedName}`;
+      const fullObjectPath = `${publicPath}/${fileName}`;
+
+      const parts = fullObjectPath.split("/").filter(Boolean);
+      const bucketName = parts[0];
+      const objectName = parts.slice(1).join("/");
+
+      const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+
+      await file.save(req.file.buffer, {
+        metadata: { contentType: "application/pdf" },
+      });
+
+      const serveUrl = `/api/public/pdf/${encodeURIComponent(fileName)}`;
+      await storage.upsertSetting("company_profile_pdf", serveUrl);
+      res.json({ url: serveUrl });
     } catch (e: any) {
+      console.error("PDF upload error:", e);
       res.status(400).json({ message: e.message });
+    }
+  });
+
+  // ──────── SERVE PDF FROM OBJECT STORAGE ────────
+  app.get("/api/public/pdf/:filename", async (req, res) => {
+    try {
+      const objService = new ObjectStorageService();
+      const fileName = decodeURIComponent(req.params.filename);
+      const file = await objService.searchPublicObject(fileName);
+      if (!file) {
+        return res.status(404).json({ message: "PDF not found" });
+      }
+      await objService.downloadObject(file, res, 86400);
+    } catch (e: any) {
+      console.error("PDF serve error:", e);
+      res.status(500).json({ message: "Error serving PDF" });
     }
   });
 
