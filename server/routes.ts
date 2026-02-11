@@ -388,7 +388,7 @@ export async function registerRoutes(
         metadata: { contentType: "application/pdf" },
       });
 
-      const serveUrl = `/api/public/pdf/${encodeURIComponent(fileName)}`;
+      const serveUrl = `/public/uploads/${encodeURIComponent(fileName)}`;
       await storage.upsertSetting("company_profile_pdf", serveUrl);
       res.json({ url: serveUrl });
     } catch (e: any) {
@@ -397,19 +397,19 @@ export async function registerRoutes(
     }
   });
 
-  // ──────── SERVE PDF FROM OBJECT STORAGE ────────
-  app.get("/api/public/pdf/:filename", async (req, res) => {
+  // ──────── SERVE UPLOADED FILES AS STATIC ────────
+  app.get("/public/uploads/:filename", async (req, res) => {
     try {
       const objService = new ObjectStorageService();
       const fileName = decodeURIComponent(req.params.filename);
       const file = await objService.searchPublicObject(fileName);
       if (!file) {
-        return res.status(404).json({ message: "PDF not found" });
+        return res.status(404).json({ message: "File not found" });
       }
       await objService.downloadObject(file, res, 86400);
     } catch (e: any) {
-      console.error("PDF serve error:", e);
-      res.status(500).json({ message: "Error serving PDF" });
+      console.error("Static file serve error:", e);
+      res.status(500).json({ message: "Error serving file" });
     }
   });
 
