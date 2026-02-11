@@ -76,7 +76,7 @@ export default function CompanyProfile() {
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
       <Navbar />
 
-      <div className="bg-primary text-white py-16 md:py-24 relative overflow-hidden" style={{ minHeight: '50vh', maxHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+      <div className="bg-primary text-white relative overflow-hidden" style={{ padding: '120px 0 80px 0' }}>
         <div className="absolute inset-0 bg-black/30 z-0"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <h1 data-testid="text-company-profile-title" className="text-3xl md:text-5xl font-playfair font-bold mb-6 tracking-widest text-white drop-shadow-md uppercase">
