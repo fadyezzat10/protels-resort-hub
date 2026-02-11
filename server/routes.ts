@@ -88,6 +88,7 @@ export async function registerRoutes(
       { path: "/careers", priority: "0.6", changefreq: "monthly" },
       { path: "/gallery", priority: "0.6", changefreq: "monthly" },
       { path: "/blog", priority: "0.8", changefreq: "weekly" },
+      { path: "/company-profile", priority: "0.6", changefreq: "monthly" },
     ];
     const hotelSlugs = ["crystal-beach", "beach-club", "la-plage", "royal-bay"];
     const today = new Date().toISOString().split("T")[0];
@@ -346,6 +347,36 @@ export async function registerRoutes(
     res.json({ ok: true });
   });
 
+  // ──────── COMPANY PROFILE PDF UPLOAD (50MB limit) ────────
+  const pdfUpload = multer({
+    storage: multer.diskStorage({
+      destination: (_req, _file, cb) => cb(null, uploadDir),
+      filename: (_req, file, cb) => {
+        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+        cb(null, uniqueName);
+      },
+    }),
+    limits: { fileSize: 50 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      if (file.mimetype === "application/pdf") {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF files are allowed"));
+      }
+    },
+  });
+
+  app.post("/api/cms/company-profile/upload", requireAuth, pdfUpload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+      const url = `/uploads/${req.file.filename}`;
+      await storage.upsertSetting("company_profile_pdf", url);
+      res.json({ url });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+
   // ──────── PUBLIC API (for website consumption) ────────
   app.get("/api/public/pages/:slug", async (req, res) => {
     const page = await storage.getPageBySlug(req.params.slug);
@@ -388,6 +419,24 @@ export async function registerRoutes(
   app.get("/api/public/media", async (_req, res) => {
     const files = await storage.getMediaFiles();
     res.json(files);
+  });
+
+  app.get("/api/public/company-profile", async (_req, res) => {
+    const settings = await storage.getSettings();
+    const findVal = (key: string) => {
+      const s = settings.find((s: any) => s.key === key);
+      return s?.value ?? null;
+    };
+    const status = findVal("company_profile_status");
+    if (status !== "active") {
+      return res.status(404).json({ message: "Company profile is not active" });
+    }
+    res.json({
+      pdfUrl: findVal("company_profile_pdf"),
+      coverImage: findVal("company_profile_cover"),
+      title: findVal("company_profile_title"),
+      status: status,
+    });
   });
 
   app.get("/api/public/blog", async (_req, res) => {
