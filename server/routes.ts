@@ -406,6 +406,13 @@ export async function registerRoutes(
       if (!file) {
         return res.status(404).json({ message: "File not found" });
       }
+      res.set({
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Range",
+        "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
+        "Accept-Ranges": "bytes",
+      });
       await objService.downloadObject(file, res, 86400);
     } catch (e: any) {
       console.error("Static file serve error:", e);

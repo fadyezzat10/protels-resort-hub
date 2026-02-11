@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useI18n } from "@/lib/i18n";
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2, Minimize2, Loader2 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { PageFlip } from "page-flip";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 interface CompanyProfileData {
   pdfUrl: string;
@@ -100,7 +101,7 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
   const flipbookRef = useRef<HTMLDivElement>(null);
   const pageFlipRef = useRef<any>(null);
   const initRef = useRef(false);
-  const [pages, setPages] = useState<string[]>([]);
+  const pagesRef = useRef<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -108,18 +109,28 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [pdfReady, setPdfReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadPDF() {
       try {
+        console.log("[Flipbook] Loading PDF from:", pdfUrl);
         setLoading(true);
         setError(false);
-        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        setPdfReady(false);
+        setLoadingProgress(0);
+
+        const absoluteUrl = pdfUrl.startsWith("http") ? pdfUrl : `${window.location.origin}${pdfUrl}`;
+        console.log("[Flipbook] Resolved PDF URL:", absoluteUrl);
+
+        const loadingTask = pdfjsLib.getDocument(absoluteUrl);
         const pdf = await loadingTask.promise;
         if (cancelled) return;
+
         const numPages = pdf.numPages;
+        console.log("[Flipbook] PDF loaded, pages:", numPages);
         setTotalPages(numPages);
 
         const isMobile = window.innerWidth < 768;
@@ -145,11 +156,13 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
         }
 
         if (!cancelled) {
-          setPages(pageImages);
+          console.log("[Flipbook] All pages rendered:", pageImages.length);
+          pagesRef.current = pageImages;
           setLoading(false);
+          setPdfReady(true);
         }
       } catch (err) {
-        console.error("Error loading PDF:", err);
+        console.error("[Flipbook] Error loading PDF:", err);
         if (!cancelled) {
           setError(true);
           setLoading(false);
@@ -160,71 +173,90 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
     loadPDF();
 
     return () => {
+      console.log("[Flipbook] PDF load effect cleanup");
       cancelled = true;
     };
   }, [pdfUrl]);
 
   useEffect(() => {
-    if (loading || error || pages.length === 0 || !flipbookRef.current || initRef.current) return;
+    if (!pdfReady || initRef.current) return;
+
+    const pages = pagesRef.current;
+    if (pages.length === 0) return;
 
     const container = flipbookRef.current;
+    if (!container) {
+      console.error("[Flipbook] Container ref not available");
+      return;
+    }
+
     let rafId: number;
+    let attempts = 0;
 
     const tryInit = () => {
-      if (initRef.current || !container) return;
+      if (initRef.current) return;
+      attempts++;
 
       const containerWidth = containerRef.current?.clientWidth || 0;
-      if (containerWidth === 0) {
+      if (containerWidth === 0 && attempts < 60) {
         rafId = requestAnimationFrame(tryInit);
         return;
       }
 
-      const isMobile = containerWidth < 768;
-      const pageWidth = isMobile ? Math.min(containerWidth - 32, 400) : Math.min(Math.floor((containerWidth - 40) / 2), 500);
-      const pageHeight = Math.floor(pageWidth * 1.414);
+      const finalWidth = containerWidth || 800;
+      console.log("[Flipbook] Initializing PageFlip, container width:", finalWidth, "attempt:", attempts);
 
-      const flipbook = new PageFlip(container, {
-        width: pageWidth,
-        height: pageHeight,
-        size: "fixed",
-        minWidth: 200,
-        maxWidth: 600,
-        minHeight: 283,
-        maxHeight: 849,
-        showCover: true,
-        mobileScrollSupport: true,
-        swipeDistance: 30,
-        clickEventForward: true,
-        useMouseEvents: true,
-        flippingTime: 800,
-        usePortrait: isMobile,
-        startZIndex: 0,
-        autoSize: false,
-        maxShadowOpacity: 0.5,
-        drawShadow: true,
-      });
+      try {
+        const isMobile = finalWidth < 768;
+        const pageWidth = isMobile ? Math.min(finalWidth - 32, 400) : Math.min(Math.floor((finalWidth - 40) / 2), 500);
+        const pageHeight = Math.floor(pageWidth * 1.414);
 
-      const pagesElements: HTMLElement[] = [];
-      pages.forEach((dataUrl, index) => {
-        const div = document.createElement("div");
-        div.className = "flipbook-page";
-        div.style.cssText = "background: white; overflow: hidden;";
-        const img = document.createElement("img");
-        img.src = dataUrl;
-        img.alt = `Page ${index + 1}`;
-        img.style.cssText = "width: 100%; height: 100%; object-fit: contain; pointer-events: none;";
-        div.appendChild(img);
-        pagesElements.push(div);
-      });
+        const flipbook = new PageFlip(container, {
+          width: pageWidth,
+          height: pageHeight,
+          size: "fixed",
+          minWidth: 200,
+          maxWidth: 600,
+          minHeight: 283,
+          maxHeight: 849,
+          showCover: true,
+          mobileScrollSupport: true,
+          swipeDistance: 30,
+          clickEventForward: true,
+          useMouseEvents: true,
+          flippingTime: 800,
+          usePortrait: isMobile,
+          startZIndex: 0,
+          autoSize: false,
+          maxShadowOpacity: 0.5,
+          drawShadow: true,
+        });
 
-      flipbook.loadFromHTML(pagesElements);
+        const pagesElements: HTMLElement[] = [];
+        pages.forEach((dataUrl, index) => {
+          const div = document.createElement("div");
+          div.className = "flipbook-page";
+          div.style.cssText = "background: white; overflow: hidden;";
+          const img = document.createElement("img");
+          img.src = dataUrl;
+          img.alt = `Page ${index + 1}`;
+          img.style.cssText = "width: 100%; height: 100%; object-fit: contain; pointer-events: none;";
+          div.appendChild(img);
+          pagesElements.push(div);
+        });
 
-      flipbook.on("flip", (e: any) => {
-        setCurrentPage(e.data);
-      });
+        flipbook.loadFromHTML(pagesElements);
+        console.log("[Flipbook] PageFlip initialized successfully with", pages.length, "pages");
 
-      pageFlipRef.current = flipbook;
-      initRef.current = true;
+        flipbook.on("flip", (e: any) => {
+          setCurrentPage(e.data);
+        });
+
+        pageFlipRef.current = flipbook;
+        initRef.current = true;
+      } catch (err) {
+        console.error("[Flipbook] PageFlip initialization error:", err);
+      }
     };
 
     rafId = requestAnimationFrame(() => {
@@ -232,16 +264,19 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
     });
 
     return () => {
+      console.log("[Flipbook] PageFlip cleanup");
       cancelAnimationFrame(rafId);
       if (pageFlipRef.current) {
         try {
           pageFlipRef.current.destroy();
-        } catch {}
+        } catch (err) {
+          console.error("[Flipbook] Destroy error:", err);
+        }
         pageFlipRef.current = null;
       }
       initRef.current = false;
     };
-  }, [pages, loading, error]);
+  }, [pdfReady]);
 
   const goNext = () => pageFlipRef.current?.flipNext();
   const goPrev = () => pageFlipRef.current?.flipPrev();
@@ -297,13 +332,15 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
           transform: `scale(${zoom})`,
           transformOrigin: "center top",
           transition: "transform 0.3s ease",
-          display: loading || error ? "none" : "flex",
+          visibility: loading || error ? "hidden" : "visible",
+          height: loading || error ? 0 : "auto",
+          overflow: loading || error ? "hidden" : "auto",
         }}
       >
         <div ref={flipbookRef} data-testid="flipbook-container" />
       </div>
 
-      {!loading && !error && pages.length > 0 && (
+      {!loading && !error && pdfReady && (
         <div className={`flex items-center justify-center gap-3 py-4 flex-wrap ${isFullscreen ? "absolute bottom-4 left-0 right-0" : ""}`}>
           <button
             data-testid="button-prev-page"
