@@ -76,14 +76,14 @@ export default function CompanyProfile() {
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
       <Navbar />
 
-      <div className="bg-primary text-white py-32 md:py-48 relative overflow-hidden">
+      <div className="bg-primary text-white py-16 md:py-24 relative overflow-hidden" style={{ minHeight: '50vh', maxHeight: '60vh', display: 'flex', alignItems: 'center' }}>
         <div className="absolute inset-0 bg-black/30 z-0"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 data-testid="text-company-profile-title" className="text-6xl md:text-8xl lg:text-9xl font-playfair font-bold mb-10 tracking-widest text-white drop-shadow-md uppercase">
+          <h1 data-testid="text-company-profile-title" className="text-3xl md:text-5xl font-playfair font-bold mb-6 tracking-widest text-white drop-shadow-md uppercase">
             {profile.title || (isAr ? "ملف الشركة" : "Company Profile")}
           </h1>
-          <div className="w-24 h-1 bg-white/40 mx-auto mb-10 rounded-full"></div>
-          <p className="text-xl md:text-2xl max-w-4xl mx-auto text-white/95 font-light leading-loose tracking-wide">
+          <div className="w-20 h-1 bg-white/40 mx-auto mb-6 rounded-full"></div>
+          <p className="text-base md:text-lg max-w-3xl mx-auto text-white/95 font-light leading-relaxed tracking-wide">
             {isAr
               ? "اكتشف رؤيتنا وقيمنا ومنتجعاتنا الفاخرة عبر وجهاتنا المتميزة"
               : "Discover our vision, values, and premium resorts across our exclusive destinations"}
