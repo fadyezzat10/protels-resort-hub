@@ -425,16 +425,19 @@ export async function registerRoutes(
     const settings = await storage.getSettings();
     const findVal = (key: string) => {
       const s = settings.find((s: any) => s.key === key);
-      return s?.value ?? null;
+      if (!s) return null;
+      const v = s.value;
+      if (typeof v === "string") return v;
+      return v ?? null;
     };
     const status = findVal("company_profile_status");
     if (status !== "active") {
       return res.status(404).json({ message: "Company profile is not active" });
     }
     res.json({
-      pdfUrl: findVal("company_profile_pdf"),
-      coverImage: findVal("company_profile_cover"),
-      title: findVal("company_profile_title"),
+      pdfUrl: findVal("company_profile_pdf") || null,
+      coverImage: findVal("company_profile_cover") || null,
+      title: findVal("company_profile_title") || null,
       status: status,
     });
   });

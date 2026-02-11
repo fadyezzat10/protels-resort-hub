@@ -66,11 +66,14 @@ export default function CMSCompanyProfile() {
         body: formData,
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(errData.message || "Upload failed");
+      }
       const data = await res.json();
       setPdfUrl(data.url);
       queryClient.invalidateQueries({ queryKey: ["/api/cms/settings"] });
-      toast({ title: "PDF uploaded successfully" });
+      toast({ title: "PDF uploaded and saved successfully" });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -84,11 +87,28 @@ export default function CMSCompanyProfile() {
     saveMutation.mutate({ key: "company_profile_status", value: newStatus });
   };
 
+  const saveAll = async () => {
+    try {
+      await apiRequest("PUT", "/api/cms/settings/company_profile_title", { value: title });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_pdf", { value: pdfUrl });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_cover", { value: coverImage });
+      queryClient.invalidateQueries({ queryKey: ["/api/cms/settings"] });
+      toast({ title: "All settings saved successfully" });
+    } catch (err: any) {
+      toast({ title: "Error saving", description: err.message, variant: "destructive" });
+    }
+  };
+
   return (
     <CMSLayout>
-      <div className="mb-8">
-        <h2 className="text-3xl font-serif text-brand-blue mb-2">Company Profile</h2>
-        <p className="text-gray-500">Manage the Company Profile flipbook page</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-serif text-brand-blue mb-2">Company Profile</h2>
+          <p className="text-gray-500">Manage the Company Profile flipbook page</p>
+        </div>
+        <Button data-testid="button-save-all-company-profile" onClick={saveAll} disabled={saveMutation.isPending}>
+          <Save className="w-4 h-4 mr-2" /> Save All
+        </Button>
       </div>
 
       {isLoading ? (

@@ -52,7 +52,7 @@ export default function CompanyProfile() {
     );
   }
 
-  if (!profile || !profile.pdfUrl) {
+  if (!profile) {
     return (
       <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
         <Navbar />
@@ -62,7 +62,7 @@ export default function CompanyProfile() {
               {isAr ? "ملف الشركة" : "Company Profile"}
             </h1>
             <p className="text-gray-500">
-              {isAr ? "قريباً..." : "Coming soon..."}
+              {isAr ? "غير متوفر حالياً" : "Not available at this time"}
             </p>
           </div>
         </div>
@@ -80,7 +80,15 @@ export default function CompanyProfile() {
             {profile.title || (isAr ? "ملف الشركة" : "Company Profile")}
           </h1>
         </div>
-        <FlipbookViewer pdfUrl={profile.pdfUrl} coverImage={profile.coverImage} />
+        {profile.pdfUrl ? (
+          <FlipbookViewer pdfUrl={profile.pdfUrl} coverImage={profile.coverImage} />
+        ) : (
+          <div className="flex items-center justify-center py-20">
+            <p className="text-gray-500">
+              {isAr ? "لم يتم تحميل الملف بعد" : "Document not yet uploaded"}
+            </p>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
