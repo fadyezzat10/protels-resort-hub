@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Save, Upload, FileText, Image, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
+import { Save, Upload, FileText, Image, ToggleLeft, ToggleRight, Trash2, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,12 @@ export default function CMSCompanyProfile() {
   const [pdfUrl, setPdfUrl] = useState("");
   const [status, setStatus] = useState("inactive");
   const [uploading, setUploading] = useState(false);
+
+  const [heroSubtitle, setHeroSubtitle] = useState("");
+  const [heroTitleSizeDesktop, setHeroTitleSizeDesktop] = useState("48px");
+  const [heroTitleSizeMobile, setHeroTitleSizeMobile] = useState("30px");
+  const [heroLetterSpacing, setHeroLetterSpacing] = useState("0.1em");
+  const [heroFontFamily, setHeroFontFamily] = useState("Cormorant Garamond");
 
   const { data: settings = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/cms/settings"],
@@ -31,6 +37,11 @@ export default function CMSCompanyProfile() {
       setCoverImage(findSetting("company_profile_cover"));
       setPdfUrl(findSetting("company_profile_pdf"));
       setStatus(findSetting("company_profile_status") || "inactive");
+      setHeroSubtitle(findSetting("company_profile_hero_subtitle"));
+      setHeroTitleSizeDesktop(findSetting("company_profile_hero_title_size_desktop") || "48px");
+      setHeroTitleSizeMobile(findSetting("company_profile_hero_title_size_mobile") || "30px");
+      setHeroLetterSpacing(findSetting("company_profile_hero_letter_spacing") || "0.1em");
+      setHeroFontFamily(findSetting("company_profile_hero_font_family") || "Cormorant Garamond");
     }
   }, [settings]);
 
@@ -92,6 +103,11 @@ export default function CMSCompanyProfile() {
       await apiRequest("PUT", "/api/cms/settings/company_profile_title", { value: title });
       await apiRequest("PUT", "/api/cms/settings/company_profile_pdf", { value: pdfUrl });
       await apiRequest("PUT", "/api/cms/settings/company_profile_cover", { value: coverImage });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_hero_subtitle", { value: heroSubtitle });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_hero_title_size_desktop", { value: heroTitleSizeDesktop });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_hero_title_size_mobile", { value: heroTitleSizeMobile });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_hero_letter_spacing", { value: heroLetterSpacing });
+      await apiRequest("PUT", "/api/cms/settings/company_profile_hero_font_family", { value: heroFontFamily });
       queryClient.invalidateQueries({ queryKey: ["/api/cms/settings"] });
       toast({ title: "All settings saved successfully" });
     } catch (err: any) {
@@ -177,6 +193,85 @@ export default function CMSCompanyProfile() {
                 >
                   <Save className="w-4 h-4" />
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Type className="w-5 h-5 text-brand-blue" /> Hero Section Styling
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Hero Subtitle</label>
+                <Input
+                  data-testid="input-company-profile-hero-subtitle"
+                  value={heroSubtitle}
+                  onChange={(e) => setHeroSubtitle(e.target.value)}
+                  placeholder="Discover our vision, values, and premium resorts..."
+                />
+                <p className="text-xs text-gray-400 mt-1">Leave empty to use the default subtitle.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Title Size – Desktop</label>
+                  <Input
+                    data-testid="input-company-profile-hero-title-size-desktop"
+                    value={heroTitleSizeDesktop}
+                    onChange={(e) => setHeroTitleSizeDesktop(e.target.value)}
+                    placeholder="48px"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Title Size – Mobile</label>
+                  <Input
+                    data-testid="input-company-profile-hero-title-size-mobile"
+                    value={heroTitleSizeMobile}
+                    onChange={(e) => setHeroTitleSizeMobile(e.target.value)}
+                    placeholder="30px"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Letter Spacing</label>
+                  <Input
+                    data-testid="input-company-profile-hero-letter-spacing"
+                    value={heroLetterSpacing}
+                    onChange={(e) => setHeroLetterSpacing(e.target.value)}
+                    placeholder="0.1em"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Font Family</label>
+                  <select
+                    data-testid="select-company-profile-hero-font-family"
+                    value={heroFontFamily}
+                    onChange={(e) => setHeroFontFamily(e.target.value)}
+                    className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                  >
+                    <option value="Cormorant Garamond">Cormorant Garamond (Serif)</option>
+                    <option value="Playfair Display">Playfair Display (Serif)</option>
+                    <option value="Montserrat">Montserrat (Sans-serif)</option>
+                    <option value="Georgia">Georgia (Serif)</option>
+                    <option value="Times New Roman">Times New Roman (Serif)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="bg-gray-50 border rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-2">Preview:</p>
+                <p
+                  className="text-brand-blue font-bold uppercase"
+                  style={{
+                    fontFamily: heroFontFamily,
+                    fontSize: heroTitleSizeDesktop,
+                    letterSpacing: heroLetterSpacing,
+                  }}
+                >
+                  {title || "Company Profile"}
+                </p>
               </div>
             </CardContent>
           </Card>

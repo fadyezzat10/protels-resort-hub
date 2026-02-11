@@ -482,6 +482,11 @@ export async function registerRoutes(
       coverImage: findVal("company_profile_cover") || null,
       title: findVal("company_profile_title") || null,
       status: status,
+      heroSubtitle: findVal("company_profile_hero_subtitle") || null,
+      heroTitleSizeDesktop: findVal("company_profile_hero_title_size_desktop") || null,
+      heroTitleSizeMobile: findVal("company_profile_hero_title_size_mobile") || null,
+      heroLetterSpacing: findVal("company_profile_hero_letter_spacing") || null,
+      heroFontFamily: findVal("company_profile_hero_font_family") || null,
     });
   });
 

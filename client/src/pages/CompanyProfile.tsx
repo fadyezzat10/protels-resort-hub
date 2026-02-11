@@ -15,6 +15,11 @@ interface CompanyProfileData {
   coverImage: string;
   title: string;
   status: string;
+  heroSubtitle?: string | null;
+  heroTitleSizeDesktop?: string | null;
+  heroTitleSizeMobile?: string | null;
+  heroLetterSpacing?: string | null;
+  heroFontFamily?: string | null;
 }
 
 export default function CompanyProfile() {
@@ -77,15 +82,24 @@ export default function CompanyProfile() {
       <Navbar />
       <div className="bg-primary text-white relative overflow-hidden" style={{ padding: '120px 0 80px 0' }}>
         <div className="absolute inset-0 bg-black/30 z-0"></div>
-        <div className="container mx-auto px-4 text-center relative z-10 mt-[20px] mb-[20px] pt-[-6px] pb-[-6px] pl-[9px] pr-[9px] ml-[270.783px] mr-[270.783px]">
-          <h1 data-testid="text-company-profile-title" className="text-3xl md:text-5xl font-playfair font-bold mb-6 tracking-widest text-white drop-shadow-md uppercase">
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1
+            data-testid="text-company-profile-title"
+            className="font-bold mb-6 text-white drop-shadow-md uppercase"
+            style={{
+              fontFamily: profile.heroFontFamily || "'Cormorant Garamond', serif",
+              fontSize: profile.heroTitleSizeMobile || "30px",
+              letterSpacing: profile.heroLetterSpacing || "0.1em",
+            }}
+          >
+            <style>{`@media (min-width: 768px) { [data-testid="text-company-profile-title"] { font-size: ${profile.heroTitleSizeDesktop || "48px"} !important; } }`}</style>
             {profile.title || (isAr ? "ملف الشركة" : "Company Profile")}
           </h1>
           <div className="w-20 h-1 bg-white/40 mx-auto mb-6 rounded-full"></div>
           <p className="text-base md:text-lg max-w-3xl mx-auto text-white/95 font-light leading-relaxed tracking-wide">
-            {isAr
+            {profile.heroSubtitle || (isAr
               ? "اكتشف رؤيتنا وقيمنا ومنتجعاتنا الفاخرة عبر وجهاتنا المتميزة"
-              : "Discover our vision, values, and premium resorts across our exclusive destinations"}
+              : "Discover our vision, values, and premium resorts across our exclusive destinations")}
           </p>
         </div>
       </div>
