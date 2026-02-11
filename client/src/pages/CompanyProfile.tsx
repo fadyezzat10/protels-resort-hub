@@ -99,117 +99,149 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
   const containerRef = useRef<HTMLDivElement>(null);
   const flipbookRef = useRef<HTMLDivElement>(null);
   const pageFlipRef = useRef<any>(null);
+  const initRef = useRef(false);
   const [pages, setPages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [flipbookReady, setFlipbookReady] = useState(false);
 
-  const renderPDF = useCallback(async () => {
-    try {
-      setLoading(true);
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
-      const pdf = await loadingTask.promise;
-      const numPages = pdf.numPages;
-      setTotalPages(numPages);
+  useEffect(() => {
+    let cancelled = false;
 
-      const isMobile = window.innerWidth < 768;
-      const scale = isMobile ? 1.2 : 1.5;
-      const quality = isMobile ? 0.7 : 0.85;
-      const pageImages: string[] = [];
+    async function loadPDF() {
+      try {
+        setLoading(true);
+        setError(false);
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
+        if (cancelled) return;
+        const numPages = pdf.numPages;
+        setTotalPages(numPages);
 
-      for (let i = 1; i <= numPages; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale });
+        const isMobile = window.innerWidth < 768;
+        const scale = isMobile ? 1.2 : 1.5;
+        const quality = isMobile ? 0.7 : 0.85;
+        const pageImages: string[] = [];
 
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d")!;
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        for (let i = 1; i <= numPages; i++) {
+          if (cancelled) return;
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale });
 
-        await page.render({ canvasContext: context, viewport, canvas } as any).promise;
-        pageImages.push(canvas.toDataURL("image/jpeg", quality));
-        canvas.width = 0;
-        canvas.height = 0;
-        setLoadingProgress(Math.round((i / numPages) * 100));
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d")!;
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          await page.render({ canvasContext: context, viewport, canvas } as any).promise;
+          pageImages.push(canvas.toDataURL("image/jpeg", quality));
+          canvas.width = 0;
+          canvas.height = 0;
+          if (!cancelled) setLoadingProgress(Math.round((i / numPages) * 100));
+        }
+
+        if (!cancelled) {
+          setPages(pageImages);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Error loading PDF:", err);
+        if (!cancelled) {
+          setError(true);
+          setLoading(false);
+        }
       }
-
-      setPages(pageImages);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error loading PDF:", error);
-      setLoading(false);
     }
+
+    loadPDF();
+
+    return () => {
+      cancelled = true;
+    };
   }, [pdfUrl]);
 
   useEffect(() => {
-    renderPDF();
-  }, [renderPDF]);
+    if (loading || error || pages.length === 0 || !flipbookRef.current || initRef.current) return;
 
-  useEffect(() => {
-    if (pages.length === 0 || !flipbookRef.current || flipbookReady) return;
+    const container = flipbookRef.current;
+    let rafId: number;
 
-    const containerWidth = containerRef.current?.clientWidth || 800;
-    const isMobile = containerWidth < 768;
-    const pageWidth = isMobile ? Math.min(containerWidth - 32, 400) : Math.min(Math.floor((containerWidth - 40) / 2), 500);
-    const pageHeight = Math.floor(pageWidth * 1.414);
+    const tryInit = () => {
+      if (initRef.current || !container) return;
 
-    const flipbook = new PageFlip(flipbookRef.current, {
-      width: pageWidth,
-      height: pageHeight,
-      size: "fixed",
-      minWidth: 200,
-      maxWidth: 600,
-      minHeight: 283,
-      maxHeight: 849,
-      showCover: true,
-      mobileScrollSupport: true,
-      swipeDistance: 30,
-      clickEventForward: true,
-      useMouseEvents: true,
-      flippingTime: 800,
-      usePortrait: isMobile,
-      startZIndex: 0,
-      autoSize: true,
-      maxShadowOpacity: 0.5,
-      drawShadow: true,
+      const containerWidth = containerRef.current?.clientWidth || 0;
+      if (containerWidth === 0) {
+        rafId = requestAnimationFrame(tryInit);
+        return;
+      }
+
+      const isMobile = containerWidth < 768;
+      const pageWidth = isMobile ? Math.min(containerWidth - 32, 400) : Math.min(Math.floor((containerWidth - 40) / 2), 500);
+      const pageHeight = Math.floor(pageWidth * 1.414);
+
+      const flipbook = new PageFlip(container, {
+        width: pageWidth,
+        height: pageHeight,
+        size: "fixed",
+        minWidth: 200,
+        maxWidth: 600,
+        minHeight: 283,
+        maxHeight: 849,
+        showCover: true,
+        mobileScrollSupport: true,
+        swipeDistance: 30,
+        clickEventForward: true,
+        useMouseEvents: true,
+        flippingTime: 800,
+        usePortrait: isMobile,
+        startZIndex: 0,
+        autoSize: false,
+        maxShadowOpacity: 0.5,
+        drawShadow: true,
+      });
+
+      const pagesElements: HTMLElement[] = [];
+      pages.forEach((dataUrl, index) => {
+        const div = document.createElement("div");
+        div.className = "flipbook-page";
+        div.style.cssText = "background: white; overflow: hidden;";
+        const img = document.createElement("img");
+        img.src = dataUrl;
+        img.alt = `Page ${index + 1}`;
+        img.style.cssText = "width: 100%; height: 100%; object-fit: contain; pointer-events: none;";
+        div.appendChild(img);
+        pagesElements.push(div);
+      });
+
+      flipbook.loadFromHTML(pagesElements);
+
+      flipbook.on("flip", (e: any) => {
+        setCurrentPage(e.data);
+      });
+
+      pageFlipRef.current = flipbook;
+      initRef.current = true;
+    };
+
+    rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(tryInit);
     });
-
-    const pagesElements: HTMLElement[] = [];
-    pages.forEach((dataUrl, index) => {
-      const div = document.createElement("div");
-      div.className = "flipbook-page";
-      div.style.cssText = "background: white; overflow: hidden;";
-      const img = document.createElement("img");
-      img.src = dataUrl;
-      img.alt = `Page ${index + 1}`;
-      img.style.cssText = "width: 100%; height: 100%; object-fit: contain; pointer-events: none;";
-      div.appendChild(img);
-      pagesElements.push(div);
-    });
-
-    flipbook.loadFromHTML(pagesElements);
-
-    flipbook.on("flip", (e: any) => {
-      setCurrentPage(e.data);
-    });
-
-    pageFlipRef.current = flipbook;
-    setFlipbookReady(true);
 
     return () => {
+      cancelAnimationFrame(rafId);
       if (pageFlipRef.current) {
         try {
           pageFlipRef.current.destroy();
         } catch {}
         pageFlipRef.current = null;
-        setFlipbookReady(false);
       }
+      initRef.current = false;
     };
-  }, [pages]);
+  }, [pages, loading, error]);
 
   const goNext = () => pageFlipRef.current?.flipNext();
   const goPrev = () => pageFlipRef.current?.flipPrev();
@@ -232,97 +264,100 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
     return () => document.removeEventListener("fullscreenchange", handleFs);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        {coverImage && (
-          <img src={coverImage} alt="Cover" className="w-64 h-auto rounded-lg shadow-xl mb-4 object-contain" />
-        )}
-        <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
-        <p className="text-gray-500 text-sm">Loading document... {loadingProgress}%</p>
-        <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-brand-blue rounded-full transition-all duration-300"
-            style={{ width: `${loadingProgress}%` }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (pages.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <p className="text-gray-500">Unable to load the document.</p>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={containerRef}
       className={`relative ${isFullscreen ? "bg-gray-900 flex flex-col items-center justify-center h-screen" : ""}`}
     >
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          {coverImage && (
+            <img src={coverImage} alt="Cover" className="w-64 h-auto rounded-lg shadow-xl mb-4 object-contain" />
+          )}
+          <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
+          <p className="text-gray-500 text-sm">Loading document... {loadingProgress}%</p>
+          <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-brand-blue rounded-full transition-all duration-300"
+              style={{ width: `${loadingProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="flex items-center justify-center py-20">
+          <p className="text-gray-500">Unable to load the document.</p>
+        </div>
+      )}
+
       <div
         className="flex items-center justify-center overflow-auto py-4"
-        style={{ transform: `scale(${zoom})`, transformOrigin: "center top", transition: "transform 0.3s ease" }}
+        style={{
+          transform: `scale(${zoom})`,
+          transformOrigin: "center top",
+          transition: "transform 0.3s ease",
+          display: loading || error ? "none" : "flex",
+        }}
       >
         <div ref={flipbookRef} data-testid="flipbook-container" />
       </div>
 
-      <div className={`flex items-center justify-center gap-3 py-4 flex-wrap ${isFullscreen ? "absolute bottom-4 left-0 right-0" : ""}`}>
-        <button
-          data-testid="button-prev-page"
-          onClick={goPrev}
-          className="p-2 rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30"
-          disabled={currentPage === 0}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        <span data-testid="text-page-indicator" className={`text-sm font-medium px-4 ${isFullscreen ? "text-white" : "text-gray-600"}`}>
-          {currentPage + 1} / {totalPages}
-        </span>
-
-        <button
-          data-testid="button-next-page"
-          onClick={goNext}
-          className="p-2 rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30"
-          disabled={currentPage >= totalPages - 1}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center gap-1 ml-4 border-l pl-4 border-gray-300">
+      {!loading && !error && pages.length > 0 && (
+        <div className={`flex items-center justify-center gap-3 py-4 flex-wrap ${isFullscreen ? "absolute bottom-4 left-0 right-0" : ""}`}>
           <button
-            data-testid="button-zoom-out"
-            onClick={handleZoomOut}
-            className={`p-2 rounded-full hover:bg-gray-200 transition-colors ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
-            disabled={zoom <= 0.5}
+            data-testid="button-prev-page"
+            onClick={goPrev}
+            className="p-2 rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30"
+            disabled={currentPage === 0}
           >
-            <ZoomOut className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className={`text-xs font-medium w-12 text-center ${isFullscreen ? "text-white" : "text-gray-500"}`}>
-            {Math.round(zoom * 100)}%
+
+          <span data-testid="text-page-indicator" className={`text-sm font-medium px-4 ${isFullscreen ? "text-white" : "text-gray-600"}`}>
+            {currentPage + 1} / {totalPages}
           </span>
+
           <button
-            data-testid="button-zoom-in"
-            onClick={handleZoomIn}
-            className={`p-2 rounded-full hover:bg-gray-200 transition-colors ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
-            disabled={zoom >= 2.5}
+            data-testid="button-next-page"
+            onClick={goNext}
+            className="p-2 rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30"
+            disabled={currentPage >= totalPages - 1}
           >
-            <ZoomIn className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-1 ml-4 border-l pl-4 border-gray-300">
+            <button
+              data-testid="button-zoom-out"
+              onClick={handleZoomOut}
+              className={`p-2 rounded-full hover:bg-gray-200 transition-colors ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
+              disabled={zoom <= 0.5}
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <span className={`text-xs font-medium w-12 text-center ${isFullscreen ? "text-white" : "text-gray-500"}`}>
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              data-testid="button-zoom-in"
+              onClick={handleZoomIn}
+              className={`p-2 rounded-full hover:bg-gray-200 transition-colors ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
+              disabled={zoom >= 2.5}
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+          </div>
+
+          <button
+            data-testid="button-fullscreen"
+            onClick={toggleFullscreen}
+            className={`p-2 rounded-full hover:bg-gray-200 transition-colors ml-2 ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
-
-        <button
-          data-testid="button-fullscreen"
-          onClick={toggleFullscreen}
-          className={`p-2 rounded-full hover:bg-gray-200 transition-colors ml-2 ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
-        >
-          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-        </button>
-      </div>
+      )}
     </div>
   );
 }
