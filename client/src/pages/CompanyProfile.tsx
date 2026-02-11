@@ -75,12 +75,23 @@ export default function CompanyProfile() {
   return (
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
       <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="text-center mb-8 px-4">
-          <h1 data-testid="text-company-profile-title" className="text-3xl md:text-4xl font-serif text-brand-blue mb-2">
+
+      <div className="bg-primary text-white py-32 md:py-48 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/30 z-0"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 data-testid="text-company-profile-title" className="text-6xl md:text-8xl lg:text-9xl font-playfair font-bold mb-10 tracking-widest text-white drop-shadow-md uppercase">
             {profile.title || (isAr ? "ملف الشركة" : "Company Profile")}
           </h1>
+          <div className="w-24 h-1 bg-white/40 mx-auto mb-10 rounded-full"></div>
+          <p className="text-xl md:text-2xl max-w-4xl mx-auto text-white/95 font-light leading-loose tracking-wide">
+            {isAr
+              ? "اكتشف رؤيتنا وقيمنا ومنتجعاتنا الفاخرة عبر وجهاتنا المتميزة"
+              : "Discover our vision, values, and premium resorts across our exclusive destinations"}
+          </p>
         </div>
+      </div>
+
+      <div className="pb-16 pt-10">
         {profile.pdfUrl ? (
           <FlipbookViewer pdfUrl={profile.pdfUrl} coverImage={profile.coverImage} />
         ) : (
@@ -102,6 +113,7 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
   const pageFlipRef = useRef<any>(null);
   const initRef = useRef(false);
   const pagesRef = useRef<string[]>([]);
+  const aspectRatioRef = useRef(1.414);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -142,6 +154,11 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
           if (cancelled) return;
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale });
+
+          if (i === 1) {
+            aspectRatioRef.current = viewport.height / viewport.width;
+            console.log("[Flipbook] Page aspect ratio (h/w):", aspectRatioRef.current, "landscape:", aspectRatioRef.current < 1);
+          }
 
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d")!;
@@ -208,17 +225,30 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
 
       try {
         const isMobile = finalWidth < 768;
-        const pageWidth = isMobile ? Math.min(finalWidth - 32, 400) : Math.min(Math.floor((finalWidth - 40) / 2), 500);
-        const pageHeight = Math.floor(pageWidth * 1.414);
+        const ratio = aspectRatioRef.current;
+        const isLandscape = ratio < 1;
+
+        let pageWidth: number;
+        let pageHeight: number;
+
+        if (isLandscape) {
+          pageWidth = isMobile ? Math.min(finalWidth - 32, 500) : Math.min(Math.floor((finalWidth - 40) / 2), 600);
+          pageHeight = Math.floor(pageWidth * ratio);
+        } else {
+          pageWidth = isMobile ? Math.min(finalWidth - 32, 400) : Math.min(Math.floor((finalWidth - 40) / 2), 500);
+          pageHeight = Math.floor(pageWidth * ratio);
+        }
+
+        console.log("[Flipbook] Page dimensions:", pageWidth, "x", pageHeight, "ratio:", ratio, "landscape:", isLandscape);
 
         const flipbook = new PageFlip(container, {
           width: pageWidth,
           height: pageHeight,
           size: "fixed",
-          minWidth: 200,
-          maxWidth: 600,
-          minHeight: 283,
-          maxHeight: 849,
+          minWidth: isLandscape ? 280 : 200,
+          maxWidth: isLandscape ? 800 : 600,
+          minHeight: isLandscape ? 198 : 283,
+          maxHeight: isLandscape ? 566 : 849,
           showCover: true,
           mobileScrollSupport: true,
           swipeDistance: 30,
