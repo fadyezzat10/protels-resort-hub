@@ -20,6 +20,10 @@ interface CompanyProfileData {
   heroTitleSizeMobile?: string | null;
   heroLetterSpacing?: string | null;
   heroFontFamily?: string | null;
+  heroFontWeight?: string | null;
+  heroTextTransform?: string | null;
+  customFontUrl?: string | null;
+  customFontName?: string | null;
 }
 
 export default function CompanyProfile() {
@@ -80,19 +84,26 @@ export default function CompanyProfile() {
   return (
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
       <Navbar />
+      {profile.customFontUrl && profile.customFontName && (
+        <style>{`@font-face { font-family: '${profile.customFontName}'; src: url('${profile.customFontUrl}'); font-display: swap; }`}</style>
+      )}
       <div className="bg-primary text-white relative overflow-hidden" style={{ padding: '120px 0 80px 0' }}>
         <div className="absolute inset-0 bg-black/30 z-0"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <h1
             data-testid="text-company-profile-title"
-            className="font-bold mb-6 text-white drop-shadow-md uppercase"
+            className="company-profile-hero-title mb-6 text-white drop-shadow-md"
             style={{
-              fontFamily: profile.heroFontFamily || "'Cormorant Garamond', serif",
+              fontFamily: profile.heroFontFamily
+                ? `'${profile.heroFontFamily}', serif`
+                : "inherit",
               fontSize: profile.heroTitleSizeMobile || "30px",
               letterSpacing: profile.heroLetterSpacing || "0.1em",
+              fontWeight: Number(profile.heroFontWeight) || 700,
+              textTransform: (profile.heroTextTransform || "uppercase") as any,
             }}
           >
-            <style>{`@media (min-width: 768px) { [data-testid="text-company-profile-title"] { font-size: ${profile.heroTitleSizeDesktop || "48px"} !important; } }`}</style>
+            <style>{`@media (min-width: 768px) { .company-profile-hero-title { font-size: ${profile.heroTitleSizeDesktop || "48px"} !important; } }`}</style>
             {profile.title || (isAr ? "ملف الشركة" : "Company Profile")}
           </h1>
           <div className="w-20 h-1 bg-white/40 mx-auto mb-6 rounded-full"></div>

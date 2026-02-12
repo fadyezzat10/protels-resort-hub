@@ -397,6 +397,66 @@ export async function registerRoutes(
     }
   });
 
+  // ──────── COMPANY PROFILE FONT UPLOAD (5MB limit) ────────
+  const fontUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const allowed = [".ttf", ".woff", ".woff2"];
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (allowed.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only .ttf, .woff, .woff2 font files are allowed"));
+      }
+    },
+  });
+
+  app.post("/api/cms/company-profile/upload-font", requireAuth, fontUpload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+      const objService = new ObjectStorageService();
+      const searchPaths = objService.getPublicObjectSearchPaths();
+      const publicPath = searchPaths[0];
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      const sanitizedName = req.file.originalname
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .replace(/_+/g, "_");
+      const fileName = `font-${Date.now()}-${sanitizedName}`;
+      const fullObjectPath = `${publicPath}/fonts/${fileName}`;
+
+      const parts = fullObjectPath.split("/").filter(Boolean);
+      const bucketName = parts[0];
+      const objectName = parts.slice(1).join("/");
+
+      const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+
+      const mimeMap: Record<string, string> = {
+        ".ttf": "font/ttf",
+        ".woff": "font/woff",
+        ".woff2": "font/woff2",
+      };
+      await file.save(req.file.buffer, {
+        metadata: { contentType: mimeMap[ext] || "application/octet-stream" },
+      });
+
+      const fontName = req.body.fontName || sanitizedName.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+      const serveUrl = `/public/uploads/fonts/${encodeURIComponent(fileName)}`;
+
+      await storage.upsertSetting("company_profile_custom_font_url", serveUrl);
+      await storage.upsertSetting("company_profile_custom_font_name", fontName);
+      await storage.upsertSetting("company_profile_hero_font_family", fontName);
+
+      res.json({ url: serveUrl, fontName });
+    } catch (e: any) {
+      console.error("Font upload error:", e);
+      res.status(400).json({ message: e.message });
+    }
+  });
+
   // ──────── SERVE UPLOADED FILES AS STATIC ────────
   app.get("/public/uploads/:filename", async (req, res) => {
     try {
@@ -417,6 +477,25 @@ export async function registerRoutes(
     } catch (e: any) {
       console.error("Static file serve error:", e);
       res.status(500).json({ message: "Error serving file" });
+    }
+  });
+
+  app.get("/public/uploads/fonts/:filename", async (req, res) => {
+    try {
+      const objService = new ObjectStorageService();
+      const fileName = decodeURIComponent(req.params.filename);
+      const file = await objService.searchPublicObject(`fonts/${fileName}`);
+      if (!file) {
+        return res.status(404).json({ message: "Font file not found" });
+      }
+      res.set({
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "public, max-age=31536000, immutable",
+      });
+      await objService.downloadObject(file, res, 31536000);
+    } catch (e: any) {
+      console.error("Font file serve error:", e);
+      res.status(500).json({ message: "Error serving font file" });
     }
   });
 
@@ -487,6 +566,10 @@ export async function registerRoutes(
       heroTitleSizeMobile: findVal("company_profile_hero_title_size_mobile") || null,
       heroLetterSpacing: findVal("company_profile_hero_letter_spacing") || null,
       heroFontFamily: findVal("company_profile_hero_font_family") || null,
+      heroFontWeight: findVal("company_profile_hero_font_weight") || null,
+      heroTextTransform: findVal("company_profile_hero_text_transform") || null,
+      customFontUrl: findVal("company_profile_custom_font_url") || null,
+      customFontName: findVal("company_profile_custom_font_name") || null,
     });
   });
 
