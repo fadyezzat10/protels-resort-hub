@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useParams, useLocation } from "wouter";
@@ -37,6 +37,14 @@ import {
   Monitor,
   Pencil,
   ExternalLink,
+  ImagePlus,
+  ImageMinus,
+  Layers,
+  MoveUp,
+  MoveDown,
+  ArrowUpDown,
+  Palette,
+  Maximize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -288,6 +296,37 @@ export default function CMSBuilder() {
     };
     return SLUG_ROUTE_MAP[slug] || `/${slug}`;
   }, []);
+
+  const uploadImageRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const uploadImage = useCallback(async (file: File): Promise<string> => {
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/cms/media", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      return data.url;
+    } finally {
+      setUploadingImage(false);
+    }
+  }, []);
+
+  const handleBgImageUpload = useCallback(async (sectionId: string, file: File) => {
+    try {
+      const url = await uploadImage(file);
+      updateSectionStyles(sectionId, "backgroundImage", url);
+      toast({ title: "تم رفع الصورة بنجاح" });
+    } catch {
+      toast({ title: "فشل رفع الصورة", variant: "destructive" });
+    }
+  }, [uploadImage, updateSectionStyles, toast]);
 
   const selectedSection = useMemo(
     () => sections.find((s) => s.id === selectedId),
@@ -563,18 +602,93 @@ export default function CMSBuilder() {
                       )}
                       onClick={() => setSelectedId(section.id)}
                     >
-                      {selectedId === section.id && (
-                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10 font-medium shadow-sm">
-                          {section.label}
-                        </div>
-                      )}
-                      <div className={cn("group-hover:ring-1 group-hover:ring-blue-300 group-hover:ring-inset transition-all", selectedId !== section.id && "group-hover:opacity-95")}>
-                        <SectionRenderer
-                          section={section}
-                          isEditing={selectedId === section.id}
-                          onContentChange={(key, value) => updateSectionContent(section.id, key, value)}
-                        />
+                      {/* Section label badge */}
+                      <div className={cn(
+                        "absolute top-2 left-2 text-white text-xs px-2 py-1 rounded z-20 font-medium shadow-sm transition-opacity",
+                        selectedId === section.id ? "bg-blue-500 opacity-100" : "bg-gray-600 opacity-0 group-hover:opacity-100"
+                      )}>
+                        {section.label}
                       </div>
+
+                      {/* Floating toolbar */}
+                      <div className={cn(
+                        "absolute top-2 right-2 z-20 flex items-center gap-1 bg-white/95 backdrop-blur shadow-lg rounded-lg px-1 py-0.5 transition-opacity border border-gray-200",
+                        selectedId === section.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                      )}>
+                        <label className="p-1.5 hover:bg-blue-50 rounded cursor-pointer transition-colors" title="Upload Background">
+                          <ImagePlus className="w-3.5 h-3.5 text-blue-600" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) await handleBgImageUpload(section.id, file);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                        {section.styles.backgroundImage && (
+                          <button
+                            className="p-1.5 hover:bg-red-50 rounded transition-colors"
+                            title="Remove Background"
+                            onClick={(e) => { e.stopPropagation(); updateSectionStyles(section.id, "backgroundImage", ""); }}
+                          >
+                            <ImageMinus className="w-3.5 h-3.5 text-red-500" />
+                          </button>
+                        )}
+                        <div className="w-px h-5 bg-gray-200" />
+                        <button
+                          className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                          title="Move Up"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const idx = sections.findIndex(s => s.id === section.id);
+                            if (idx > 0) updateSections(arrayMove([...sections], idx, idx - 1));
+                          }}
+                        >
+                          <MoveUp className="w-3.5 h-3.5 text-gray-600" />
+                        </button>
+                        <button
+                          className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                          title="Move Down"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const idx = sections.findIndex(s => s.id === section.id);
+                            if (idx < sections.length - 1) updateSections(arrayMove([...sections], idx, idx + 1));
+                          }}
+                        >
+                          <MoveDown className="w-3.5 h-3.5 text-gray-600" />
+                        </button>
+                        <div className="w-px h-5 bg-gray-200" />
+                        <button
+                          className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                          title={section.hidden ? "Show" : "Hide"}
+                          onClick={(e) => { e.stopPropagation(); toggleVisibility(section.id); }}
+                        >
+                          {section.hidden ? <EyeOff className="w-3.5 h-3.5 text-gray-500" /> : <Eye className="w-3.5 h-3.5 text-gray-500" />}
+                        </button>
+                        <button
+                          className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                          title="Duplicate"
+                          onClick={(e) => { e.stopPropagation(); duplicateSection(section.id); }}
+                        >
+                          <Copy className="w-3.5 h-3.5 text-gray-600" />
+                        </button>
+                        <button
+                          className="p-1.5 hover:bg-red-50 rounded transition-colors"
+                          title="Delete"
+                          onClick={(e) => { e.stopPropagation(); deleteSection(section.id); }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                        </button>
+                      </div>
+
+                      <SectionRenderer
+                        section={section}
+                        isEditing={selectedId === section.id}
+                        onContentChange={(key, value) => updateSectionContent(section.id, key, value)}
+                      />
                     </div>
                   ))
                 )}
@@ -614,218 +728,410 @@ export default function CMSBuilder() {
 
         {/* RIGHT: Settings Panel (only in edit mode) */}
         {viewMode === "edit" && (
-        <div className="w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-hidden">
+        <div className="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-hidden">
           {selectedSection ? (
             <div className="flex-1 overflow-auto">
-              <div className="p-3 border-b">
-                <h3 className="text-sm font-semibold text-gray-700">Section Settings</h3>
-                <p className="text-xs text-gray-400">{SECTION_TYPE_LABELS[selectedSection.type]}</p>
-              </div>
-
-              {/* Label */}
-              <div className="p-3 border-b">
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Section Label</label>
+              {/* Section Header */}
+              <div className="p-3 border-b bg-gray-50">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-sm font-bold text-gray-800">إعدادات القسم</h3>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{SECTION_TYPE_LABELS[selectedSection.type]}</span>
+                </div>
                 <Input
                   data-testid="input-section-label"
                   value={selectedSection.label}
                   onChange={(e) => updateSection(selectedSection.id, { label: e.target.value })}
-                  className="h-8 text-sm"
+                  className="h-8 text-sm mt-2"
+                  placeholder="Section label"
                 />
               </div>
 
               {/* Content Fields */}
-              <div className="p-3 border-b space-y-3">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase">Content</h4>
-                {Object.entries(selectedSection.content).map(([key, value]) => {
-                  if (Array.isArray(value)) return null;
-                  if (typeof value === "boolean") {
+              <details open className="border-b">
+                <summary className="px-3 py-2.5 text-xs font-bold text-gray-600 uppercase cursor-pointer hover:bg-gray-50 select-none flex items-center gap-1">
+                  <ChevronDown className="w-3 h-3" /> المحتوى
+                </summary>
+                <div className="px-3 pb-3 space-y-3">
+                  {Object.entries(selectedSection.content).map(([key, value]: [string, any]) => {
+                    if (Array.isArray(value)) return null;
+                    if (typeof value === "boolean") {
+                      return (
+                        <label key={key} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={value}
+                            onChange={(e) => updateSectionContent(selectedSection.id, key, e.target.checked)}
+                            className="rounded"
+                          />
+                          {key.replace(/([A-Z])/g, " $1").replace(/^./, (s: string) => s.toUpperCase())}
+                        </label>
+                      );
+                    }
+                    const label = key.replace(/([A-Z])/g, " $1").replace(/^./, (s: string) => s.toUpperCase());
+                    const isLong = typeof value === "string" && (key === "body" || key === "text" || value.length > 60);
                     return (
-                      <label key={key} className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={value}
-                          onChange={(e) => updateSectionContent(selectedSection.id, key, e.target.checked)}
-                        />
-                        {key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                      </label>
+                      <div key={key}>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">{label}</label>
+                        {isLong ? (
+                          <textarea
+                            data-testid={`input-content-${key}`}
+                            value={value as string}
+                            onChange={(e) => updateSectionContent(selectedSection.id, key, e.target.value)}
+                            className="w-full border rounded-md px-2.5 py-1.5 text-sm min-h-[80px] resize-y focus:ring-2 focus:ring-blue-300 focus:border-blue-400 outline-none"
+                          />
+                        ) : (
+                          <Input
+                            data-testid={`input-content-${key}`}
+                            value={value as string}
+                            onChange={(e) => updateSectionContent(selectedSection.id, key, e.target.value)}
+                            className="h-8 text-sm"
+                          />
+                        )}
+                      </div>
                     );
-                  }
-                  const label = key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
-                  const isLong = typeof value === "string" && (key === "body" || key === "text" || value.length > 60);
-                  return (
-                    <div key={key}>
-                      <label className="text-xs font-medium text-gray-600 mb-1 block">{label}</label>
-                      {isLong ? (
-                        <textarea
-                          data-testid={`input-content-${key}`}
-                          value={value as string}
-                          onChange={(e) => updateSectionContent(selectedSection.id, key, e.target.value)}
-                          className="w-full border rounded px-2 py-1.5 text-sm min-h-[80px] resize-y"
-                        />
-                      ) : (
+                  })}
+                </div>
+              </details>
+
+              {/* Background Controls */}
+              <details open className="border-b">
+                <summary className="px-3 py-2.5 text-xs font-bold text-gray-600 uppercase cursor-pointer hover:bg-gray-50 select-none flex items-center gap-1">
+                  <ChevronDown className="w-3 h-3" /> الخلفية
+                </summary>
+                <div className="px-3 pb-3 space-y-3">
+                  {/* Background Image */}
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1.5 block">صورة الخلفية</label>
+                    {selectedSection.styles.backgroundImage ? (
+                      <div className="space-y-2">
+                        <div className="relative rounded-lg overflow-hidden border border-gray-200">
+                          <img
+                            src={selectedSection.styles.backgroundImage}
+                            alt="Background"
+                            className="w-full h-24 object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
+                            <label className="bg-white/90 text-gray-700 text-xs px-3 py-1.5 rounded-md cursor-pointer hover:bg-white font-medium shadow-sm">
+                              استبدال
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) await handleBgImageUpload(selectedSection.id, file);
+                                  e.target.value = "";
+                                }}
+                              />
+                            </label>
+                            <button
+                              className="bg-red-500/90 text-white text-xs px-3 py-1.5 rounded-md hover:bg-red-600 font-medium shadow-sm"
+                              onClick={() => updateSectionStyles(selectedSection.id, "backgroundImage", "")}
+                            >
+                              إزالة
+                            </button>
+                          </div>
+                        </div>
                         <Input
-                          data-testid={`input-content-${key}`}
-                          value={value as string}
-                          onChange={(e) => updateSectionContent(selectedSection.id, key, e.target.value)}
-                          className="h-8 text-sm"
+                          value={selectedSection.styles.backgroundImage}
+                          onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundImage", e.target.value)}
+                          className="h-7 text-xs"
+                          placeholder="Image URL"
                         />
-                      )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <label className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg py-6 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors">
+                          <ImagePlus className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm text-gray-500">رفع صورة خلفية</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) await handleBgImageUpload(selectedSection.id, file);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                        <Input
+                          value={selectedSection.styles.backgroundImage || ""}
+                          onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundImage", e.target.value)}
+                          className="h-7 text-xs"
+                          placeholder="أو الصق رابط الصورة..."
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Background Size & Position (only when image exists) */}
+                  {selectedSection.styles.backgroundImage && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">الحجم</label>
+                        <select
+                          value={selectedSection.styles.backgroundSize || "cover"}
+                          onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundSize", e.target.value)}
+                          className="w-full h-8 rounded-md border border-input bg-transparent px-2 text-xs"
+                        >
+                          <option value="cover">Cover</option>
+                          <option value="contain">Contain</option>
+                          <option value="auto">Auto</option>
+                          <option value="100% 100%">Stretch</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">الموضع</label>
+                        <select
+                          value={selectedSection.styles.backgroundPosition || "center"}
+                          onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundPosition", e.target.value)}
+                          className="w-full h-8 rounded-md border border-input bg-transparent px-2 text-xs"
+                        >
+                          <option value="center">Center</option>
+                          <option value="top">Top</option>
+                          <option value="bottom">Bottom</option>
+                          <option value="left">Left</option>
+                          <option value="right">Right</option>
+                          <option value="top left">Top Left</option>
+                          <option value="top right">Top Right</option>
+                          <option value="bottom left">Bottom Left</option>
+                          <option value="bottom right">Bottom Right</option>
+                        </select>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+                  )}
 
-              {/* Style Fields */}
-              <div className="p-3 border-b space-y-3">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase">Background</h4>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Background Color</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={selectedSection.styles.backgroundColor || "#ffffff"}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundColor", e.target.value)}
-                      className="w-8 h-8 rounded border cursor-pointer"
-                    />
-                    <Input
-                      value={selectedSection.styles.backgroundColor || "#ffffff"}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundColor", e.target.value)}
-                      className="h-8 text-sm flex-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Background Image URL</label>
-                  <Input
-                    value={selectedSection.styles.backgroundImage || ""}
-                    onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundImage", e.target.value)}
-                    className="h-8 text-sm"
-                    placeholder="https://..."
-                  />
-                </div>
-                {selectedSection.styles.backgroundImage && (
+                  {/* Background Color */}
                   <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Overlay Opacity</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={selectedSection.styles.backgroundOverlay || 0}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundOverlay", parseFloat(e.target.value))}
-                      className="w-full"
-                    />
-                    <span className="text-xs text-gray-400">{(selectedSection.styles.backgroundOverlay || 0) * 100}%</span>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">لون الخلفية</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={selectedSection.styles.backgroundColor || "#ffffff"}
+                        onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundColor", e.target.value)}
+                        className="w-9 h-9 rounded-lg border border-gray-300 cursor-pointer p-0.5"
+                      />
+                      <Input
+                        value={selectedSection.styles.backgroundColor || "#ffffff"}
+                        onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundColor", e.target.value)}
+                        className="h-8 text-sm flex-1 font-mono"
+                      />
+                    </div>
                   </div>
-                )}
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Gradient</label>
-                  <Input
-                    value={selectedSection.styles.backgroundGradient || ""}
-                    onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundGradient", e.target.value)}
-                    className="h-8 text-sm"
-                    placeholder="linear-gradient(to right, #000, #333)"
-                  />
-                </div>
-              </div>
 
-              <div className="p-3 border-b space-y-3">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase">Spacing</h4>
+                  {/* Overlay Controls */}
+                  <div className="bg-gray-50 rounded-lg p-2.5 space-y-2">
+                    <label className="text-xs font-bold text-gray-600 block">طبقة التعتيم (Overlay)</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={selectedSection.styles.overlayColor || "#000000"}
+                        onChange={(e) => updateSectionStyles(selectedSection.id, "overlayColor", e.target.value)}
+                        className="w-8 h-8 rounded border border-gray-300 cursor-pointer p-0.5"
+                      />
+                      <Input
+                        value={selectedSection.styles.overlayColor || "#000000"}
+                        onChange={(e) => updateSectionStyles(selectedSection.id, "overlayColor", e.target.value)}
+                        className="h-7 text-xs flex-1 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-gray-500">الشفافية</span>
+                        <span className="text-xs font-bold text-gray-700">{Math.round((selectedSection.styles.backgroundOverlay || 0) * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={selectedSection.styles.backgroundOverlay || 0}
+                        onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundOverlay", parseFloat(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Gradient */}
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">تدرج لوني</label>
+                    <Input
+                      value={selectedSection.styles.backgroundGradient || ""}
+                      onChange={(e) => updateSectionStyles(selectedSection.id, "backgroundGradient", e.target.value)}
+                      className="h-8 text-xs font-mono"
+                      placeholder="linear-gradient(135deg, #0c1c2c, #1a3a5c)"
+                    />
+                    {selectedSection.styles.backgroundGradient && (
+                      <div className="mt-1.5 h-6 rounded border" style={{ background: selectedSection.styles.backgroundGradient }} />
+                    )}
+                  </div>
+                </div>
+              </details>
+
+              {/* Dimensions */}
+              <details className="border-b">
+                <summary className="px-3 py-2.5 text-xs font-bold text-gray-600 uppercase cursor-pointer hover:bg-gray-50 select-none flex items-center gap-1">
+                  <ChevronDown className="w-3 h-3" /> الأبعاد
+                </summary>
+                <div className="px-3 pb-3 space-y-3">
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">الحد الأدنى للارتفاع</label>
+                    <div className="flex gap-1">
+                      {["auto", "300px", "400px", "500px", "600px", "100vh"].map(v => (
+                        <button
+                          key={v}
+                          onClick={() => updateSectionStyles(selectedSection.id, "minHeight", v === "auto" ? "" : v)}
+                          className={cn(
+                            "flex-1 text-xs py-1.5 rounded border transition-colors",
+                            (selectedSection.styles.minHeight || "") === (v === "auto" ? "" : v)
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                          )}
+                        >
+                          {v === "100vh" ? "Full" : v === "auto" ? "Auto" : v.replace("px", "")}
+                        </button>
+                      ))}
+                    </div>
+                    <Input
+                      value={selectedSection.styles.minHeight || ""}
+                      onChange={(e) => updateSectionStyles(selectedSection.id, "minHeight", e.target.value)}
+                      className="h-7 text-xs mt-1.5"
+                      placeholder="Custom: e.g. 450px"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">الحد الأقصى للعرض</label>
+                    <Input
+                      value={selectedSection.styles.maxWidth || ""}
+                      onChange={(e) => updateSectionStyles(selectedSection.id, "maxWidth", e.target.value)}
+                      className="h-8 text-sm"
+                      placeholder="1200px"
+                    />
+                  </div>
+                </div>
+              </details>
+
+              {/* Spacing */}
+              <details className="border-b">
+                <summary className="px-3 py-2.5 text-xs font-bold text-gray-600 uppercase cursor-pointer hover:bg-gray-50 select-none flex items-center gap-1">
+                  <ChevronDown className="w-3 h-3" /> المسافات
+                </summary>
+                <div className="px-3 pb-3 space-y-3">
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 mb-1.5 block">Padding</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["paddingTop", "paddingBottom", "paddingLeft", "paddingRight"] as const).map(prop => (
+                        <div key={prop}>
+                          <label className="text-[10px] text-gray-500 mb-0.5 block">{prop.replace("padding", "").toLowerCase()}</label>
+                          <Input
+                            value={(selectedSection.styles as any)[prop] || ""}
+                            onChange={(e) => updateSectionStyles(selectedSection.id, prop, e.target.value)}
+                            className="h-7 text-xs"
+                            placeholder="60px"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 mb-1.5 block">Margin</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["marginTop", "marginBottom"] as const).map(prop => (
+                        <div key={prop}>
+                          <label className="text-[10px] text-gray-500 mb-0.5 block">{prop.replace("margin", "").toLowerCase()}</label>
+                          <Input
+                            value={(selectedSection.styles as any)[prop] || ""}
+                            onChange={(e) => updateSectionStyles(selectedSection.id, prop, e.target.value)}
+                            className="h-7 text-xs"
+                            placeholder="0px"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              {/* Layout */}
+              <details className="border-b">
+                <summary className="px-3 py-2.5 text-xs font-bold text-gray-600 uppercase cursor-pointer hover:bg-gray-50 select-none flex items-center gap-1">
+                  <ChevronDown className="w-3 h-3" /> التخطيط
+                </summary>
+                <div className="px-3 pb-3 space-y-3">
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1.5 block">محاذاة النص</label>
+                    <div className="flex gap-1">
+                      {[
+                        { value: "left", label: "يسار" },
+                        { value: "center", label: "وسط" },
+                        { value: "right", label: "يمين" },
+                      ].map(a => (
+                        <button
+                          key={a.value}
+                          onClick={() => updateSectionStyles(selectedSection.id, "textAlign", a.value)}
+                          className={cn(
+                            "flex-1 text-xs py-1.5 rounded border transition-colors",
+                            selectedSection.styles.textAlign === a.value
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                          )}
+                        >
+                          {a.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">حواف مستديرة</label>
+                    <Input
+                      value={selectedSection.styles.borderRadius || ""}
+                      onChange={(e) => updateSectionStyles(selectedSection.id, "borderRadius", e.target.value)}
+                      className="h-8 text-sm"
+                      placeholder="0px"
+                    />
+                  </div>
+                </div>
+              </details>
+
+              {/* Quick Actions */}
+              <div className="p-3 space-y-2">
+                <h4 className="text-xs font-bold text-gray-600 uppercase mb-2">إجراءات سريعة</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Padding Top</label>
-                    <Input
-                      value={selectedSection.styles.paddingTop || ""}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "paddingTop", e.target.value)}
-                      className="h-8 text-sm"
-                      placeholder="60px"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Padding Bottom</label>
-                    <Input
-                      value={selectedSection.styles.paddingBottom || ""}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "paddingBottom", e.target.value)}
-                      className="h-8 text-sm"
-                      placeholder="60px"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Padding Left</label>
-                    <Input
-                      value={selectedSection.styles.paddingLeft || ""}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "paddingLeft", e.target.value)}
-                      className="h-8 text-sm"
-                      placeholder="16px"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Padding Right</label>
-                    <Input
-                      value={selectedSection.styles.paddingRight || ""}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "paddingRight", e.target.value)}
-                      className="h-8 text-sm"
-                      placeholder="16px"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Margin Top</label>
-                    <Input
-                      value={selectedSection.styles.marginTop || ""}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "marginTop", e.target.value)}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Margin Bottom</label>
-                    <Input
-                      value={selectedSection.styles.marginBottom || ""}
-                      onChange={(e) => updateSectionStyles(selectedSection.id, "marginBottom", e.target.value)}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Max Width</label>
-                  <Input
-                    value={selectedSection.styles.maxWidth || ""}
-                    onChange={(e) => updateSectionStyles(selectedSection.id, "maxWidth", e.target.value)}
-                    className="h-8 text-sm"
-                    placeholder="1200px"
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 space-y-3">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase">Layout</h4>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Text Alignment</label>
-                  <select
-                    value={selectedSection.styles.textAlign || "left"}
-                    onChange={(e) => updateSectionStyles(selectedSection.id, "textAlign", e.target.value)}
-                    className="w-full h-8 rounded-md border border-input bg-transparent px-2 text-sm"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-8"
+                    onClick={() => duplicateSection(selectedSection.id)}
                   >
-                    {TEXT_ALIGNMENTS.map((a) => (
-                      <option key={a} value={a}>{a.charAt(0).toUpperCase() + a.slice(1)}</option>
-                    ))}
-                  </select>
+                    <Copy className="w-3.5 h-3.5 mr-1" /> نسخ
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-8"
+                    onClick={() => toggleVisibility(selectedSection.id)}
+                  >
+                    {selectedSection.hidden ? <EyeOff className="w-3.5 h-3.5 mr-1" /> : <Eye className="w-3.5 h-3.5 mr-1" />}
+                    {selectedSection.hidden ? "إظهار" : "إخفاء"}
+                  </Button>
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Border Radius</label>
-                  <Input
-                    value={selectedSection.styles.borderRadius || ""}
-                    onChange={(e) => updateSectionStyles(selectedSection.id, "borderRadius", e.target.value)}
-                    className="h-8 text-sm"
-                    placeholder="0px"
-                  />
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-8 w-full text-red-500 hover:bg-red-50 hover:text-red-600 border-red-200"
+                  onClick={() => deleteSection(selectedSection.id)}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" /> حذف القسم
+                </Button>
               </div>
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400 text-sm text-center p-6">
-              Select a section to edit its settings
+              <div>
+                <Layers className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                <p>اختر قسم لتعديل إعداداته</p>
+              </div>
             </div>
           )}
         </div>

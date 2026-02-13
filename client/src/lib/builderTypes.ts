@@ -13,7 +13,10 @@ export interface SectionStyles {
   backgroundColor?: string;
   backgroundImage?: string;
   backgroundOverlay?: number;
+  overlayColor?: string;
   backgroundGradient?: string;
+  backgroundSize?: string;
+  backgroundPosition?: string;
   paddingTop?: string;
   paddingBottom?: string;
   paddingLeft?: string;
@@ -21,6 +24,7 @@ export interface SectionStyles {
   marginTop?: string;
   marginBottom?: string;
   maxWidth?: string;
+  minHeight?: string;
   textAlign?: string;
   borderRadius?: string;
 }

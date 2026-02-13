@@ -20,6 +20,7 @@ function getSectionStyle(section: BuilderSection): CSSProperties {
     borderRadius: s.borderRadius,
     position: "relative",
     overflow: "hidden",
+    minHeight: s.minHeight || undefined,
   };
 
   if (s.backgroundGradient) {
@@ -30,21 +31,33 @@ function getSectionStyle(section: BuilderSection): CSSProperties {
 
   if (s.backgroundImage) {
     style.backgroundImage = `url(${s.backgroundImage})`;
-    style.backgroundSize = "cover";
-    style.backgroundPosition = "center";
+    style.backgroundSize = s.backgroundSize || "cover";
+    style.backgroundPosition = s.backgroundPosition || "center";
   }
 
   return style;
 }
 
-function Overlay({ opacity }: { opacity?: number }) {
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const c = hex.replace("#", "");
+  if (c.length < 6) return null;
+  return {
+    r: parseInt(c.substring(0, 2), 16),
+    g: parseInt(c.substring(2, 4), 16),
+    b: parseInt(c.substring(4, 6), 16),
+  };
+}
+
+function Overlay({ opacity, color }: { opacity?: number; color?: string }) {
   if (!opacity) return null;
+  const rgb = hexToRgb(color || "#000000");
+  const bgColor = rgb ? `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})` : `rgba(0,0,0,${opacity})`;
   return (
     <div
       style={{
         position: "absolute",
         inset: 0,
-        backgroundColor: `rgba(0,0,0,${opacity})`,
+        backgroundColor: bgColor,
         pointerEvents: "none",
         zIndex: 1,
       }}
@@ -75,7 +88,7 @@ function HeroSection({ section }: { section: BuilderSection }) {
   const dark = !isLight(section.styles.backgroundColor || "#0c1c2c") || section.styles.backgroundImage || section.styles.backgroundOverlay;
   return (
     <div style={getSectionStyle(section)}>
-      <Overlay opacity={section.styles.backgroundOverlay} />
+      <Overlay opacity={section.styles.backgroundOverlay} color={section.styles.overlayColor} />
       <ContentWrap maxWidth={section.styles.maxWidth}>
         <h1
           style={{
@@ -297,7 +310,7 @@ function CTASection({ section }: { section: BuilderSection }) {
   const dark = !isLight(section.styles.backgroundColor || "#0c1c2c");
   return (
     <div style={getSectionStyle(section)}>
-      <Overlay opacity={section.styles.backgroundOverlay} />
+      <Overlay opacity={section.styles.backgroundOverlay} color={section.styles.overlayColor} />
       <ContentWrap maxWidth={section.styles.maxWidth}>
         {c.heading && (
           <h2
@@ -485,7 +498,13 @@ const RENDERERS: Record<string, React.FC<{ section: BuilderSection }>> = {
 
 export default function SectionRenderer({ section, isEditing, onContentChange }: SectionRendererProps) {
   const Renderer = RENDERERS[section.type] || CustomSection;
-  return <Renderer section={section} />;
+  const needsOverlay = section.type !== "hero" && section.type !== "cta" && (section.styles.backgroundOverlay || 0) > 0;
+  return (
+    <div style={{ position: "relative" }}>
+      {needsOverlay && <Overlay opacity={section.styles.backgroundOverlay} color={section.styles.overlayColor} />}
+      <Renderer section={section} />
+    </div>
+  );
 }
 
 export { RENDERERS };
