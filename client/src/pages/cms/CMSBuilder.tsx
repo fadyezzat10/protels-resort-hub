@@ -34,6 +34,9 @@ import {
   ChevronDown,
   X,
   Undo2,
+  Monitor,
+  Pencil,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,7 +114,9 @@ export default function CMSBuilder() {
   const [showVersions, setShowVersions] = useState(false);
   const [pageId, setPageId] = useState<number | null>(null);
   const [pageTitle, setPageTitle] = useState("");
+  const [pageSlug, setPageSlug] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
+  const [viewMode, setViewMode] = useState<"preview" | "edit">("preview");
 
   const { data: pagesData } = useQuery<any[]>({
     queryKey: ["/api/cms/pages"],
@@ -123,6 +128,7 @@ export default function CMSBuilder() {
       if (page) {
         setPageId(page.id);
         setPageTitle(page.title?.en || page.slug);
+        setPageSlug(page.slug);
       }
     }
   }, [pagesData, params.slug]);
@@ -265,6 +271,19 @@ export default function CMSBuilder() {
     );
   }, [sections, updateSections]);
 
+  const getPreviewUrl = useCallback((slug: string) => {
+    const SLUG_ROUTE_MAP: Record<string, string> = {
+      home: "/",
+      about: "/about",
+      hotels: "/hotels",
+      gallery: "/gallery",
+      contact: "/contact",
+      careers: "/careers",
+      "company-profile": "/company-profile",
+    };
+    return SLUG_ROUTE_MAP[slug] || `/${slug}`;
+  }, []);
+
   const selectedSection = useMemo(
     () => sections.find((s) => s.id === selectedId),
     [sections, selectedId]
@@ -294,6 +313,40 @@ export default function CMSBuilder() {
           <div className="h-6 w-px bg-white/20" />
           <span className="text-sm font-medium">{pageTitle}</span>
           {hasChanges && <span className="text-xs text-yellow-300 ml-2">● Unsaved</span>}
+          <div className="h-6 w-px bg-white/20" />
+          <div className="flex items-center bg-white/10 rounded-lg p-0.5">
+            <button
+              data-testid="button-preview-mode"
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                viewMode === "preview" ? "bg-white text-brand-blue" : "text-white/70 hover:text-white"
+              )}
+              onClick={() => setViewMode("preview")}
+            >
+              <Monitor className="w-3.5 h-3.5" /> معاينة
+            </button>
+            <button
+              data-testid="button-edit-mode"
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                viewMode === "edit" ? "bg-white text-brand-blue" : "text-white/70 hover:text-white"
+              )}
+              onClick={() => setViewMode("edit")}
+            >
+              <Pencil className="w-3.5 h-3.5" /> تعديل
+            </button>
+          </div>
+          {pageSlug && (
+            <a
+              href={getPreviewUrl(pageSlug)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-white/70 hover:text-white text-xs ml-1"
+              title="Open page in new tab"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -366,101 +419,146 @@ export default function CMSBuilder() {
         </div>
       )}
 
-      {/* Main 3-Pane Layout */}
+      {/* Main Layout */}
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT: Sections List */}
-        <div className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-hidden">
-          <div className="p-3 border-b flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-700">Sections</h3>
-            <div className="relative">
+        {viewMode === "preview" ? (
+          /* PREVIEW MODE: Full page iframe */
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 bg-gray-200 p-4">
+              <div className="h-full max-w-[1400px] mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
+                {pageSlug ? (
+                  <iframe
+                    src={getPreviewUrl(pageSlug)}
+                    className="w-full h-full border-0"
+                    title={`Preview: ${pageTitle}`}
+                    key={pageSlug}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400">
+                    <div className="animate-spin w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full" />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="bg-white border-t px-4 py-2 flex items-center justify-center gap-4 text-sm text-gray-500 shrink-0">
+              <span>هذه معاينة مباشرة للصفحة كما يراها الزوار.</span>
               <Button
-                data-testid="button-add-section"
                 size="sm"
                 variant="outline"
-                onClick={() => setShowAddMenu(!showAddMenu)}
+                onClick={() => setViewMode("edit")}
+                className="text-xs"
               >
-                <Plus className="w-4 h-4 mr-1" /> Add
+                <Pencil className="w-3.5 h-3.5 mr-1" /> التبديل لوضع التعديل
               </Button>
-              {showAddMenu && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-lg z-50 py-1">
-                  {(Object.keys(SECTION_TYPE_LABELS) as SectionType[]).map((type) => (
-                    <button
-                      key={type}
-                      data-testid={`add-section-${type}`}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
-                      onClick={() => addSection(type)}
-                    >
-                      <span>{SECTION_TYPE_ICONS[type]}</span>
-                      {SECTION_TYPE_LABELS[type]}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <a
+                href={getPreviewUrl(pageSlug)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline text-xs flex items-center gap-1"
+              >
+                <ExternalLink className="w-3 h-3" /> فتح في تبويب جديد
+              </a>
             </div>
           </div>
-          <div className="flex-1 overflow-auto p-2 space-y-1">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-                {sections.map((section) => (
-                  <SortableSectionItem
-                    key={section.id}
-                    section={section}
-                    isSelected={selectedId === section.id}
-                    onSelect={() => setSelectedId(section.id)}
-                    onToggleVisibility={() => toggleVisibility(section.id)}
-                    onDuplicate={() => duplicateSection(section.id)}
-                    onDelete={() => deleteSection(section.id)}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-            {sections.length === 0 && (
-              <div className="text-center py-8 text-gray-400 text-sm">
-                No sections yet.<br />Click "Add" to start building.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CENTER: Canvas Preview */}
-        <div className="flex-1 overflow-auto bg-gray-200 p-6">
-          <div className="max-w-[1200px] mx-auto bg-white shadow-lg rounded-lg overflow-hidden min-h-[600px]">
-            {sections.length === 0 ? (
-              <div className="flex items-center justify-center h-[600px] text-gray-400">
-                <div className="text-center">
-                  <p className="text-lg mb-2">Empty Page</p>
-                  <p className="text-sm">Add sections from the left panel to start building</p>
-                </div>
-              </div>
-            ) : (
-              sections.map((section) => (
-                <div
-                  key={section.id}
-                  data-testid={`canvas-section-${section.id}`}
-                  className={cn(
-                    "relative group transition-all cursor-pointer",
-                    section.hidden && "opacity-30",
-                    selectedId === section.id && "ring-2 ring-blue-500 ring-inset"
-                  )}
-                  onClick={() => setSelectedId(section.id)}
-                >
-                  {selectedId === section.id && (
-                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10">
-                      {section.label}
+        ) : (
+          /* EDIT MODE: 3-Pane Layout */
+          <>
+            {/* LEFT: Sections List */}
+            <div className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-hidden">
+              <div className="p-3 border-b flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-700">الأقسام</h3>
+                <div className="relative">
+                  <Button
+                    data-testid="button-add-section"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowAddMenu(!showAddMenu)}
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> إضافة
+                  </Button>
+                  {showAddMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-lg z-50 py-1">
+                      {(Object.keys(SECTION_TYPE_LABELS) as SectionType[]).map((type) => (
+                        <button
+                          key={type}
+                          data-testid={`add-section-${type}`}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                          onClick={() => addSection(type)}
+                        >
+                          <span>{SECTION_TYPE_ICONS[type]}</span>
+                          {SECTION_TYPE_LABELS[type]}
+                        </button>
+                      ))}
                     </div>
                   )}
-                  <SectionRenderer
-                    section={section}
-                    isEditing={selectedId === section.id}
-                    onContentChange={(key, value) => updateSectionContent(section.id, key, value)}
-                  />
                 </div>
-              ))
-            )}
-          </div>
-        </div>
+              </div>
+              <div className="flex-1 overflow-auto p-2 space-y-1">
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                    {sections.map((section) => (
+                      <SortableSectionItem
+                        key={section.id}
+                        section={section}
+                        isSelected={selectedId === section.id}
+                        onSelect={() => setSelectedId(section.id)}
+                        onToggleVisibility={() => toggleVisibility(section.id)}
+                        onDuplicate={() => duplicateSection(section.id)}
+                        onDelete={() => deleteSection(section.id)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+                {sections.length === 0 && (
+                  <div className="text-center py-8 text-gray-400 text-sm">
+                    لا توجد أقسام بعد.<br />اضغط "إضافة" لبدء البناء.
+                  </div>
+                )}
+              </div>
+            </div>
 
-        {/* RIGHT: Settings Panel */}
+            {/* CENTER: Canvas Preview */}
+            <div className="flex-1 overflow-auto bg-gray-200 p-6">
+              <div className="max-w-[1200px] mx-auto bg-white shadow-lg rounded-lg overflow-hidden min-h-[600px]">
+                {sections.length === 0 ? (
+                  <div className="flex items-center justify-center h-[600px] text-gray-400">
+                    <div className="text-center">
+                      <p className="text-lg mb-2">صفحة فارغة</p>
+                      <p className="text-sm">أضف أقسام من اللوحة اليسرى لبدء البناء</p>
+                    </div>
+                  </div>
+                ) : (
+                  sections.map((section) => (
+                    <div
+                      key={section.id}
+                      data-testid={`canvas-section-${section.id}`}
+                      className={cn(
+                        "relative group transition-all cursor-pointer",
+                        section.hidden && "opacity-30",
+                        selectedId === section.id && "ring-2 ring-blue-500 ring-inset"
+                      )}
+                      onClick={() => setSelectedId(section.id)}
+                    >
+                      {selectedId === section.id && (
+                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10">
+                          {section.label}
+                        </div>
+                      )}
+                      <SectionRenderer
+                        section={section}
+                        isEditing={selectedId === section.id}
+                        onContentChange={(key, value) => updateSectionContent(section.id, key, value)}
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* RIGHT: Settings Panel (only in edit mode) */}
+        {viewMode === "edit" && (
         <div className="w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-hidden">
           {selectedSection ? (
             <div className="flex-1 overflow-auto">
@@ -676,6 +774,7 @@ export default function CMSBuilder() {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );
