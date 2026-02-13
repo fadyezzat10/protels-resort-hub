@@ -96,6 +96,9 @@ import BuilderPage from "@/pages/BuilderPage";
 import Blog from "@/pages/Blog";
 import BlogArticle from "@/pages/BlogArticle";
 import CMSHead from "@/components/CMSHead";
+import CMSTheme from "./pages/cms/CMSTheme";
+import CMSUsers from "./pages/cms/CMSUsers";
+import ThemeProvider from "@/components/ThemeProvider";
 
 function Router() {
   return (
@@ -125,9 +128,11 @@ function Router() {
       <Route path="/controlpanal/media" component={CMSMedia} />
       <Route path="/controlpanal/seo" component={CMSSeo} />
       <Route path="/controlpanal/settings" component={CMSSettings} />
+      <Route path="/controlpanal/theme" component={CMSTheme} />
       <Route path="/controlpanal/blog" component={CMSBlog} />
       <Route path="/controlpanal/company-profile" component={CMSCompanyProfile} />
       <Route path="/controlpanal/builder/:slug" component={CMSBuilder} />
+      <Route path="/controlpanal/users" component={CMSUsers} />
       <Route path="/controlpanal/visual-edit/:slug" component={VisualEditor} />
       
       {/* Dynamic hotel page routing with sections */}
@@ -164,11 +169,13 @@ function App() {
           <I18nProvider>
             <EditModeProvider>
               <CMSHead />
+              <ThemeProvider>
               <Toaster />
               <ScrollToTop />
               <Router />
               <AdminToolbar />
               <ChatbotWrapper />
+              </ThemeProvider>
             </EditModeProvider>
           </I18nProvider>
         </TooltipProvider>

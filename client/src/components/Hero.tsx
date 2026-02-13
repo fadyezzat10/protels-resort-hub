@@ -10,6 +10,7 @@ import { Camera, Loader2 } from "lucide-react";
 interface HeroProps {
   image?: string;
   images?: string[];
+  video?: string;
   title?: string;
   subtitle?: string;
   showButton?: boolean;
@@ -21,6 +22,7 @@ interface HeroProps {
 export default function Hero({ 
   image, 
   images = [],
+  video,
   title, 
   subtitle, 
   showButton = true,
@@ -84,22 +86,49 @@ export default function Hero({
 
   return (
     <div className={`relative w-full ${getHeightClass()} overflow-hidden bg-brand-dark`}>
-      <AnimatePresence mode="wait">
-        <motion.div 
-          key={currentIndex}
-          className="absolute inset-0 w-full h-full"
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 2, ease: "easeInOut" }}
-        >
-          <img 
-            src={currentSrc} 
-            alt="Luxury Resort" 
-            className="w-full h-full object-cover"
+      {video ? (
+        <div className="absolute inset-0 w-full h-full">
+          <video
+            src={video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
           />
-        </motion.div>
-      </AnimatePresence>
+          {heroImages.length > 0 && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                className="absolute inset-0 w-full h-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.3 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 2, ease: "easeInOut" }}
+              >
+                <img src={currentSrc} alt="Overlay" className="w-full h-full object-cover mix-blend-overlay" />
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={currentIndex}
+            className="absolute inset-0 w-full h-full"
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
+          >
+            <img 
+              src={currentSrc} 
+              alt="Luxury Resort" 
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+        </AnimatePresence>
+      )}
       
       <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" /> 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40 z-10 pointer-events-none" />

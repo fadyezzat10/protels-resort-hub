@@ -86,6 +86,9 @@ export interface Hotel {
   roomDetails?: RoomDetail[];
   gallery?: string[];
   mapLink?: string;
+  heroVideo?: string;
+  theme?: { primaryColor?: string; secondaryColor?: string; accentColor?: string };
+  tabConfig?: { tabs: { id: string; label: string; visible: boolean; order: number }[] };
 }
 
 export const hotels: Hotel[] = [

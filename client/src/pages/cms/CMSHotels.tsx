@@ -20,6 +20,12 @@ import {
   Languages,
   BedDouble,
   Info,
+  Palette,
+  Video,
+  ListOrdered,
+  Eye,
+  EyeOff,
+  GripVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +96,13 @@ interface HotelForm {
   mapLink: string;
   status: string;
   sortOrder: number;
+  heroVideo: string;
+  theme: {
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+  };
+  tabConfig: { id: string; label: string; visible: boolean; order: number }[];
 }
 
 const emptyForm: HotelForm = {
@@ -112,6 +125,16 @@ const emptyForm: HotelForm = {
   mapLink: "",
   status: "draft",
   sortOrder: 0,
+  heroVideo: "",
+  theme: { primaryColor: "", secondaryColor: "", accentColor: "" },
+  tabConfig: [
+    { id: "overview", label: "Overview", visible: true, order: 1 },
+    { id: "rooms", label: "Rooms", visible: true, order: 2 },
+    { id: "dining", label: "Dining", visible: true, order: 3 },
+    { id: "gallery", label: "Gallery", visible: true, order: 4 },
+    { id: "features", label: "Features", visible: true, order: 5 },
+    { id: "location", label: "Location", visible: true, order: 6 },
+  ],
 };
 
 const FEATURE_SUGGESTIONS = [
@@ -226,6 +249,9 @@ export default function CMSHotels() {
     mapLink: form.mapLink || null,
     status: form.status,
     sortOrder: form.sortOrder,
+    heroVideo: form.heroVideo || null,
+    theme: (form.theme.primaryColor || form.theme.secondaryColor || form.theme.accentColor) ? form.theme : null,
+    tabConfig: form.tabConfig.length > 0 ? { tabs: form.tabConfig } : null,
   });
 
   const handleSubmit = () => {
@@ -267,6 +293,16 @@ export default function CMSHotels() {
       mapLink: hotel.mapLink || "",
       status: hotel.status || "draft",
       sortOrder: hotel.sortOrder || 0,
+      heroVideo: hotel.heroVideo || "",
+      theme: hotel.theme || { primaryColor: "", secondaryColor: "", accentColor: "" },
+      tabConfig: hotel.tabConfig?.tabs || [
+        { id: "overview", label: "Overview", visible: true, order: 1 },
+        { id: "rooms", label: "Rooms", visible: true, order: 2 },
+        { id: "dining", label: "Dining", visible: true, order: 3 },
+        { id: "gallery", label: "Gallery", visible: true, order: 4 },
+        { id: "features", label: "Features", visible: true, order: 5 },
+        { id: "location", label: "Location", visible: true, order: 6 },
+      ],
     });
     setExpandedRooms(new Set());
     setView("editor");
@@ -453,6 +489,18 @@ export default function CMSHotels() {
             <TabsTrigger data-testid="tab-links" value="links" className="flex items-center gap-1.5 text-xs sm:text-sm">
               <Link2 className="w-3.5 h-3.5" />
               الروابط
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-video" value="video" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <Video className="w-3.5 h-3.5" />
+              الفيديو
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-theme" value="theme" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <Palette className="w-3.5 h-3.5" />
+              الألوان
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-tabconfig" value="tabconfig" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <ListOrdered className="w-3.5 h-3.5" />
+              التبويبات
             </TabsTrigger>
           </TabsList>
 
@@ -1076,6 +1124,167 @@ export default function CMSHotels() {
                     فتح في خرائط جوجل ↗
                   </a>
                 )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="video">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">فيديو الصفحة الرئيسية</h3>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">رابط الفيديو (MP4)</label>
+                <Input
+                  data-testid="input-hotel-hero-video"
+                  value={form.heroVideo}
+                  onChange={(e) => setForm({ ...form, heroVideo: e.target.value })}
+                  placeholder="https://example.com/video.mp4"
+                />
+                <p className="text-xs text-gray-400 mt-1">رابط فيديو MP4 يظهر في خلفية صفحة الفندق. ارفع الفيديو أولاً في مكتبة الوسائط.</p>
+              </div>
+              {form.heroVideo && (
+                <div className="mt-4">
+                  <label className="text-sm font-medium mb-1.5 block">معاينة الفيديو</label>
+                  <video src={form.heroVideo} controls muted className="w-full max-w-lg rounded-lg border" />
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="theme">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">ألوان مخصصة لهذا الفندق</h3>
+              <p className="text-sm text-gray-500">اتركها فارغة لاستخدام الألوان العامة للموقع</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">اللون الأساسي</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={form.theme.primaryColor || "#1a2744"}
+                      onChange={(e) => setForm({ ...form, theme: { ...form.theme, primaryColor: e.target.value } })}
+                      className="w-10 h-10 rounded cursor-pointer border"
+                    />
+                    <Input
+                      data-testid="input-hotel-theme-primary"
+                      value={form.theme.primaryColor}
+                      onChange={(e) => setForm({ ...form, theme: { ...form.theme, primaryColor: e.target.value } })}
+                      placeholder="اللون الأساسي (مثلاً #1a2744)"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">اللون الثانوي</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={form.theme.secondaryColor || "#c4a96a"}
+                      onChange={(e) => setForm({ ...form, theme: { ...form.theme, secondaryColor: e.target.value } })}
+                      className="w-10 h-10 rounded cursor-pointer border"
+                    />
+                    <Input
+                      data-testid="input-hotel-theme-secondary"
+                      value={form.theme.secondaryColor}
+                      onChange={(e) => setForm({ ...form, theme: { ...form.theme, secondaryColor: e.target.value } })}
+                      placeholder="اللون الثانوي (مثلاً #c4a96a)"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">لون التمييز</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={form.theme.accentColor || "#e8d5b0"}
+                      onChange={(e) => setForm({ ...form, theme: { ...form.theme, accentColor: e.target.value } })}
+                      className="w-10 h-10 rounded cursor-pointer border"
+                    />
+                    <Input
+                      data-testid="input-hotel-theme-accent"
+                      value={form.theme.accentColor}
+                      onChange={(e) => setForm({ ...form, theme: { ...form.theme, accentColor: e.target.value } })}
+                      placeholder="لون التمييز (مثلاً #e8d5b0)"
+                    />
+                  </div>
+                </div>
+              </div>
+              {(form.theme.primaryColor || form.theme.secondaryColor || form.theme.accentColor) && (
+                <div className="mt-4 p-4 rounded-lg border" style={{ backgroundColor: form.theme.primaryColor || '#1a2744' }}>
+                  <h4 className="font-serif text-lg" style={{ color: form.theme.secondaryColor || '#c4a96a' }}>معاينة الألوان</h4>
+                  <p className="text-sm mt-1" style={{ color: '#ffffff' }}>هكذا ستظهر ألوان صفحة الفندق</p>
+                  <button className="mt-2 px-4 py-2 rounded text-sm font-medium" style={{ backgroundColor: form.theme.accentColor || '#e8d5b0', color: form.theme.primaryColor || '#1a2744' }}>زر تجريبي</button>
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setForm({ ...form, theme: { primaryColor: "", secondaryColor: "", accentColor: "" } })}
+              >
+                إعادة تعيين الألوان
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tabconfig">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">إعدادات التبويبات</h3>
+              <p className="text-sm text-gray-500">تحكم في ترتيب وإظهار/إخفاء التبويبات في صفحة الفندق</p>
+              <div className="space-y-2">
+                {[...form.tabConfig].sort((a, b) => a.order - b.order).map((tab, idx) => (
+                  <div key={tab.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+                    <GripVertical className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium flex-1">{tab.label}</span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={idx === 0}
+                        onClick={() => {
+                          const sorted = [...form.tabConfig].sort((a, b) => a.order - b.order);
+                          if (idx > 0) {
+                            const temp = sorted[idx].order;
+                            sorted[idx].order = sorted[idx - 1].order;
+                            sorted[idx - 1].order = temp;
+                            setForm({ ...form, tabConfig: sorted });
+                          }
+                        }}
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={idx === form.tabConfig.length - 1}
+                        onClick={() => {
+                          const sorted = [...form.tabConfig].sort((a, b) => a.order - b.order);
+                          if (idx < sorted.length - 1) {
+                            const temp = sorted[idx].order;
+                            sorted[idx].order = sorted[idx + 1].order;
+                            sorted[idx + 1].order = temp;
+                            setForm({ ...form, tabConfig: sorted });
+                          }
+                        }}
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const updated = form.tabConfig.map((t) =>
+                            t.id === tab.id ? { ...t, visible: !t.visible } : t
+                          );
+                          setForm({ ...form, tabConfig: updated });
+                        }}
+                      >
+                        {tab.visible ? <Eye className="w-4 h-4 text-green-600" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </TabsContent>

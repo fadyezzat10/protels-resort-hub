@@ -34,15 +34,24 @@ export default function HotelDetails() {
 
   if (!hotel) return <NotFound />;
 
-  // Tabs Configuration
-  const tabs = [
-    { id: "overview", label: t("hotel.overview") },
-    { id: "accommodation", label: t("hotel.accommodation") },
-    { id: "dining", label: t("hotel.dining") },
-    { id: "facilities", label: t("hotel.facilities") },
-    { id: "gallery", label: t("nav.gallery") },
-    { id: "contact", label: t("nav.contact") },
+  const defaultTabs = [
+    { id: "overview", label: t("hotel.overview"), order: 1 },
+    { id: "accommodation", label: t("hotel.accommodation"), order: 2 },
+    { id: "dining", label: t("hotel.dining"), order: 3 },
+    { id: "facilities", label: t("hotel.facilities"), order: 4 },
+    { id: "gallery", label: t("nav.gallery"), order: 5 },
+    { id: "contact", label: t("nav.contact"), order: 6 },
   ];
+
+  const tabs = hotel.tabConfig?.tabs
+    ? hotel.tabConfig.tabs
+        .filter((t) => t.visible !== false)
+        .sort((a, b) => a.order - b.order)
+        .map((t) => {
+          const def = defaultTabs.find((d) => d.id === t.id);
+          return { id: t.id, label: def?.label || t.label };
+        })
+    : defaultTabs;
 
   // Feature Icons mapping
   const getFeatureIcon = (feature: string) => {
@@ -56,24 +65,19 @@ export default function HotelDetails() {
   };
 
   const isLaPlage = hotel.id === "la-plage";
+  const hotelTheme = hotel.theme;
+  const hasCustomTheme = hotelTheme && (hotelTheme.primaryColor || hotelTheme.secondaryColor || hotelTheme.accentColor);
 
   return (
-    <div className={cn("min-h-screen bg-brand-white transition-colors duration-500", isLaPlage && "bg-[#F9F6F0]")}>
-      {isLaPlage && (
+    <div className={cn("min-h-screen bg-brand-white transition-colors duration-500", (isLaPlage || hasCustomTheme) && "bg-[var(--hotel-bg,#F9F6F0)]")}>
+      {(isLaPlage || hasCustomTheme) && (
         <style>{`
-          .la-plage-theme {
-            --color-brand-blue: hsl(180 60% 25%); /* Deep Teal */
-            --color-brand-blue-light: hsl(175 50% 35%);
-            --color-brand-gold: hsl(25 70% 50%); /* Burnt Orange/Terracotta */
-            --color-brand-gold-light: hsl(30 60% 85%);
-            --color-brand-white: hsl(40 33% 96%); /* Warm Beige */
-            --color-background: hsl(40 33% 96%);
-            
-            /* Font overrides if needed, but keeping hierarchy */
-          }
-          
-          .la-plage-theme .font-serif {
-            /* Maybe a slightly more organic serif if possible, but keeping standard for now */
+          .hotel-custom-theme {
+            ${hotelTheme?.primaryColor ? `--color-brand-blue: ${hotelTheme.primaryColor};` : isLaPlage ? '--color-brand-blue: hsl(180 60% 25%);' : ''}
+            ${hotelTheme?.primaryColor ? `--color-brand-blue-light: ${hotelTheme.primaryColor};` : isLaPlage ? '--color-brand-blue-light: hsl(175 50% 35%);' : ''}
+            ${hotelTheme?.secondaryColor ? `--color-brand-gold: ${hotelTheme.secondaryColor};` : isLaPlage ? '--color-brand-gold: hsl(25 70% 50%);' : ''}
+            ${hotelTheme?.accentColor ? `--color-brand-gold-light: ${hotelTheme.accentColor};` : isLaPlage ? '--color-brand-gold-light: hsl(30 60% 85%);' : ''}
+            ${isLaPlage && !hasCustomTheme ? '--color-brand-white: hsl(40 33% 96%); --color-background: hsl(40 33% 96%); --hotel-bg: hsl(40 33% 96%);' : ''}
           }
         `}</style>
       )}
@@ -84,11 +88,12 @@ export default function HotelDetails() {
           style={{ backgroundImage: `url(${tribalPattern})`, backgroundSize: '400px' }}
         />
       )}
-      <div className={cn("relative z-10", isLaPlage && "la-plage-theme")}>
+      <div className={cn("relative z-10", (isLaPlage || hasCustomTheme) && "hotel-custom-theme")}>
       <Navbar />
       
       <Hero 
         image={hotel.image}
+        video={hotel.heroVideo}
         title={hotel.name}
         subtitle={hotel.location}
         height="large"

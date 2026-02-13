@@ -15,6 +15,8 @@ import {
   User,
   Newspaper,
   BookOpen,
+  Palette,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,8 @@ const navItems = [
   { href: "/controlpanal/company-profile", label: "Company Profile", icon: BookOpen },
   { href: "/controlpanal/seo", label: "SEO", icon: Search },
   { href: "/controlpanal/settings", label: "Settings", icon: Settings },
+  { href: "/controlpanal/theme", label: "Theme", icon: Palette },
+  { href: "/controlpanal/users", label: "Users", icon: Users },
 ];
 
 export default function CMSLayout({ children }: { children: React.ReactNode }) {

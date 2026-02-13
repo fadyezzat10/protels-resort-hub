@@ -163,14 +163,17 @@ export async function registerRoutes(
   });
 
   // ──────── USERS (admin) ────────
-  app.get("/api/cms/users", requireAuth, async (_req, res) => {
+  app.get("/api/cms/users", requireAuth, async (req, res) => {
+    if (req.session.role !== "super_admin") return res.status(403).json({ message: "Forbidden" });
     const all = await storage.getUsers();
     res.json(all.map(u => ({ id: u.id, username: u.username, role: u.role, createdAt: u.createdAt })));
   });
 
   app.post("/api/cms/users", requireAuth, async (req, res) => {
+    if (req.session.role !== "super_admin") return res.status(403).json({ message: "Forbidden" });
     try {
       const { username, password, role } = req.body;
+      if (!username || !password) return res.status(400).json({ message: "Username and password required" });
       const hashed = await hashPassword(password);
       const user = await storage.createUser({ username, password: hashed, role: role || "admin" });
       res.json({ id: user.id, username: user.username, role: user.role });
@@ -179,8 +182,28 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/cms/users/:id", requireAuth, async (req, res) => {
+    if (req.session.role !== "super_admin") return res.status(403).json({ message: "Forbidden" });
+    try {
+      const id = Number(req.params.id);
+      const { username, password, role } = req.body;
+      const updateData: any = {};
+      if (username) updateData.username = username;
+      if (password) updateData.password = await hashPassword(password);
+      if (role) updateData.role = role;
+      const user = await storage.updateUser(id, updateData);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      res.json({ id: user.id, username: user.username, role: user.role });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+
   app.delete("/api/cms/users/:id", requireAuth, async (req, res) => {
-    await storage.deleteUser(Number(req.params.id));
+    if (req.session.role !== "super_admin") return res.status(403).json({ message: "Forbidden" });
+    const id = Number(req.params.id);
+    if (id === req.session.userId) return res.status(400).json({ message: "Cannot delete yourself" });
+    await storage.deleteUser(id);
     res.json({ ok: true });
   });
 

@@ -1,9 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { useI18n, type Language } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { useBookingLink, useHeaderLogo } from "@/lib/cms";
+import { useBookingLink, useHeaderLogo, useCMSAllSettings } from "@/lib/cms";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import defaultLogo from "@assets/سش.pngش_1770193463633.png";
 import {
@@ -13,6 +13,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const defaultNavLinks = [
+  { href: "/", label: "nav.home", visible: true, order: 1 },
+  { href: "/hotels", label: "nav.hotels", visible: true, order: 2 },
+  { href: "/about", label: "nav.about", visible: true, order: 3 },
+  { href: "/careers", label: "nav.careers", visible: true, order: 4 },
+  { href: "/contact", label: "nav.contact", visible: true, order: 5 },
+  { href: "/gallery", label: "nav.gallery", visible: true, order: 6 },
+  { href: "/company-profile", label: "nav.companyProfile", visible: true, order: 7 },
+];
+
 export default function Navbar() {
   const { t, language, setLanguage, dir } = useI18n();
   const [location] = useLocation();
@@ -21,6 +31,7 @@ export default function Navbar() {
   const bookingLink = useBookingLink();
   const cmsLogo = useHeaderLogo();
   const logoSrc = cmsLogo || defaultLogo;
+  const { data: allSettings } = useCMSAllSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,15 +41,16 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { href: "/", label: "nav.home" },
-    { href: "/hotels", label: "nav.hotels" },
-    { href: "/about", label: "nav.about" },
-    { href: "/careers", label: "nav.careers" },
-    { href: "/contact", label: "nav.contact" },
-    { href: "/gallery", label: "nav.gallery" },
-    { href: "/company-profile", label: "nav.companyProfile" },
-  ];
+  const navLinks = useMemo(() => {
+    const config = allSettings?.header_nav_config;
+    if (Array.isArray(config) && config.length > 0) {
+      return config
+        .filter((item: any) => item.visible !== false)
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+        .map((item: any) => ({ href: item.href, label: item.label }));
+    }
+    return defaultNavLinks.map((item) => ({ href: item.href, label: item.label }));
+  }, [allSettings]);
 
   const languages: { code: Language; label: string }[] = [
     { code: "en", label: "English" },

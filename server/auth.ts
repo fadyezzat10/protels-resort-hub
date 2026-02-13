@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
+import { migrateHotelData } from "./migrate-hotel-data";
 
 export async function seedAdmin() {
   const existing = await storage.getUserByUsername("Fezzat");
@@ -174,6 +175,8 @@ export async function seedContent() {
   if (seededSettings > 0) {
     console.log(`Seeded ${seededSettings} default global settings.`);
   }
+
+  await migrateHotelData();
 }
 
 export async function verifyPassword(plain: string, hashed: string) {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type } from "lucide-react";
+import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,12 +25,32 @@ export default function CMSSettings() {
   const [heroSubtitleEn, setHeroSubtitleEn] = useState("");
   const [heroSubtitleAr, setHeroSubtitleAr] = useState("");
   const [heroImagesText, setHeroImagesText] = useState("");
+  const [heroVideoUrl, setHeroVideoUrl] = useState("");
   const [footerDescEn, setFooterDescEn] = useState("");
   const [footerDescAr, setFooterDescAr] = useState("");
   const [socialLinks, setSocialLinks] = useState({
     facebook: "",
     instagram: "",
     linkedin: "",
+  });
+
+  const defaultNavItems = [
+    { href: "/", label: "nav.home", displayLabel: "Home", visible: true, order: 1 },
+    { href: "/hotels", label: "nav.hotels", displayLabel: "Hotels", visible: true, order: 2 },
+    { href: "/about", label: "nav.about", displayLabel: "About", visible: true, order: 3 },
+    { href: "/careers", label: "nav.careers", displayLabel: "Careers", visible: true, order: 4 },
+    { href: "/contact", label: "nav.contact", displayLabel: "Contact", visible: true, order: 5 },
+    { href: "/gallery", label: "nav.gallery", displayLabel: "Gallery", visible: true, order: 6 },
+    { href: "/company-profile", label: "nav.companyProfile", displayLabel: "Company Profile", visible: true, order: 7 },
+  ];
+  const [headerNavConfig, setHeaderNavConfig] = useState(defaultNavItems);
+  const [footerConfig, setFooterConfig] = useState({
+    col1Title: "",
+    col1Content: "",
+    col2Title: "",
+    col2Content: "",
+    col3Title: "",
+    col3Content: "",
   });
 
   const { data: settings = [], isLoading } = useQuery<any[]>({
@@ -66,6 +86,7 @@ export default function CMSSettings() {
       if (Array.isArray(heroImages)) {
         setHeroImagesText(heroImages.join("\n"));
       }
+      setHeroVideoUrl(findSetting("hero_video") || "");
       const footerDesc = findSetting("footer_description");
       if (footerDesc && typeof footerDesc === "object") {
         setFooterDescEn(footerDesc.en || "");
@@ -78,6 +99,23 @@ export default function CMSSettings() {
           facebook: social.facebook || "",
           instagram: social.instagram || "",
           linkedin: social.linkedin || "",
+        });
+      }
+
+      const navConfig = findSetting("header_nav_config");
+      if (Array.isArray(navConfig) && navConfig.length > 0) {
+        setHeaderNavConfig(navConfig);
+      }
+
+      const fConfig = findSetting("footer_config");
+      if (fConfig && typeof fConfig === "object") {
+        setFooterConfig({
+          col1Title: fConfig.col1Title || "",
+          col1Content: fConfig.col1Content || "",
+          col2Title: fConfig.col2Title || "",
+          col2Content: fConfig.col2Content || "",
+          col3Title: fConfig.col3Title || "",
+          col3Content: fConfig.col3Content || "",
         });
       }
     }
@@ -175,6 +213,15 @@ export default function CMSSettings() {
               }} disabled={saveMutation.isPending} className="w-full">
                 <Save className="w-4 h-4 mr-2" /> Save Hero Images
               </Button>
+              <div className="border-t pt-4">
+                <label className="text-sm font-medium mb-1 block">Hero Background Video (MP4 URL)</label>
+                <div className="flex gap-2">
+                  <Input data-testid="input-setting-hero-video" value={heroVideoUrl} onChange={(e) => setHeroVideoUrl(e.target.value)} placeholder="https://example.com/hero-video.mp4" />
+                  <Button data-testid="button-save-hero-video" size="sm" onClick={() => saveSetting("hero_video", heroVideoUrl)} disabled={saveMutation.isPending}><Save className="w-4 h-4" /></Button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Optional: A background video plays behind the hero slider. Upload in Media Library first.</p>
+                {heroVideoUrl && <video data-testid="video-preview-hero" src={heroVideoUrl} controls muted className="mt-2 w-full max-w-sm rounded border" />}
+              </div>
             </CardContent>
           </Card>
 
@@ -202,6 +249,130 @@ export default function CMSSettings() {
                 <p className="text-xs text-gray-400 mt-1">Leave empty to use the default logo. Upload in Media Library first.</p>
                 {headerLogo && <img data-testid="img-preview-header-logo" src={headerLogo} alt="Logo preview" className="mt-2 h-16 object-contain bg-gray-100 p-2 rounded" />}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Menu className="w-5 h-5 text-brand-blue" /> Header Navigation
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-gray-400">Reorder and toggle visibility of navigation menu items</p>
+              <div className="space-y-2">
+                {headerNavConfig
+                  .sort((a, b) => a.order - b.order)
+                  .map((item, idx) => (
+                  <div key={item.label} data-testid={`nav-item-${item.label}`} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border">
+                    <span className="text-sm font-medium flex-1">{item.displayLabel || item.label}</span>
+                    <span className="text-xs text-gray-400">{item.href}</span>
+                    <Button
+                      data-testid={`button-toggle-nav-${item.label}`}
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => {
+                        const updated = headerNavConfig.map(n =>
+                          n.label === item.label ? { ...n, visible: !n.visible } : n
+                        );
+                        setHeaderNavConfig(updated);
+                      }}
+                    >
+                      {item.visible ? <Eye className="w-4 h-4 text-green-600" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
+                    </Button>
+                    <Button
+                      data-testid={`button-move-up-${item.label}`}
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      disabled={idx === 0}
+                      onClick={() => {
+                        const sorted = [...headerNavConfig].sort((a, b) => a.order - b.order);
+                        if (idx > 0) {
+                          const temp = sorted[idx].order;
+                          sorted[idx] = { ...sorted[idx], order: sorted[idx - 1].order };
+                          sorted[idx - 1] = { ...sorted[idx - 1], order: temp };
+                          setHeaderNavConfig(sorted);
+                        }
+                      }}
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      data-testid={`button-move-down-${item.label}`}
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      disabled={idx === headerNavConfig.length - 1}
+                      onClick={() => {
+                        const sorted = [...headerNavConfig].sort((a, b) => a.order - b.order);
+                        if (idx < sorted.length - 1) {
+                          const temp = sorted[idx].order;
+                          sorted[idx] = { ...sorted[idx], order: sorted[idx + 1].order };
+                          sorted[idx + 1] = { ...sorted[idx + 1], order: temp };
+                          setHeaderNavConfig(sorted);
+                        }
+                      }}
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button
+                data-testid="button-save-header-nav"
+                onClick={() => saveSetting("header_nav_config", headerNavConfig)}
+                disabled={saveMutation.isPending}
+                className="w-full"
+              >
+                <Save className="w-4 h-4 mr-2" /> Save Header Navigation
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Columns className="w-5 h-5 text-brand-blue" /> Footer Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-gray-400">Configure footer column content</p>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Column 1 Title</label>
+                  <Input data-testid="input-footer-col1-title" value={footerConfig.col1Title} onChange={(e) => setFooterConfig({ ...footerConfig, col1Title: e.target.value })} placeholder="Quick Links" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Column 1 Content</label>
+                  <Textarea data-testid="textarea-footer-col1-content" value={footerConfig.col1Content} onChange={(e) => setFooterConfig({ ...footerConfig, col1Content: e.target.value })} placeholder="Links or text (one per line)" rows={3} />
+                </div>
+                <div className="border-t pt-4">
+                  <label className="text-sm font-medium mb-1 block">Column 2 Title</label>
+                  <Input data-testid="input-footer-col2-title" value={footerConfig.col2Title} onChange={(e) => setFooterConfig({ ...footerConfig, col2Title: e.target.value })} placeholder="Our Hotels" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Column 2 Content</label>
+                  <Textarea data-testid="textarea-footer-col2-content" value={footerConfig.col2Content} onChange={(e) => setFooterConfig({ ...footerConfig, col2Content: e.target.value })} placeholder="Links or text (one per line)" rows={3} />
+                </div>
+                <div className="border-t pt-4">
+                  <label className="text-sm font-medium mb-1 block">Column 3 Title</label>
+                  <Input data-testid="input-footer-col3-title" value={footerConfig.col3Title} onChange={(e) => setFooterConfig({ ...footerConfig, col3Title: e.target.value })} placeholder="Contact Info" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Column 3 Content</label>
+                  <Textarea data-testid="textarea-footer-col3-content" value={footerConfig.col3Content} onChange={(e) => setFooterConfig({ ...footerConfig, col3Content: e.target.value })} placeholder="Address, phone, email" rows={3} />
+                </div>
+              </div>
+              <Button
+                data-testid="button-save-footer-config"
+                onClick={() => saveSetting("footer_config", footerConfig)}
+                disabled={saveMutation.isPending}
+                className="w-full"
+              >
+                <Save className="w-4 h-4 mr-2" /> Save Footer Configuration
+              </Button>
             </CardContent>
           </Card>
 

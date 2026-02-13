@@ -123,6 +123,9 @@ function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
     roomDetails: cmsHotel.roomDetails?.length ? cmsHotel.roomDetails : staticHotel.roomDetails,
     gallery: cmsHotel.gallery?.length ? cmsHotel.gallery : staticHotel.gallery,
     mapLink: cmsHotel.mapLink || staticHotel.mapLink,
+    heroVideo: cmsHotel.heroVideo || staticHotel.heroVideo,
+    theme: cmsHotel.theme || staticHotel.theme,
+    tabConfig: cmsHotel.tabConfig || staticHotel.tabConfig,
   };
 }
 
@@ -201,6 +204,9 @@ export function useMergedHotel(hotelId: string): { hotel: StaticHotel | null; is
         roomDetails: cmsHotel.roomDetails || [],
         gallery: cmsHotel.gallery || [],
         mapLink: cmsHotel.mapLink,
+        heroVideo: cmsHotel.heroVideo,
+        theme: cmsHotel.theme,
+        tabConfig: cmsHotel.tabConfig,
       },
       isLoading,
     };
@@ -225,8 +231,9 @@ export function useHeroContent(language: string) {
   const heroTitle = settings?.hero_title?.[language] || settings?.hero_title?.en || null;
   const heroSubtitle = settings?.hero_subtitle?.[language] || settings?.hero_subtitle?.en || null;
   const heroImages: string[] = settings?.hero_images?.length ? settings.hero_images : [];
+  const heroVideo: string | null = settings?.hero_video || null;
 
-  return { heroTitle, heroSubtitle, heroImages };
+  return { heroTitle, heroSubtitle, heroImages, heroVideo };
 }
 
 export function useFooterContent(language: string) {

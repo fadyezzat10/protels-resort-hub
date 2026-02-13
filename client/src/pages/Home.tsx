@@ -18,7 +18,7 @@ const staticSliderImages = [slider1, slider2, slider3, slider4, slider5];
 export default function Home() {
   const { t, language } = useI18n();
   const { hotels } = useMergedHotels();
-  const { heroTitle, heroSubtitle, heroImages } = useHeroContent(language);
+  const { heroTitle, heroSubtitle, heroImages, heroVideo } = useHeroContent(language);
   const bookingLink = useBookingLink();
 
   const finalHeroImages = heroImages.length > 0 ? heroImages : staticSliderImages;
@@ -29,6 +29,7 @@ export default function Home() {
       
       <Hero 
         images={finalHeroImages}
+        video={heroVideo || undefined}
         title={heroTitle || t("hero.title")}
         subtitle={heroSubtitle || t("hero.subtitle")}
         bookingLink={bookingLink}
