@@ -84,7 +84,7 @@ export default function Hero({
 
   return (
     <div className={`relative w-full ${getHeightClass()} overflow-hidden bg-brand-dark`}>
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="wait">
         <motion.div 
           key={currentIndex}
           className="absolute inset-0 w-full h-full"
