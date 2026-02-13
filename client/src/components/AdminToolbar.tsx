@@ -67,6 +67,17 @@ export default function AdminToolbar() {
   const { toast } = useToast();
   const [showPanel, setShowPanel] = useState(true);
 
+  const styleKey = selectedKey ? `style:${selectedKey}` : null;
+
+  const updateStyle = useCallback((prop: string, value: string) => {
+    if (!styleKey) return;
+    let existing: Record<string, string> = {};
+    try { if (pageContent[styleKey]) existing = JSON.parse(pageContent[styleKey]); } catch { }
+    const updated = { ...existing, [prop]: value };
+    if (!value) delete updated[prop];
+    updateContent(styleKey, JSON.stringify(updated));
+  }, [styleKey, pageContent, updateContent]);
+
   if (!isAdmin) return null;
 
   const handleSave = async () => {
@@ -79,18 +90,8 @@ export default function AdminToolbar() {
   const isTextKey = selectedKey && !selectedKey.startsWith("img:");
   const isImageKey = selectedKey && selectedKey.startsWith("img:");
 
-  const styleKey = selectedKey ? `style:${selectedKey}` : null;
   let currentStyle: Record<string, string> = {};
   try { if (styleKey && pageContent[styleKey]) currentStyle = JSON.parse(pageContent[styleKey]); } catch { }
-
-  const updateStyle = useCallback((prop: string, value: string) => {
-    if (!styleKey) return;
-    let existing: Record<string, string> = {};
-    try { if (pageContent[styleKey]) existing = JSON.parse(pageContent[styleKey]); } catch { }
-    const updated = { ...existing, [prop]: value };
-    if (!value) delete updated[prop];
-    updateContent(styleKey, JSON.stringify(updated));
-  }, [styleKey, pageContent, updateContent]);
 
   return (
     <>
