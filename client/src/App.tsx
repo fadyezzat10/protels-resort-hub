@@ -28,6 +28,7 @@ import CMSSettings from "@/pages/cms/CMSSettings";
 import CMSBlog from "@/pages/cms/CMSBlog";
 import CMSCompanyProfile from "@/pages/cms/CMSCompanyProfile";
 import CMSBuilder from "@/pages/cms/CMSBuilder";
+import VisualEditor from "@/pages/cms/VisualEditor";
 import CompanyProfile from "@/pages/CompanyProfile";
 import BuilderPage from "@/pages/BuilderPage";
 import Blog from "@/pages/Blog";
@@ -65,6 +66,7 @@ function Router() {
       <Route path="/controlpanal/blog" component={CMSBlog} />
       <Route path="/controlpanal/company-profile" component={CMSCompanyProfile} />
       <Route path="/controlpanal/builder/:slug" component={CMSBuilder} />
+      <Route path="/controlpanal/visual-edit/:slug" component={VisualEditor} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/hotels/:hotelId" component={HotelDetails} />

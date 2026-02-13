@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -54,6 +54,12 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
     },
   });
 
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setLocation("/controlpanal");
+    }
+  }, [isLoading, user, setLocation]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -63,7 +69,6 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    setLocation("/controlpanal");
     return null;
   }
 

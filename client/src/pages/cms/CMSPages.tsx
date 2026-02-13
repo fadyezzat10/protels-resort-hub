@@ -218,8 +218,8 @@ export default function CMSPages() {
                       data-testid={`button-builder-page-${page.id}`}
                       variant="ghost"
                       size="sm"
-                      title="Open Page Builder"
-                      onClick={() => setLocation(`/controlpanal/builder/${page.slug}`)}
+                      title="Visual Editor"
+                      onClick={() => setLocation(`/controlpanal/visual-edit/${page.slug}`)}
                     >
                       <LayoutDashboard className="w-4 h-4 text-blue-500" />
                     </Button>
