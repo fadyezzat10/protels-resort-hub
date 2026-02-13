@@ -2,8 +2,19 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Plus, Pencil, Trash2, LayoutDashboard } from "lucide-react";
+import { Plus, Pencil, Trash2, LayoutDashboard, ExternalLink } from "lucide-react";
 import { useLocation } from "wouter";
+
+const SLUG_TO_ROUTE: Record<string, string> = {
+  home: "/",
+  about: "/about",
+  "about-us": "/about",
+  contact: "/contact",
+  careers: "/careers",
+  hotels: "/hotels",
+  gallery: "/gallery",
+  blog: "/blog",
+};
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -214,15 +225,29 @@ export default function CMSPages() {
                     {page.updatedAt ? new Date(page.updatedAt).toLocaleDateString() : "—"}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    <Button
-                      data-testid={`button-builder-page-${page.id}`}
-                      variant="ghost"
-                      size="sm"
-                      title="Visual Editor"
-                      onClick={() => setLocation(`/controlpanal/visual-edit/${page.slug}`)}
-                    >
-                      <LayoutDashboard className="w-4 h-4 text-blue-500" />
-                    </Button>
+                    {SLUG_TO_ROUTE[page.slug] ? (
+                      <Button
+                        data-testid={`button-liveedit-page-${page.id}`}
+                        variant="ghost"
+                        size="sm"
+                        title="تعديل مباشر على الصفحة"
+                        onClick={() => {
+                          window.open(SLUG_TO_ROUTE[page.slug], "_blank");
+                        }}
+                      >
+                        <ExternalLink className="w-4 h-4 text-green-600" />
+                      </Button>
+                    ) : (
+                      <Button
+                        data-testid={`button-builder-page-${page.id}`}
+                        variant="ghost"
+                        size="sm"
+                        title="Visual Editor"
+                        onClick={() => setLocation(`/controlpanal/visual-edit/${page.slug}`)}
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-blue-500" />
+                      </Button>
+                    )}
                     <Button
                       data-testid={`button-edit-page-${page.id}`}
                       variant="ghost"
