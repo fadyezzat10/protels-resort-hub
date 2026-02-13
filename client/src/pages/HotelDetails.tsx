@@ -92,6 +92,7 @@ export default function HotelDetails() {
         title={hotel.name}
         subtitle={hotel.location}
         height="large"
+        editPrefix={`hotel.${hotel.id}.hero`}
       />
 
       <div className={cn("h-12 bg-white", isLaPlage && "bg-[#F9F6F0]")} />

@@ -5,6 +5,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
+import { EditModeProvider } from "@/lib/editMode";
+import AdminToolbar from "@/components/AdminToolbar";
 import BookingAssistant from "@/components/BookingAssistant";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
@@ -99,11 +101,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <I18nProvider>
-          <CMSHead />
-          <Toaster />
-          <ScrollToTop />
-          <Router />
-          <ChatbotWrapper />
+          <EditModeProvider>
+            <CMSHead />
+            <Toaster />
+            <ScrollToTop />
+            <Router />
+            <AdminToolbar />
+            <ChatbotWrapper />
+          </EditModeProvider>
         </I18nProvider>
       </TooltipProvider>
     </QueryClientProvider>

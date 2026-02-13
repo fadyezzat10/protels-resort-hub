@@ -1,5 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import EditableText from "@/components/EditableText";
+import EditableImage from "@/components/EditableImage";
 import { useI18n } from "@/lib/i18n";
 import { useCMSPage } from "@/lib/cms";
 import { motion } from "framer-motion";
@@ -104,15 +106,24 @@ export default function About() {
             transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
             className="max-w-5xl"
           >
-            <span className="text-white/80 text-sm md:text-base tracking-[0.3em] uppercase font-light mb-8 block drop-shadow-sm">
-              Welcome to Protels
-            </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight drop-shadow-lg">
-              Crafting Unforgettable <br className="hidden md:block" /> Seaside Experiences
-            </h1>
-            <p className="text-white/90 text-lg md:text-xl font-sans font-light max-w-2xl mx-auto leading-relaxed tracking-wide drop-shadow-md">
-              Where authentic hospitality meets the timeless beauty of the coast.
-            </p>
+            <EditableText
+              contentKey="about.hero.subtitle"
+              defaultValue="Welcome to Protels"
+              as="span"
+              className="text-white/80 text-sm md:text-base tracking-[0.3em] uppercase font-light mb-8 block drop-shadow-sm"
+            />
+            <EditableText
+              contentKey="about.hero.title"
+              defaultValue="Crafting Unforgettable Seaside Experiences"
+              as="h1"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight drop-shadow-lg"
+            />
+            <EditableText
+              contentKey="about.hero.desc"
+              defaultValue="Where authentic hospitality meets the timeless beauty of the coast."
+              as="p"
+              className="text-white/90 text-lg md:text-xl font-sans font-light max-w-2xl mx-auto leading-relaxed tracking-wide drop-shadow-md"
+            />
           </motion.div>
         </div>
       </div>
@@ -121,17 +132,25 @@ export default function About() {
       <section className="py-24 px-6 md:px-12 bg-white relative overflow-hidden">
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <motion.div {...fadeIn}>
-            <span className="text-brand-gold text-xs font-bold tracking-widest uppercase mb-4 block">
-              Our Story
-            </span>
-            <h2 className="text-3xl md:text-5xl font-serif text-brand-blue mb-8 leading-tight">
-              Redefining Luxury Through <br />
-              <span className="italic text-brand-gold">Authentic Connection</span>
-            </h2>
+            <EditableText
+              contentKey="about.story.label"
+              defaultValue="Our Story"
+              as="span"
+              className="text-brand-gold text-xs font-bold tracking-widest uppercase mb-4 block"
+            />
+            <EditableText
+              contentKey="about.story.title"
+              defaultValue="Redefining Luxury Through Authentic Connection"
+              as="h2"
+              className="text-3xl md:text-5xl font-serif text-brand-blue mb-8 leading-tight"
+            />
             <div className="w-24 h-1 bg-brand-gold mx-auto mb-10" />
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto font-light">
-              {cmsContent || "At PROTELS Hotels & Resorts, we believe that true luxury lies in the feeling of belonging. Born from a passion for the sea and a dedication to authentic hospitality, our collection of beachfront resorts offers more than just a stay—we offer a journey into the extraordinary. From the vibrant coral reefs of the Red Sea to the spice-scented breezes of Zanzibar, each property is a gateway to its unique destination."}
-            </p>
+            <EditableText
+              contentKey="about.story.desc"
+              defaultValue={cmsContent || "At PROTELS Hotels & Resorts, we believe that true luxury lies in the feeling of belonging. Born from a passion for the sea and a dedication to authentic hospitality, our collection of beachfront resorts offers more than just a stay—we offer a journey into the extraordinary. From the vibrant coral reefs of the Red Sea to the spice-scented breezes of Zanzibar, each property is a gateway to its unique destination."}
+              as="p"
+              className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto font-light"
+            />
           </motion.div>
         </div>
       </section>
@@ -235,13 +254,18 @@ export default function About() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-5xl font-serif mb-8 leading-tight">
-                Guest Experience <br />
-                <span className="text-brand-gold italic">Philosophy</span>
-              </h2>
-              <p className="text-white/80 text-lg leading-relaxed mb-8 font-light">
-                From the moment you arrive, you are wrapped in a warmth that feels like home, yet elevated by service that anticipates your every need. We curate moments of wonder—from sunrise walks on private beaches to star-lit dinners by the ocean.
-              </p>
+              <EditableText
+                contentKey="about.philosophy.title"
+                defaultValue="Guest Experience Philosophy"
+                as="h2"
+                className="text-3xl md:text-5xl font-serif mb-8 leading-tight"
+              />
+              <EditableText
+                contentKey="about.philosophy.desc"
+                defaultValue="From the moment you arrive, you are wrapped in a warmth that feels like home, yet elevated by service that anticipates your every need. We curate moments of wonder—from sunrise walks on private beaches to star-lit dinners by the ocean."
+                as="p"
+                className="text-white/80 text-lg leading-relaxed mb-8 font-light"
+              />
               <ul className="space-y-4">
                 {[
                   "Personalized service tailored to your preferences",
@@ -289,13 +313,18 @@ export default function About() {
              transition={{ duration: 0.8 }}
              viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-5xl font-serif text-brand-blue mb-8">
-              Your Journey Begins Here
-            </h2>
-            <p className="text-xl text-gray-600 mb-12 font-light leading-relaxed">
-              Discover a world where time slows down, and every moment is a treasured memory. <br className="hidden md:block" />
-              We invite you to experience the authentic warmth of PROTELS.
-            </p>
+            <EditableText
+              contentKey="about.cta.title"
+              defaultValue="Your Journey Begins Here"
+              as="h2"
+              className="text-3xl md:text-5xl font-serif text-brand-blue mb-8"
+            />
+            <EditableText
+              contentKey="about.cta.desc"
+              defaultValue="Discover a world where time slows down, and every moment is a treasured memory. We invite you to experience the authentic warmth of PROTELS."
+              as="p"
+              className="text-xl text-gray-600 mb-12 font-light leading-relaxed"
+            />
             <Button size="lg" className="bg-brand-blue hover:bg-brand-blue/90 text-white px-10 py-6 text-lg rounded-none uppercase tracking-widest" asChild>
                <a href="/hotels">Explore Our Resorts</a>
             </Button>

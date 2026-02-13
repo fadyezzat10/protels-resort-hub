@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import EditableText from "@/components/EditableText";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -161,12 +162,19 @@ export default function Careers() {
       <div className="bg-primary text-white py-32 md:py-48 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/30 z-0"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-playfair font-bold mb-10 tracking-widest text-white drop-shadow-md uppercase">Join Our Team</h1>
+          <EditableText
+            contentKey="careers.hero.title"
+            defaultValue="Join Our Team"
+            as="h1"
+            className="text-6xl md:text-8xl lg:text-9xl font-playfair font-bold mb-10 tracking-widest text-white drop-shadow-md uppercase"
+          />
           <div className="w-24 h-1 bg-white/40 mx-auto mb-10 rounded-full"></div>
-          <p className="text-xl md:text-2xl max-w-4xl mx-auto text-white/95 font-light leading-loose tracking-wide">
-            At Protels Hotels & Resorts, we believe that exceptional hospitality starts with exceptional people.
-            We are always looking for passionate, talented individuals who are eager to grow and deliver memorable guest experiences across our destinations.
-          </p>
+          <EditableText
+            contentKey="careers.hero.desc"
+            defaultValue="At Protels Hotels & Resorts, we believe that exceptional hospitality starts with exceptional people. We are always looking for passionate, talented individuals who are eager to grow and deliver memorable guest experiences across our destinations."
+            as="p"
+            className="text-xl md:text-2xl max-w-4xl mx-auto text-white/95 font-light leading-loose tracking-wide"
+          />
         </div>
       </div>
 

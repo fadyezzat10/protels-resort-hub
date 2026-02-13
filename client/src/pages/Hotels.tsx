@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
+import EditableText from "@/components/EditableText";
 import { useMergedHotels } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hotels-hero-aerial.jpg";
@@ -20,6 +21,7 @@ export default function Hotels() {
         subtitle="Our Collection"
         height="half"
         showButton={false}
+        editPrefix="hotels.hero"
       />
 
       <section className="py-20 container-padding">

@@ -639,6 +639,81 @@ export async function registerRoutes(
     }
   });
 
+  // ──────── PAGE CONTENTS (Live Edit) ────────
+  app.get("/api/cms/page-contents", requireAuth, async (_req, res) => {
+    try {
+      const all = await storage.getAllPageContents();
+      res.json(all);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.get("/api/cms/page-contents/:pagePath", requireAuth, async (req, res) => {
+    try {
+      const pagePath = Array.isArray(req.params.pagePath) ? req.params.pagePath[0] : req.params.pagePath;
+      const contents = await storage.getPageContents(decodeURIComponent(pagePath));
+      res.json(contents);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/cms/page-contents", requireAuth, async (req, res) => {
+    try {
+      const { pagePath, contentKey, contentType, value } = req.body;
+      if (!pagePath || !contentKey || value === undefined) {
+        return res.status(400).json({ message: "pagePath, contentKey, and value are required" });
+      }
+      const result = await storage.upsertPageContent(pagePath, contentKey, contentType || "text", value);
+      res.json(result);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/cms/page-contents/batch", requireAuth, async (req, res) => {
+    try {
+      const { items } = req.body;
+      if (!Array.isArray(items)) {
+        return res.status(400).json({ message: "items array required" });
+      }
+      const results = [];
+      for (const item of items) {
+        const result = await storage.upsertPageContent(item.pagePath, item.contentKey, item.contentType || "text", item.value);
+        results.push(result);
+      }
+      res.json(results);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.delete("/api/cms/page-contents/:id", requireAuth, async (req, res) => {
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      await storage.deletePageContent(parseInt(id));
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  // Public page content API (for website rendering)
+  app.get("/api/public/page-content/:pagePath", async (req, res) => {
+    try {
+      const pagePath = Array.isArray(req.params.pagePath) ? req.params.pagePath[0] : req.params.pagePath;
+      const contents = await storage.getPageContents(decodeURIComponent(pagePath));
+      const result: Record<string, string> = {};
+      for (const c of contents) {
+        result[c.contentKey] = c.value;
+      }
+      res.json(result);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // ──────── PUBLIC API (for website consumption) ────────
   app.get("/api/public/pages/:slug/builder", async (req, res) => {
     try {

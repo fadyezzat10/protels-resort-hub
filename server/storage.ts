@@ -1,8 +1,9 @@
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { desc } from "drizzle-orm";
+import { and } from "drizzle-orm";
 import {
-  users, pages, hotels, media, globalSettings, seoSettings, blogPosts, pageVersions,
+  users, pages, hotels, media, globalSettings, seoSettings, blogPosts, pageVersions, pageContents,
   type User, type InsertUser,
   type Page, type InsertPage,
   type Hotel, type InsertHotel,
@@ -11,6 +12,7 @@ import {
   type SeoSetting, type InsertSeoSetting,
   type BlogPost, type InsertBlogPost,
   type PageVersion, type InsertPageVersion,
+  type PageContent, type InsertPageContent,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -67,6 +69,12 @@ export interface IStorage {
   // Page Versions
   getPageVersions(pageId: number): Promise<PageVersion[]>;
   createPageVersion(version: InsertPageVersion): Promise<PageVersion>;
+
+  // Page Contents (Live Edit)
+  getPageContents(pagePath: string): Promise<PageContent[]>;
+  getAllPageContents(): Promise<PageContent[]>;
+  upsertPageContent(pagePath: string, contentKey: string, contentType: string, value: string): Promise<PageContent>;
+  deletePageContent(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -240,6 +248,30 @@ export class DatabaseStorage implements IStorage {
   async createPageVersion(version: InsertPageVersion) {
     const [created] = await db.insert(pageVersions).values(version).returning();
     return created;
+  }
+
+  // Page Contents (Live Edit)
+  async getPageContents(pagePath: string) {
+    return db.select().from(pageContents).where(eq(pageContents.pagePath, pagePath));
+  }
+  async getAllPageContents() {
+    return db.select().from(pageContents);
+  }
+  async upsertPageContent(pagePath: string, contentKey: string, contentType: string, value: string) {
+    const [existing] = await db.select().from(pageContents)
+      .where(and(eq(pageContents.pagePath, pagePath), eq(pageContents.contentKey, contentKey)));
+    if (existing) {
+      const [updated] = await db.update(pageContents)
+        .set({ value, contentType, updatedAt: new Date() })
+        .where(eq(pageContents.id, existing.id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(pageContents).values({ pagePath, contentKey, contentType, value }).returning();
+    return created;
+  }
+  async deletePageContent(id: number) {
+    await db.delete(pageContents).where(eq(pageContents.id, id));
   }
 }
 

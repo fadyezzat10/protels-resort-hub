@@ -27,6 +27,7 @@ export default function Gallery() {
         subtitle="Visual Journey"
         height="half"
         showButton={false}
+        editPrefix="gallery.hero"
       />
       
       <div className="container-padding py-20">

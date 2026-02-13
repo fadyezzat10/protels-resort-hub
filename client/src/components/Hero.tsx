@@ -3,6 +3,8 @@ import { useI18n } from "@/lib/i18n";
 import { useBookingLink } from "@/lib/cms";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import EditableText from "@/components/EditableText";
+import EditableImage from "@/components/EditableImage";
 
 interface HeroProps {
   image?: string;
@@ -12,6 +14,7 @@ interface HeroProps {
   showButton?: boolean;
   height?: "full" | "half" | "large";
   bookingLink?: string;
+  editPrefix?: string;
 }
 
 export default function Hero({ 
@@ -22,6 +25,7 @@ export default function Hero({
   showButton = true,
   height = "full",
   bookingLink: bookingLinkProp,
+  editPrefix = "hero",
 }: HeroProps) {
   const { t } = useI18n();
   const cmsBookingLink = useBookingLink();
@@ -60,9 +64,10 @@ export default function Hero({
           exit={{ opacity: 0 }}
           transition={{ duration: 2, ease: "easeInOut" }}
         >
-          <img 
-            src={heroImages[currentIndex]} 
-            alt="Luxury Resort" 
+          <EditableImage
+            contentKey={`img:${editPrefix}.bg.${currentIndex}`}
+            src={heroImages[currentIndex]}
+            alt="Luxury Resort"
             className="w-full h-full object-cover"
           />
         </motion.div>
@@ -79,14 +84,20 @@ export default function Hero({
           className="max-w-5xl"
         >
           {subtitle && (
-            <p className="text-white/90 text-sm md:text-base uppercase tracking-[0.3em] mb-6 font-medium drop-shadow-md">
-              {subtitle}
-            </p>
+            <EditableText
+              contentKey={`${editPrefix}.subtitle`}
+              defaultValue={subtitle}
+              as="p"
+              className="text-white/90 text-sm md:text-base uppercase tracking-[0.3em] mb-6 font-medium drop-shadow-md"
+            />
           )}
           {title && (
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-10 leading-tight drop-shadow-xl font-medium">
-              {title}
-            </h1>
+            <EditableText
+              contentKey={`${editPrefix}.title`}
+              defaultValue={title}
+              as="h1"
+              className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-10 leading-tight drop-shadow-xl font-medium"
+            />
           )}
           
           {showButton && (

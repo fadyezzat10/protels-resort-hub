@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
+import EditableText from "@/components/EditableText";
 import { useI18n } from "@/lib/i18n";
 import heroImg from "@/assets/images/hotel-beach-club.jpg";
 import { Mail, Phone, MapPin, Smartphone, Globe } from "lucide-react";
@@ -75,11 +76,17 @@ export default function Contact() {
         subtitle="We're Here For You"
         height="half"
         showButton={false}
+        editPrefix="contact.hero"
       />
       
       <div className="container-padding py-20">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif text-brand-blue mb-4">{t("contact.title")}</h2>
+          <EditableText
+            contentKey="contact.title"
+            defaultValue={t("contact.title")}
+            as="h2"
+            className="text-3xl md:text-4xl font-serif text-brand-blue mb-4"
+          />
           <div className="w-24 h-1 bg-brand-gold mx-auto" />
         </div>
 

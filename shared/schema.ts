@@ -102,6 +102,15 @@ export const blogPosts = pgTable("blog_posts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const pageContents = pgTable("page_contents", {
+  id: serial("id").primaryKey(),
+  pagePath: text("page_path").notNull(),
+  contentKey: text("content_key").notNull(),
+  contentType: text("content_type").notNull().default("text"),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
@@ -111,6 +120,7 @@ export const insertMediaSchema = createInsertSchema(media).omit({ id: true, crea
 export const insertGlobalSettingSchema = createInsertSchema(globalSettings).omit({ id: true, updatedAt: true });
 export const insertSeoSettingSchema = createInsertSchema(seoSettings).omit({ id: true, updatedAt: true });
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertPageContentSchema = createInsertSchema(pageContents).omit({ id: true, updatedAt: true });
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -129,3 +139,5 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertPageVersion = z.infer<typeof insertPageVersionSchema>;
 export type PageVersion = typeof pageVersions.$inferSelect;
+export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
+export type PageContent = typeof pageContents.$inferSelect;

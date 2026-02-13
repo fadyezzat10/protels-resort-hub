@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import EditableText from "@/components/EditableText";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Building2 } from "lucide-react";
@@ -60,17 +61,26 @@ export default function Blog() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-brand-gold text-xs font-bold tracking-widest uppercase mb-4 block">
-              {isAr ? "مدونة" : "Blog"}
-            </span>
-            <h1 className="text-4xl md:text-6xl font-serif text-white mb-6">
-              {isAr ? "أخبار ومقالات" : "News & Articles"}
-            </h1>
-            <p className="text-white/80 text-lg max-w-2xl mx-auto font-light">
-              {isAr
+            <EditableText
+              contentKey="blog.hero.label"
+              defaultValue={isAr ? "مدونة" : "Blog"}
+              as="span"
+              className="text-brand-gold text-xs font-bold tracking-widest uppercase mb-4 block"
+            />
+            <EditableText
+              contentKey="blog.hero.title"
+              defaultValue={isAr ? "أخبار ومقالات" : "News & Articles"}
+              as="h1"
+              className="text-4xl md:text-6xl font-serif text-white mb-6"
+            />
+            <EditableText
+              contentKey="blog.hero.desc"
+              defaultValue={isAr
                 ? "اكتشف أحدث الأخبار والنصائح حول وجهاتنا ومنتجعاتنا الفاخرة"
                 : "Discover the latest news, travel tips, and stories from our luxury resorts"}
-            </p>
+              as="p"
+              className="text-white/80 text-lg max-w-2xl mx-auto font-light"
+            />
           </motion.div>
         </div>
       </section>
