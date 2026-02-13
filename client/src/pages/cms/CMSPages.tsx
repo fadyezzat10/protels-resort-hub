@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, LayoutDashboard } from "lucide-react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -64,6 +65,7 @@ const emptyForm: PageForm = {
 
 export default function CMSPages() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -212,6 +214,15 @@ export default function CMSPages() {
                     {page.updatedAt ? new Date(page.updatedAt).toLocaleDateString() : "—"}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
+                    <Button
+                      data-testid={`button-builder-page-${page.id}`}
+                      variant="ghost"
+                      size="sm"
+                      title="Open Page Builder"
+                      onClick={() => setLocation(`/controlpanal/builder/${page.slug}`)}
+                    >
+                      <LayoutDashboard className="w-4 h-4 text-blue-500" />
+                    </Button>
                     <Button
                       data-testid={`button-edit-page-${page.id}`}
                       variant="ghost"

@@ -6,9 +6,10 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { pool } from "./db";
+import { pool, db } from "./db";
 import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
-import { insertBlogPostSchema } from "@shared/schema";
+import { insertBlogPostSchema, pageVersions } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { findRuleBasedResponse, detectArabicText } from "@shared/chatResponses";
 import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
@@ -499,7 +500,103 @@ export async function registerRoutes(
     }
   });
 
+  // ──────── PAGE BUILDER ────────
+  app.get("/api/cms/pages/:id/builder", requireAuth, async (req, res) => {
+    try {
+      const page = await storage.getPage(Number(req.params.id));
+      if (!page) return res.status(404).json({ message: "Not found" });
+      res.json({ page, builderDraft: page.builderDraft || { sections: [] } });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/cms/pages/:id/builder", requireAuth, async (req, res) => {
+    try {
+      const { sections } = req.body;
+      if (!sections) return res.status(400).json({ message: "sections is required" });
+      const page = await storage.updatePage(Number(req.params.id), {
+        builderDraft: { sections } as any,
+        builderEnabled: true,
+      } as any);
+      if (!page) return res.status(404).json({ message: "Not found" });
+      res.json(page);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.post("/api/cms/pages/:id/builder/publish", requireAuth, async (req, res) => {
+    try {
+      const pageId = Number(req.params.id);
+      const page = await storage.getPage(pageId);
+      if (!page) return res.status(404).json({ message: "Not found" });
+      if (!page.builderDraft) return res.status(400).json({ message: "No builder draft to publish" });
+
+      const updatedPage = await storage.updatePage(pageId, {
+        builderPublished: page.builderDraft,
+        status: "published",
+      });
+
+      const existingVersions = await storage.getPageVersions(pageId);
+      const nextVersionNumber = existingVersions.length > 0
+        ? Math.max(...existingVersions.map(v => v.versionNumber)) + 1
+        : 1;
+
+      const version = await storage.createPageVersion({
+        pageId,
+        versionNumber: nextVersionNumber,
+        sections: page.builderDraft.sections || [],
+        status: "published",
+        createdBy: req.session.username || null,
+      });
+
+      res.json({ page: updatedPage, version });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.get("/api/cms/pages/:id/versions", requireAuth, async (req, res) => {
+    try {
+      const versions = await storage.getPageVersions(Number(req.params.id));
+      res.json(versions);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.post("/api/cms/pages/:id/versions/:versionId/restore", requireAuth, async (req, res) => {
+    try {
+      const pageId = Number(req.params.id);
+      const versionId = Number(req.params.versionId);
+
+      const [version] = await db.select().from(pageVersions).where(eq(pageVersions.id, versionId));
+      if (!version) return res.status(404).json({ message: "Version not found" });
+
+      const page = await storage.updatePage(pageId, {
+        builderDraft: { sections: version.sections },
+      } as any);
+      if (!page) return res.status(404).json({ message: "Page not found" });
+      res.json(page);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // ──────── PUBLIC API (for website consumption) ────────
+  app.get("/api/public/pages/:slug/builder", async (req, res) => {
+    try {
+      const page = await storage.getPageBySlug(req.params.slug);
+      if (!page || !page.builderEnabled || !page.builderPublished) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      res.json({ sections: page.builderPublished.sections });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   app.get("/api/public/pages/:slug", async (req, res) => {
     const page = await storage.getPageBySlug(req.params.slug);
     if (!page || page.status !== "published") return res.status(404).json({ message: "Not found" });

@@ -1,0 +1,236 @@
+We want to build a Professional Visual Page Builder inside the CMS only.
+
+⚠️ CRITICAL:
+
+Do NOT modify public website UI.
+
+Do NOT break routing.
+
+Do NOT change existing layout components.
+
+Builder must exist ONLY inside /controlpanel.
+
+🎯 GOAL
+
+Create a Webflow-style Visual Editor that allows:
+
+Editing ALL pages
+
+Drag & Drop sections
+
+Edit text inline
+
+Change images
+
+Adjust styles
+
+Reorder sections
+
+Hide / Show sections
+
+Save / Publish
+
+Live reflection on public site
+
+WITHOUT breaking structure or SEO.
+
+🏗 ARCHITECTURE REQUIREMENTS
+1️⃣ All Pages Must Be Dynamic
+
+Convert page content rendering to JSON-based structure.
+
+Each page should load from database like:
+
+{
+  slug: "company-profile",
+  sections: [
+    {
+      id: "hero",
+      type: "hero",
+      content: { title: "...", subtitle: "..." },
+      styles: { backgroundColor: "#0c1c2c", paddingTop: "100px" }
+    }
+  ]
+}
+
+
+Frontend must render dynamically from this structure.
+
+2️⃣ Create Visual Builder UI in CMS
+
+Inside /controlpanel/pages/[slug]/builder
+
+Layout:
+
+LEFT: Sections list
+CENTER: Live Canvas Preview
+RIGHT: Settings Panel
+
+3️⃣ Builder Capabilities
+Section Controls:
+
+Add Section
+
+Delete Section
+
+Duplicate Section
+
+Drag & Drop reorder
+
+Toggle visibility
+
+Content Editing:
+
+Click any text → inline edit
+
+Change:
+
+Font family
+
+Font size
+
+Letter spacing
+
+Line height
+
+Color
+
+Alignment
+
+Image Editing:
+
+Replace image
+
+Upload from Media Library
+
+Border radius
+
+Overlay
+
+Brightness
+
+Background Control:
+
+Solid color
+
+Gradient
+
+Background image
+
+Overlay opacity
+
+Layout Control:
+
+Padding
+
+Margin
+
+Width
+
+Max width
+
+Alignment
+
+4️⃣ Component System (Important)
+
+Do NOT allow raw HTML editing.
+
+Use predefined Section Types:
+
+Hero
+
+Text Block
+
+Image + Text
+
+Gallery
+
+Rooms Section
+
+CTA Section
+
+Testimonials
+
+Contact Section
+
+Custom Section
+
+Each type has schema validation.
+
+5️⃣ Save System
+
+Implement:
+
+Draft Mode
+
+Published Mode
+
+Version History
+
+Revert to Previous Version
+
+Auto-save (optional)
+
+Public site only renders Published version.
+
+6️⃣ Security
+
+Builder only accessible to authenticated admin.
+
+No builder scripts loaded on public site.
+
+No performance impact on frontend.
+
+7️⃣ Performance
+
+Use lazy rendering.
+
+Do not re-render entire page on small edits.
+
+Use state management (Zustand or Context).
+
+Memoize sections.
+
+8️⃣ SEO Safety
+
+Do not allow breaking heading structure.
+
+Always keep one H1 per page.
+
+Keep semantic structure intact.
+
+9️⃣ Styling Engine
+
+Create dynamic style generator:
+
+Convert JSON styles into inline styles or scoped CSS.
+
+Avoid global CSS override.
+
+Scope styles per section.
+
+🎯 FINAL RESULT
+
+Admin logs in →
+Open any page →
+Edit visually →
+Drag sections →
+Change fonts/colors/images →
+Save → Publish →
+Website updates instantly.
+
+WITHOUT affecting public stability.
+
+🔒 Important
+
+Do NOT:
+
+Convert to full HTML builder.
+
+Allow arbitrary code injection.
+
+Modify routing logic.
+
+Break current UI system.
+
+If anything is unclear, explain the technical implementation plan before coding.

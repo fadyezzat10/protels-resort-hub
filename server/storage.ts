@@ -1,7 +1,8 @@
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import {
-  users, pages, hotels, media, globalSettings, seoSettings, blogPosts,
+  users, pages, hotels, media, globalSettings, seoSettings, blogPosts, pageVersions,
   type User, type InsertUser,
   type Page, type InsertPage,
   type Hotel, type InsertHotel,
@@ -9,6 +10,7 @@ import {
   type GlobalSetting, type InsertGlobalSetting,
   type SeoSetting, type InsertSeoSetting,
   type BlogPost, type InsertBlogPost,
+  type PageVersion, type InsertPageVersion,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -61,6 +63,10 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: number, data: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
   deleteBlogPost(id: number): Promise<void>;
+
+  // Page Versions
+  getPageVersions(pageId: number): Promise<PageVersion[]>;
+  createPageVersion(version: InsertPageVersion): Promise<PageVersion>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -223,6 +229,17 @@ export class DatabaseStorage implements IStorage {
   }
   async deleteBlogPost(id: number) {
     await db.delete(blogPosts).where(eq(blogPosts.id, id));
+  }
+
+  // Page Versions
+  async getPageVersions(pageId: number) {
+    return db.select().from(pageVersions)
+      .where(eq(pageVersions.pageId, pageId))
+      .orderBy(desc(pageVersions.versionNumber));
+  }
+  async createPageVersion(version: InsertPageVersion) {
+    const [created] = await db.insert(pageVersions).values(version).returning();
+    return created;
   }
 }
 

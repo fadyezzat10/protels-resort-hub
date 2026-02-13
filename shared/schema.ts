@@ -19,8 +19,21 @@ export const pages = pgTable("pages", {
   metaTitle: text("meta_title"),
   metaDescription: text("meta_description"),
   status: text("status").notNull().default("draft"),
+  builderEnabled: boolean("builder_enabled").default(false),
+  builderDraft: jsonb("builder_draft").$type<any>(),
+  builderPublished: jsonb("builder_published").$type<any>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const pageVersions = pgTable("page_versions", {
+  id: serial("id").primaryKey(),
+  pageId: integer("page_id").notNull(),
+  versionNumber: integer("version_number").notNull(),
+  sections: jsonb("sections").notNull().$type<any>(),
+  status: text("status").notNull().default("draft"),
+  createdBy: text("created_by"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const hotels = pgTable("hotels", {
@@ -92,6 +105,7 @@ export const blogPosts = pgTable("blog_posts", {
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertPageVersionSchema = createInsertSchema(pageVersions).omit({ id: true, createdAt: true });
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertMediaSchema = createInsertSchema(media).omit({ id: true, createdAt: true });
 export const insertGlobalSettingSchema = createInsertSchema(globalSettings).omit({ id: true, updatedAt: true });
@@ -113,3 +127,5 @@ export type InsertSeoSetting = z.infer<typeof insertSeoSettingSchema>;
 export type SeoSetting = typeof seoSettings.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertPageVersion = z.infer<typeof insertPageVersionSchema>;
+export type PageVersion = typeof pageVersions.$inferSelect;
