@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Component, type ErrorInfo, type ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useParams, useLocation } from "wouter";
@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Undo2,
   History,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +34,69 @@ import {
   SECTION_TYPE_ICONS,
   createDefaultSection,
 } from "@/lib/builderTypes";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+class VisualEditorErrorBoundary extends Component<
+  { children: ReactNode; onReset?: () => void },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode; onReset?: () => void }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("[VisualEditor] Render error caught by ErrorBoundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h2 className="text-lg font-bold text-gray-800 mb-2">حدث خطأ في المحرر المرئي</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              {this.state.error?.message || "An unexpected error occurred in the visual editor."}
+            </p>
+            <div className="flex gap-2 justify-center">
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  this.props.onReset?.();
+                }}
+              >
+                إعادة المحاولة
+              </button>
+              <a
+                href="/controlpanal/pages"
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300"
+              >
+                العودة للصفحات
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function safeSection(section: any): BuilderSection {
+  return {
+    id: section?.id || Math.random().toString(36).substring(2, 10),
+    type: section?.type || "custom",
+    label: section?.label || "Section",
+    hidden: !!section?.hidden,
+    content: section?.content || {},
+    styles: section?.styles || { paddingTop: "60px", paddingBottom: "60px", backgroundColor: "#ffffff" },
+  };
+}
 
 function hexToRgba(hex: string, alpha: number): string {
   const c = hex.replace("#", "");
@@ -747,20 +809,39 @@ export default function VisualEditor() {
     }
   }, [pagesData, params.slug]);
 
-  const { data: builderData } = useQuery({
+  const { data: builderData, isLoading: isBuilderLoading } = useQuery({
     queryKey: ["/api/cms/pages", pageId, "builder"],
     queryFn: async () => {
       if (!pageId) return null;
-      const res = await fetch(`/api/cms/pages/${pageId}/builder`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load");
-      return res.json();
+      try {
+        const res = await fetch(`/api/cms/pages/${pageId}/builder`, { credentials: "include" });
+        if (!res.ok) {
+          console.error("[VisualEditor] Failed to load builder data, status:", res.status);
+          return { builderDraft: { sections: [] } };
+        }
+        return res.json();
+      } catch (err) {
+        console.error("[VisualEditor] Error fetching builder data:", err);
+        return { builderDraft: { sections: [] } };
+      }
     },
     enabled: !!pageId,
   });
 
+  const isLoading = !pagesData || (!!pageId && isBuilderLoading);
+
   useEffect(() => {
-    if (builderData?.builderDraft?.sections) {
-      setSections(builderData.builderDraft.sections);
+    try {
+      const rawSections = builderData?.builderDraft?.sections;
+      if (Array.isArray(rawSections)) {
+        setSections(rawSections.map(safeSection));
+      } else if (builderData && !rawSections) {
+        console.warn("[VisualEditor] builderData exists but no sections found, initializing empty");
+        setSections([]);
+      }
+    } catch (err) {
+      console.error("[VisualEditor] Error processing builder data:", err);
+      setSections([]);
     }
   }, [builderData]);
 
@@ -860,7 +941,39 @@ export default function VisualEditor() {
     onError: (err: Error) => toast({ title: "Error publishing", description: err.message, variant: "destructive" }),
   });
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full mx-auto mb-3" />
+          <p className="text-sm text-gray-500">جاري تحميل المحرر المرئي...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (pagesData && !pageId) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-gray-800 mb-2">الصفحة غير موجودة</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            لم يتم العثور على صفحة بالمعرف "{params.slug}" في النظام.
+          </p>
+          <a
+            href="/controlpanal/pages"
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+          >
+            العودة للصفحات
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
+    <VisualEditorErrorBoundary onReset={() => setSections([])}>
     <div className="min-h-screen bg-brand-white font-sans selection:bg-brand-gold/30">
       {/* Floating Editor Toolbar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200">
@@ -880,7 +993,6 @@ export default function VisualEditor() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Add Section */}
             <div className="relative">
               <Button
                 variant="outline"
@@ -938,8 +1050,24 @@ export default function VisualEditor() {
       {/* Spacer for fixed toolbar */}
       <div className="h-12" />
 
-      {/* Real Navbar */}
-      <Navbar />
+      {/* Self-contained Mini Navbar (no dependency on frontend components) */}
+      <div style={{ background: "linear-gradient(135deg, #0c1c2c 0%, #1a2d42 100%)", padding: "16px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "2px solid rgba(201,169,110,0.3)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "50%", border: "2px solid #c9a96e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ color: "#c9a96e", fontFamily: "'Cormorant Garamond', serif", fontSize: "16px", fontWeight: 700 }}>P</span>
+          </div>
+          <div>
+            <div style={{ color: "#fff", fontFamily: "'Cormorant Garamond', serif", fontSize: "15px", fontWeight: 700, letterSpacing: "3px", lineHeight: 1 }}>PROTELS</div>
+            <div style={{ color: "rgba(201,169,110,0.7)", fontSize: "7px", letterSpacing: "2px", fontFamily: "Montserrat, sans-serif" }}>HOTELS & RESORTS</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          {["HOME", "HOTELS", "ABOUT US", "CAREERS", "CONTACT"].map(item => (
+            <span key={item} style={{ color: "rgba(255,255,255,0.7)", fontSize: "10px", fontFamily: "Montserrat, sans-serif", letterSpacing: "1px", fontWeight: 500 }}>{item}</span>
+          ))}
+          <span style={{ background: "transparent", border: "1px solid #c9a96e", color: "#c9a96e", padding: "6px 16px", borderRadius: "2px", fontSize: "9px", fontFamily: "Montserrat, sans-serif", letterSpacing: "1px", fontWeight: 600 }}>BOOK NOW</span>
+        </div>
+      </div>
 
       {/* Page Sections */}
       <div onClick={() => setSelectedId(null)}>
@@ -947,8 +1075,8 @@ export default function VisualEditor() {
           <div className="flex items-center justify-center py-48 text-gray-400 bg-gray-50">
             <div className="text-center">
               <Plus className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-xl font-serif text-gray-500 mb-2">Empty Page</p>
-              <p className="text-sm mb-6">Click "Add Section" above to start building</p>
+              <p className="text-xl font-serif text-gray-500 mb-2">Empty Page – Click Add to start building</p>
+              <p className="text-sm mb-6">اضغط "Add Section" أعلاه لبدء بناء الصفحة</p>
               <Button variant="outline" onClick={() => setShowAddMenu(true)}>
                 <Plus className="w-4 h-4 mr-1" /> Add Your First Section
               </Button>
@@ -976,13 +1104,40 @@ export default function VisualEditor() {
         )}
       </div>
 
-      {/* Real Footer */}
-      <Footer />
+      {/* Self-contained Mini Footer (no dependency on frontend components) */}
+      <div style={{ background: "#0c1c2c", padding: "40px 48px 24px", borderTop: "2px solid #c9a96e" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "24px" }}>
+          <div>
+            <div style={{ color: "#fff", fontFamily: "'Cormorant Garamond', serif", fontSize: "18px", fontWeight: 700, letterSpacing: "3px", marginBottom: "8px" }}>PROTELS</div>
+            <div style={{ color: "rgba(201,169,110,0.6)", fontSize: "8px", letterSpacing: "2px", fontFamily: "Montserrat, sans-serif", marginBottom: "16px" }}>HOTELS & RESORTS</div>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", maxWidth: "280px", lineHeight: 1.7, fontFamily: "Montserrat, sans-serif" }}>
+              Experience the pinnacle of coastal luxury across our exclusive portfolio of premium beach resorts.
+            </p>
+          </div>
+          <div>
+            <div style={{ color: "#c9a96e", fontSize: "11px", fontWeight: 600, marginBottom: "12px", letterSpacing: "1px", fontFamily: "Montserrat, sans-serif" }}>OUR RESORTS</div>
+            {["Crystal Beach Resort", "Beach Club & SPA", "La Plage Zanzibar", "Royal Bay Resort"].map(h => (
+              <div key={h} style={{ color: "rgba(255,255,255,0.5)", fontSize: "10px", marginBottom: "6px", fontFamily: "Montserrat, sans-serif" }}>{h}</div>
+            ))}
+          </div>
+          <div>
+            <div style={{ color: "#c9a96e", fontSize: "11px", fontWeight: 600, marginBottom: "12px", letterSpacing: "1px", fontFamily: "Montserrat, sans-serif" }}>CONTACT</div>
+            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "10px", marginBottom: "6px", fontFamily: "Montserrat, sans-serif" }}>info@protels.com</div>
+            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "10px", marginBottom: "6px", fontFamily: "Montserrat, sans-serif" }}>+20 123 456 7890</div>
+          </div>
+        </div>
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "16px", textAlign: "center" }}>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "9px", fontFamily: "Montserrat, sans-serif" }}>
+            &copy; 2026 PROTELS Hotels & Resorts. All Rights Reserved.
+          </p>
+        </div>
+      </div>
 
       {/* Click outside to close add menu */}
       {showAddMenu && (
         <div className="fixed inset-0 z-40" onClick={() => setShowAddMenu(false)} />
       )}
     </div>
+    </VisualEditorErrorBoundary>
   );
 }

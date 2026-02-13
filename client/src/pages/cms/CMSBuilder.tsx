@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Component, type ErrorInfo, type ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useParams, useLocation } from "wouter";
@@ -45,6 +45,7 @@ import {
   ArrowUpDown,
   Palette,
   Maximize2,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,69 @@ import {
   TEXT_ALIGNMENTS,
 } from "@/lib/builderTypes";
 import SectionRenderer from "@/components/builder/SectionRenderer";
+
+class BuilderErrorBoundary extends Component<
+  { children: ReactNode; onReset?: () => void },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode; onReset?: () => void }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("[CMSBuilder] Render error caught by ErrorBoundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h2 className="text-lg font-bold text-gray-800 mb-2">حدث خطأ في المحرر</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              {this.state.error?.message || "An unexpected error occurred in the builder."}
+            </p>
+            <div className="flex gap-2 justify-center">
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  this.props.onReset?.();
+                }}
+              >
+                إعادة المحاولة
+              </button>
+              <a
+                href="/controlpanal/pages"
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300"
+              >
+                العودة للصفحات
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function safeSection(section: any): BuilderSection {
+  return {
+    id: section?.id || Math.random().toString(36).substring(2, 10),
+    type: section?.type || "custom",
+    label: section?.label || "Section",
+    hidden: !!section?.hidden,
+    content: section?.content || {},
+    styles: section?.styles || { paddingTop: "60px", paddingBottom: "60px", backgroundColor: "#ffffff" },
+  };
+}
 
 function SortableSectionItem({
   section,
@@ -146,16 +210,26 @@ export default function CMSBuilder() {
     }
   }, [pagesData, params.slug]);
 
-  const { data: builderData, isLoading } = useQuery({
+  const { data: builderData, isLoading: isBuilderLoading } = useQuery({
     queryKey: ["/api/cms/pages", pageId, "builder"],
     queryFn: async () => {
       if (!pageId) return null;
-      const res = await fetch(`/api/cms/pages/${pageId}/builder`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load builder");
-      return res.json();
+      try {
+        const res = await fetch(`/api/cms/pages/${pageId}/builder`, { credentials: "include" });
+        if (!res.ok) {
+          console.error("[CMSBuilder] Failed to load builder data, status:", res.status);
+          return { builderDraft: { sections: [] } };
+        }
+        return res.json();
+      } catch (err) {
+        console.error("[CMSBuilder] Error fetching builder data:", err);
+        return { builderDraft: { sections: [] } };
+      }
     },
     enabled: !!pageId,
   });
+
+  const isLoading = !pagesData || (!!pageId && isBuilderLoading);
 
   const { data: versions = [] } = useQuery<any[]>({
     queryKey: ["/api/cms/pages", pageId, "versions"],
@@ -169,8 +243,17 @@ export default function CMSBuilder() {
   });
 
   useEffect(() => {
-    if (builderData?.builderDraft?.sections) {
-      setSections(builderData.builderDraft.sections);
+    try {
+      const rawSections = builderData?.builderDraft?.sections;
+      if (Array.isArray(rawSections)) {
+        setSections(rawSections.map(safeSection));
+      } else if (builderData && !rawSections) {
+        console.warn("[CMSBuilder] builderData exists but no sections found, initializing empty");
+        setSections([]);
+      }
+    } catch (err) {
+      console.error("[CMSBuilder] Error processing builder data:", err);
+      setSections([]);
     }
   }, [builderData]);
 
@@ -336,12 +419,36 @@ export default function CMSBuilder() {
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full" />
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full mx-auto mb-3" />
+          <p className="text-sm text-gray-500">جاري تحميل المحرر...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (pagesData && !pageId) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-gray-800 mb-2">الصفحة غير موجودة</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            لم يتم العثور على صفحة بالمعرف "{params.slug}" في النظام.
+          </p>
+          <a
+            href="/controlpanal/pages"
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+          >
+            العودة للصفحات
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
+    <BuilderErrorBoundary onReset={() => setSections([])}>
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
       {/* Top Bar */}
       <div className="h-14 bg-brand-blue text-white flex items-center justify-between px-4 shrink-0 z-50">
@@ -1138,5 +1245,6 @@ export default function CMSBuilder() {
         )}
       </div>
     </div>
+    </BuilderErrorBoundary>
   );
 }
