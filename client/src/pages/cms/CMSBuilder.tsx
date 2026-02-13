@@ -524,9 +524,28 @@ export default function CMSBuilder() {
 
             {/* CENTER: Canvas Preview */}
             <div className="flex-1 overflow-auto bg-gray-200 p-6">
-              <div className="max-w-[1200px] mx-auto bg-white shadow-lg rounded-lg overflow-hidden min-h-[600px]">
+              <div className="max-w-[1200px] mx-auto bg-white shadow-xl rounded-lg overflow-hidden min-h-[600px]">
+                {/* Mini Navbar */}
+                <div style={{ background: "linear-gradient(135deg, #0c1c2c 0%, #1a2d42 100%)", padding: "12px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(201,169,110,0.3)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px solid #c9a96e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ color: "#c9a96e", fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", fontWeight: 700 }}>P</span>
+                    </div>
+                    <div>
+                      <div style={{ color: "#fff", fontFamily: "'Cormorant Garamond', serif", fontSize: "13px", fontWeight: 700, letterSpacing: "2px", lineHeight: 1 }}>PROTELS</div>
+                      <div style={{ color: "rgba(201,169,110,0.7)", fontSize: "6px", letterSpacing: "1.5px", fontFamily: "Montserrat, sans-serif" }}>HOTELS & RESORTS</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                    {["HOME", "HOTELS", "ABOUT US", "CAREERS", "CONTACT"].map(item => (
+                      <span key={item} style={{ color: "rgba(255,255,255,0.7)", fontSize: "9px", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.5px", fontWeight: 500 }}>{item}</span>
+                    ))}
+                    <span style={{ background: "transparent", border: "1px solid #c9a96e", color: "#c9a96e", padding: "4px 12px", borderRadius: "2px", fontSize: "8px", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.5px", fontWeight: 600 }}>BOOK NOW</span>
+                  </div>
+                </div>
+
                 {sections.length === 0 ? (
-                  <div className="flex items-center justify-center h-[600px] text-gray-400">
+                  <div className="flex items-center justify-center h-[500px] text-gray-400">
                     <div className="text-center">
                       <p className="text-lg mb-2">صفحة فارغة</p>
                       <p className="text-sm">أضف أقسام من اللوحة اليسرى لبدء البناء</p>
@@ -545,18 +564,49 @@ export default function CMSBuilder() {
                       onClick={() => setSelectedId(section.id)}
                     >
                       {selectedId === section.id && (
-                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10">
+                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded z-10 font-medium shadow-sm">
                           {section.label}
                         </div>
                       )}
-                      <SectionRenderer
-                        section={section}
-                        isEditing={selectedId === section.id}
-                        onContentChange={(key, value) => updateSectionContent(section.id, key, value)}
-                      />
+                      <div className={cn("group-hover:ring-1 group-hover:ring-blue-300 group-hover:ring-inset transition-all", selectedId !== section.id && "group-hover:opacity-95")}>
+                        <SectionRenderer
+                          section={section}
+                          isEditing={selectedId === section.id}
+                          onContentChange={(key, value) => updateSectionContent(section.id, key, value)}
+                        />
+                      </div>
                     </div>
                   ))
                 )}
+
+                {/* Mini Footer */}
+                <div style={{ background: "#0c1c2c", padding: "32px 40px 20px", borderTop: "2px solid #c9a96e" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "24px" }}>
+                    <div>
+                      <div style={{ color: "#fff", fontFamily: "'Cormorant Garamond', serif", fontSize: "16px", fontWeight: 700, letterSpacing: "3px", marginBottom: "8px" }}>PROTELS</div>
+                      <div style={{ color: "rgba(201,169,110,0.6)", fontSize: "7px", letterSpacing: "2px", fontFamily: "Montserrat, sans-serif", marginBottom: "12px" }}>HOTELS & RESORTS</div>
+                      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "10px", maxWidth: "250px", lineHeight: 1.6, fontFamily: "Montserrat, sans-serif" }}>
+                        Experience the pinnacle of coastal luxury across our exclusive portfolio of premium beach resorts.
+                      </p>
+                    </div>
+                    <div>
+                      <div style={{ color: "#c9a96e", fontSize: "10px", fontWeight: 600, marginBottom: "10px", letterSpacing: "1px", fontFamily: "Montserrat, sans-serif" }}>OUR RESORTS</div>
+                      {["Crystal Beach Resort", "Beach Club & SPA", "La Plage Zanzibar", "Royal Bay Resort"].map(h => (
+                        <div key={h} style={{ color: "rgba(255,255,255,0.5)", fontSize: "9px", marginBottom: "5px", fontFamily: "Montserrat, sans-serif" }}>{h}</div>
+                      ))}
+                    </div>
+                    <div>
+                      <div style={{ color: "#c9a96e", fontSize: "10px", fontWeight: 600, marginBottom: "10px", letterSpacing: "1px", fontFamily: "Montserrat, sans-serif" }}>CONTACT</div>
+                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "9px", marginBottom: "5px", fontFamily: "Montserrat, sans-serif" }}>info@protels.com</div>
+                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "9px", marginBottom: "5px", fontFamily: "Montserrat, sans-serif" }}>+20 123 456 7890</div>
+                    </div>
+                  </div>
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "12px", textAlign: "center" }}>
+                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "8px", fontFamily: "Montserrat, sans-serif" }}>
+                      &copy; 2026 PROTELS Hotels & Resorts. All Rights Reserved.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </>
