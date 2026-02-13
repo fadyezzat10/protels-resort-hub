@@ -69,11 +69,11 @@ export default function Navbar() {
             />
         </Link>
 
-        <div className="hidden lg:flex items-center gap-[30px] xl:gap-[35px]">
+        <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}
               className={cn(
-                "font-['Montserrat',sans-serif] text-[13px] xl:text-[14px] font-medium transition-colors duration-300 ease-in-out hover:text-brand-gold uppercase tracking-[1.5px] whitespace-nowrap leading-none",
+                "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
                 location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
               )}
             >
@@ -82,7 +82,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden lg:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -126,7 +126,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className={cn("lg:hidden", isScrolled ? "text-brand-blue" : "text-white")}
+          className={cn("md:hidden", isScrolled ? "text-brand-blue" : "text-white")}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X /> : <Menu />}
@@ -134,10 +134,10 @@ export default function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-t p-6 lg:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">
+        <div className="absolute top-full left-0 right-0 bg-white border-t p-6 md:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}
-              className="font-['Montserrat',sans-serif] text-brand-blue font-medium text-sm py-2 border-b border-gray-100 uppercase tracking-[1.5px] whitespace-nowrap"
+              className="text-brand-blue font-medium text-lg py-2 border-b border-gray-100 uppercase tracking-widest text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
               {t(link.label)}
