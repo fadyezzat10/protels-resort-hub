@@ -69,11 +69,11 @@ export default function Navbar() {
             />
         </Link>
 
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+        <div className="hidden lg:flex items-center gap-[30px] xl:gap-[35px]">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}
               className={cn(
-                "font-['Cormorant_Garamond',serif] text-[13px] xl:text-sm font-semibold transition-colors duration-200 hover:text-brand-gold uppercase tracking-[0.12em] whitespace-nowrap leading-none",
+                "font-['Montserrat',sans-serif] text-[13px] xl:text-[14px] font-medium transition-colors duration-300 ease-in-out hover:text-brand-gold uppercase tracking-[1.5px] whitespace-nowrap leading-none",
                 location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
               )}
             >
@@ -137,7 +137,7 @@ export default function Navbar() {
         <div className="absolute top-full left-0 right-0 bg-white border-t p-6 lg:hidden shadow-lg flex flex-col gap-4 animate-in slide-in-from-top-5">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}
-              className="font-['Cormorant_Garamond',serif] text-brand-blue font-semibold text-sm py-2 border-b border-gray-100 uppercase tracking-[0.12em] whitespace-nowrap"
+              className="font-['Montserrat',sans-serif] text-brand-blue font-medium text-sm py-2 border-b border-gray-100 uppercase tracking-[1.5px] whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               {t(link.label)}
