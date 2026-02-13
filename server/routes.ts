@@ -505,7 +505,62 @@ export async function registerRoutes(
     try {
       const page = await storage.getPage(Number(req.params.id));
       if (!page) return res.status(404).json({ message: "Not found" });
-      res.json({ page, builderDraft: page.builderDraft || { sections: [] } });
+
+      let builderDraft = page.builderDraft;
+      if (!builderDraft || !builderDraft.sections || builderDraft.sections.length === 0) {
+        const autoSections: any[] = [];
+        const titleEn = page.title?.en || page.slug;
+        const titleAr = page.title?.ar || "";
+        const contentEn = page.content?.en || "";
+        const contentAr = page.content?.ar || "";
+
+        autoSections.push({
+          id: "auto_hero_" + page.id,
+          type: "hero",
+          label: "Hero Section",
+          hidden: false,
+          content: {
+            title: titleEn,
+            titleAr: titleAr,
+            subtitle: "",
+            buttonText: "",
+            buttonLink: "",
+            backgroundImage: "",
+          },
+          styles: {
+            paddingTop: "120px",
+            paddingBottom: "80px",
+            backgroundColor: "#0c1c2c",
+            backgroundOverlay: 0.3,
+            textAlign: "center",
+          },
+        });
+
+        if (contentEn) {
+          autoSections.push({
+            id: "auto_text_" + page.id,
+            type: "text_block",
+            label: "Page Content",
+            hidden: false,
+            content: {
+              heading: titleEn,
+              headingAr: titleAr,
+              body: contentEn,
+              bodyAr: contentAr,
+              alignment: "left",
+            },
+            styles: {
+              paddingTop: "60px",
+              paddingBottom: "60px",
+              backgroundColor: "#ffffff",
+            },
+          });
+        }
+
+        builderDraft = { sections: autoSections };
+      }
+
+      res.json({ page, builderDraft });
     } catch (e: any) {
       res.status(500).json({ message: e.message });
     }
