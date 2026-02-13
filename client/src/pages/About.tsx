@@ -90,14 +90,19 @@ export default function About() {
         {/* Subtle dark gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 z-10" />
         
-        <motion.img 
-          src={aboutHeroImg} 
-          alt="Protels Luxury Aerial View"
-          className="absolute inset-0 w-full h-full object-cover"
+        <motion.div
+          className="absolute inset-0 w-full h-full"
           initial={{ scale: 1.15, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 2.5, ease: "easeOut" }}
-        />
+        >
+          <EditableImage
+            contentKey="img:about.hero.bg"
+            src={aboutHeroImg}
+            alt="Protels Luxury Aerial View"
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
         
         <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
           <motion.div 
