@@ -69,11 +69,11 @@ export default function Navbar() {
             />
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-5 lg:gap-7">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}
               className={cn(
-                "text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-widest",
+                "text-[11px] lg:text-xs font-medium transition-colors hover:text-brand-gold uppercase tracking-wider lg:tracking-widest whitespace-nowrap",
                 location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
               )}
             >
