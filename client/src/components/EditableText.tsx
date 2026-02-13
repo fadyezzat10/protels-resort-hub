@@ -1,7 +1,6 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import { useEditMode } from "@/lib/editMode";
 import { cn } from "@/lib/utils";
-import { Pencil } from "lucide-react";
 
 interface EditableTextProps {
   contentKey: string;
@@ -25,6 +24,18 @@ export default function EditableText({
   const [isEditing, setIsEditing] = useState(false);
 
   const currentValue = pageContent[contentKey] ?? defaultValue;
+  const styleKey = `style:${contentKey}`;
+  let savedStyle: Record<string, string> = {};
+  try { if (pageContent[styleKey]) savedStyle = JSON.parse(pageContent[styleKey]); } catch { }
+
+  const inlineStyle: React.CSSProperties = {};
+  if (savedStyle.fontFamily) inlineStyle.fontFamily = savedStyle.fontFamily;
+  if (savedStyle.fontSize) inlineStyle.fontSize = savedStyle.fontSize;
+  if (savedStyle.fontWeight) inlineStyle.fontWeight = savedStyle.fontWeight;
+  if (savedStyle.color) inlineStyle.color = savedStyle.color;
+  if (savedStyle.textAlign) inlineStyle.textAlign = savedStyle.textAlign as any;
+  if (savedStyle.letterSpacing) inlineStyle.letterSpacing = savedStyle.letterSpacing;
+  if (savedStyle.lineHeight) inlineStyle.lineHeight = savedStyle.lineHeight;
 
   useEffect(() => {
     if (ref.current && !isEditing) {
@@ -59,7 +70,7 @@ export default function EditableText({
 
   if (!isEditMode) {
     const Comp = Tag as any;
-    return <Comp className={className} {...rest}>{currentValue}</Comp>;
+    return <Comp className={className} style={inlineStyle} {...rest}>{currentValue}</Comp>;
   }
 
   const isSelected = selectedKey === contentKey;
@@ -75,6 +86,7 @@ export default function EditableText({
         isEditMode && !isSelected && "hover:outline hover:outline-2 hover:outline-dashed hover:outline-blue-400/60",
         isSelected && "outline outline-2 outline-blue-500 outline-offset-2"
       )}
+      style={inlineStyle}
       contentEditable={isEditMode}
       suppressContentEditableWarning
       onClick={handleClick}

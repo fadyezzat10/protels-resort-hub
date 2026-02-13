@@ -102,7 +102,7 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
     const items = Object.entries(pendingChanges).map(([contentKey, value]) => ({
       pagePath,
       contentKey,
-      contentType: contentKey.startsWith("img:") ? "image" : "text",
+      contentType: contentKey.startsWith("style:") ? "style" : contentKey.startsWith("img:") ? "image" : "text",
       value,
     }));
     if (items.length > 0) {
