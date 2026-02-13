@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useBookingLink } from "@/lib/cms";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import EditableText from "@/components/EditableText";
-import EditableImage from "@/components/EditableImage";
+import { useEditMode } from "@/lib/editMode";
+import { Camera, Loader2 } from "lucide-react";
 
 interface HeroProps {
   image?: string;
@@ -31,6 +32,9 @@ export default function Hero({
   const cmsBookingLink = useBookingLink();
   const finalBookingLink = bookingLinkProp || cmsBookingLink;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { isEditMode, pageContent, updateContent, uploadImage, setSelectedKey } = useEditMode();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const heroImages = images.length > 0 ? images : (image ? [image] : []);
 
@@ -43,6 +47,31 @@ export default function Hero({
 
     return () => clearInterval(timer);
   }, [heroImages.length]);
+
+  const imgKey = `img:${editPrefix}.bg.${currentIndex}`;
+  const currentSrc = pageContent[imgKey] ?? heroImages[currentIndex];
+
+  const handleImageClick = useCallback(() => {
+    if (isEditMode) {
+      setSelectedKey(imgKey);
+      fileRef.current?.click();
+    }
+  }, [isEditMode, imgKey, setSelectedKey]);
+
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const url = await uploadImage(file);
+      updateContent(imgKey, url);
+    } catch (err) {
+      console.error("Image upload failed:", err);
+    } finally {
+      setIsUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }, [imgKey, updateContent, uploadImage]);
 
   const getHeightClass = () => {
     switch (height) {
@@ -64,17 +93,44 @@ export default function Hero({
           exit={{ opacity: 0 }}
           transition={{ duration: 2, ease: "easeInOut" }}
         >
-          <EditableImage
-            contentKey={`${editPrefix}.bg.${currentIndex}`}
-            src={heroImages[currentIndex]}
-            alt="Luxury Resort"
+          <img 
+            src={currentSrc} 
+            alt="Luxury Resort" 
             className="w-full h-full object-cover"
           />
         </motion.div>
       </AnimatePresence>
       
-      <div className="absolute inset-0 bg-black/20 z-10" /> 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40 z-10" />
+      <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" /> 
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40 z-10 pointer-events-none" />
+
+      {isEditMode && (
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-[60]">
+          <button
+            onClick={handleImageClick}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg shadow-xl transition-all duration-200 hover:scale-105"
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="text-sm font-bold">جاري الرفع...</span>
+              </>
+            ) : (
+              <>
+                <Camera className="w-5 h-5" />
+                <span className="text-sm font-bold">تغيير صورة الخلفية</span>
+              </>
+            )}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
+      )}
 
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center container-padding pt-20">
         <motion.div

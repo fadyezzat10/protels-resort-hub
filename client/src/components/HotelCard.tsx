@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import EditableImage from "@/components/EditableImage";
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -31,21 +32,22 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
     >
       <Card className="overflow-hidden border-none shadow-lg group h-full flex flex-col rounded-none">
         <div className="relative h-64 overflow-hidden">
-          <img 
-            src={hotel.image} 
+          <EditableImage
+            contentKey={`hotel.${hotel.id}.card`}
+            src={hotel.image}
             alt={hotel.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-brand-blue uppercase tracking-wider">
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-brand-blue uppercase tracking-wider pointer-events-none">
             4 Stars
           </div>
           {hotel.id === "royal-bay" && (
-            <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-md uppercase tracking-wider z-10">
+            <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-md uppercase tracking-wider z-10 pointer-events-none">
               Coming Soon
             </div>
           )}
           {hotel.discount && hotel.id !== "royal-bay" && (
-            <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm">
+            <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm pointer-events-none">
               {hotel.discount}
             </div>
           )}

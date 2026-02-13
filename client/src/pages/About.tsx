@@ -3,10 +3,12 @@ import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
 import { useI18n } from "@/lib/i18n";
+import { useEditMode } from "@/lib/editMode";
 import { useCMSPage } from "@/lib/cms";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Anchor, Sun, Heart } from "lucide-react";
+import { ArrowRight, Star, Anchor, Sun, Heart, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRef, useState, useCallback } from "react";
 
 // Images
 import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.png";
@@ -18,6 +20,34 @@ import aboutHeroImg from "@/assets/images/about-hero-aerial.jpg";
 export default function About() {
   const { t, language } = useI18n();
   const { data: cmsAbout } = useCMSPage("about");
+  const { isEditMode, pageContent, updateContent, uploadImage, setSelectedKey } = useEditMode();
+  const heroFileRef = useRef<HTMLInputElement>(null);
+  const [heroUploading, setHeroUploading] = useState(false);
+
+  const heroImgKey = "img:about.hero.bg";
+  const heroSrc = pageContent[heroImgKey] ?? aboutHeroImg;
+
+  const handleHeroImageClick = useCallback(() => {
+    if (isEditMode) {
+      setSelectedKey(heroImgKey);
+      heroFileRef.current?.click();
+    }
+  }, [isEditMode, setSelectedKey]);
+
+  const handleHeroFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setHeroUploading(true);
+    try {
+      const url = await uploadImage(file);
+      updateContent(heroImgKey, url);
+    } catch (err) {
+      console.error("Image upload failed:", err);
+    } finally {
+      setHeroUploading(false);
+      if (heroFileRef.current) heroFileRef.current.value = "";
+    }
+  }, [updateContent, uploadImage]);
 
   const cmsContent = cmsAbout?.content?.[language] || cmsAbout?.content?.en;
 
@@ -88,7 +118,7 @@ export default function About() {
       {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">
         {/* Subtle dark gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 z-10 pointer-events-none" />
         
         <motion.div
           className="absolute inset-0 w-full h-full"
@@ -96,13 +126,40 @@ export default function About() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 2.5, ease: "easeOut" }}
         >
-          <EditableImage
-            contentKey="about.hero.bg"
-            src={aboutHeroImg}
+          <img
+            src={heroSrc}
             alt="Protels Luxury Aerial View"
             className="w-full h-full object-cover"
           />
         </motion.div>
+
+        {isEditMode && (
+          <div className="absolute top-24 left-1/2 -translate-x-1/2 z-[60]">
+            <button
+              onClick={handleHeroImageClick}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg shadow-xl transition-all duration-200 hover:scale-105"
+            >
+              {heroUploading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-sm font-bold">جاري الرفع...</span>
+                </>
+              ) : (
+                <>
+                  <Camera className="w-5 h-5" />
+                  <span className="text-sm font-bold">تغيير صورة الخلفية</span>
+                </>
+              )}
+            </button>
+            <input
+              ref={heroFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleHeroFileChange}
+            />
+          </div>
+        )}
         
         <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
           <motion.div 
