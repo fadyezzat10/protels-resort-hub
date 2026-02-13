@@ -108,13 +108,39 @@ Preferred communication style: Simple, everyday language.
 ### CMS Architecture
 The CMS is a built-in admin panel accessible at `/controlpanal/*` routes. It provides:
 - Page management with multilingual content editing
-- Hotel management (CRUD with rich details)
+- Hotel management (CRUD with rich details, per-hotel theme colors, hero video, tab config)
 - Media library with file uploads
 - SEO settings per URL path
-- Global settings (GTM, favicon, etc.)
-- User management with role-based access
+- Global settings (GTM, favicon, hero video, header nav config, footer config, social links)
+- User management with role-based access (Super Admin, Content Manager, Editor, Viewer)
+- Theme customization (global colors, fonts, logo sizing with live preview)
+- Live inline editing with floating style toolbar (font, size, color, alignment for text; dimensions for images)
+- Header navigation menu reordering and visibility control
+- Footer column configuration
 
 The CMS injects dynamic metadata via `CMSHead` component (GTM scripts, SEO tags, favicon).
+
+**Key CMS Files:**
+- `client/src/pages/cms/CMSTheme.tsx` – Global theme customization (colors, fonts, logo)
+- `client/src/pages/cms/CMSUsers.tsx` – User management with role-based access
+- `client/src/pages/cms/CMSHotels.tsx` – Hotel editor with Video, Theme, Tab Config tabs
+- `client/src/pages/cms/CMSSettings.tsx` – Global settings, header nav, footer, hero video
+- `client/src/components/FloatingEditToolbar.tsx` – Inline style editor for live edit mode
+- `client/src/components/ThemeProvider.tsx` – Dynamic CSS custom properties from CMS theme
+- `client/src/components/EditableText.tsx` – ContentEditable text with style persistence
+- `client/src/components/EditableImage.tsx` – Click-to-upload image replacement
+- `client/src/lib/editMode.tsx` – Edit mode context (page content, pending changes, save)
+
+**Hotel-specific Features (DB columns):**
+- `heroVideo` (text) – MP4 URL for background video in hotel hero section
+- `theme` (JSONB) – Per-hotel color overrides (primaryColor, secondaryColor, accentColor)
+- `tabConfig` (JSONB) – Tab ordering and visibility config for hotel detail page tabs
+
+**User Roles:**
+- `super_admin` – Full CMS access including user management and settings
+- `content_manager` – Content editing (pages, hotels, blog) but no settings/users
+- `editor` – Edit existing content but cannot delete
+- `viewer` – Read-only access to CMS
 
 ## External Dependencies
 

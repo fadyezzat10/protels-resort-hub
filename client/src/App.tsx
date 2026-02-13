@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { EditModeProvider } from "@/lib/editMode";
 import AdminToolbar from "@/components/AdminToolbar";
+import FloatingEditToolbar from "@/components/FloatingEditToolbar";
 import BookingAssistant from "@/components/BookingAssistant";
 import NotFound from "@/pages/not-found";
 
@@ -174,6 +175,7 @@ function App() {
               <ScrollToTop />
               <Router />
               <AdminToolbar />
+              <FloatingEditToolbar />
               <ChatbotWrapper />
               </ThemeProvider>
             </EditModeProvider>
