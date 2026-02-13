@@ -29,6 +29,7 @@ import CMSBlog from "@/pages/cms/CMSBlog";
 import CMSCompanyProfile from "@/pages/cms/CMSCompanyProfile";
 import CMSBuilder from "@/pages/cms/CMSBuilder";
 import CompanyProfile from "@/pages/CompanyProfile";
+import BuilderPage from "@/pages/BuilderPage";
 import Blog from "@/pages/Blog";
 import BlogArticle from "@/pages/BlogArticle";
 import CMSHead from "@/components/CMSHead";
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogArticle} />
       <Route path="/company-profile" component={CompanyProfile} />
+      <Route path="/page/:slug" component={BuilderPage} />
 
       {/* Admin Routes */}
       <Route path="/admin" component={Login} />
