@@ -1,11 +1,12 @@
 import { useRef, useCallback, useState } from "react";
 import { useEditMode } from "@/lib/editMode";
 import { cn } from "@/lib/utils";
-import { Camera, Upload, Loader2 } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 
 interface EditableImageProps {
   contentKey: string;
-  defaultSrc: string;
+  defaultSrc?: string;
+  src?: string;
   alt?: string;
   className?: string;
   [key: string]: any;
@@ -14,6 +15,7 @@ interface EditableImageProps {
 export default function EditableImage({
   contentKey,
   defaultSrc,
+  src,
   alt = "",
   className,
   ...rest
@@ -22,8 +24,9 @@ export default function EditableImage({
   const fileRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const imgKey = `img:${contentKey}`;
-  const currentSrc = pageContent[imgKey] ?? defaultSrc;
+  const imgKey = contentKey.startsWith("img:") ? contentKey : `img:${contentKey}`;
+  const fallbackSrc = defaultSrc || src || "";
+  const currentSrc = pageContent[imgKey] ?? fallbackSrc;
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (isEditMode) {
@@ -57,28 +60,34 @@ export default function EditableImage({
 
   return (
     <div
-      className={cn(
-        "relative group cursor-pointer transition-all duration-200",
-        !isSelected && "hover:outline hover:outline-2 hover:outline-dashed hover:outline-blue-400/60",
-        isSelected && "outline outline-2 outline-blue-500 outline-offset-2"
-      )}
+      className="relative group cursor-pointer"
       onClick={handleClick}
       data-edit-key={imgKey}
+      style={{ position: "relative" }}
     >
       <img src={currentSrc} alt={alt} className={className} {...rest} />
-      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+      <div
+        className={cn(
+          "absolute inset-0 flex items-center justify-center transition-opacity duration-200 pointer-events-none",
+          isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        )}
+        style={{ backgroundColor: "rgba(59, 130, 246, 0.35)", zIndex: 50 }}
+      >
         {isUploading ? (
-          <div className="flex flex-col items-center gap-2 text-white">
-            <Loader2 className="w-8 h-8 animate-spin" />
-            <span className="text-sm font-medium">Uploading...</span>
+          <div className="flex flex-col items-center gap-2 bg-black/60 px-6 py-4 rounded-lg">
+            <Loader2 className="w-8 h-8 animate-spin text-white" />
+            <span className="text-sm font-medium text-white">جاري الرفع...</span>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 text-white">
-            <Camera className="w-8 h-8" />
-            <span className="text-sm font-medium">Click to replace</span>
+          <div className="flex flex-col items-center gap-2 bg-black/60 px-6 py-4 rounded-lg">
+            <Camera className="w-10 h-10 text-white" />
+            <span className="text-sm font-bold text-white">اضغط لتغيير الصورة</span>
           </div>
         )}
       </div>
+      {isSelected && (
+        <div className="absolute inset-0 pointer-events-none" style={{ outline: "3px solid #3b82f6", outlineOffset: "-3px", zIndex: 51 }} />
+      )}
       <input
         ref={fileRef}
         type="file"

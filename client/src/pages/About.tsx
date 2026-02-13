@@ -97,7 +97,7 @@ export default function About() {
           transition={{ duration: 2.5, ease: "easeOut" }}
         >
           <EditableImage
-            contentKey="img:about.hero.bg"
+            contentKey="about.hero.bg"
             src={aboutHeroImg}
             alt="Protels Luxury Aerial View"
             className="w-full h-full object-cover"

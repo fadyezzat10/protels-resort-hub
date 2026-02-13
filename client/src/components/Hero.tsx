@@ -65,7 +65,7 @@ export default function Hero({
           transition={{ duration: 2, ease: "easeInOut" }}
         >
           <EditableImage
-            contentKey={`img:${editPrefix}.bg.${currentIndex}`}
+            contentKey={`${editPrefix}.bg.${currentIndex}`}
             src={heroImages[currentIndex]}
             alt="Luxury Resort"
             className="w-full h-full object-cover"
