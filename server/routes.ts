@@ -72,8 +72,9 @@ export async function registerRoutes(
     next();
   });
 
-  await seedAdmin();
-  await seedContent();
+  Promise.all([seedAdmin(), seedContent()]).catch(err => {
+    console.error("Seed error (non-fatal):", err);
+  });
 
   registerObjectStorageRoutes(app);
 

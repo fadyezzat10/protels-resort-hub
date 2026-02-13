@@ -12,6 +12,10 @@ declare module "http" {
   }
 }
 
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use(
   express.json({
     verify: (req, _res, buf) => {
@@ -96,6 +100,6 @@ app.use((req, res, next) => {
     );
   } catch (err) {
     console.error("Failed to start server:", err);
-    process.exit(1);
+    setTimeout(() => process.exit(1), 1000);
   }
 })();
