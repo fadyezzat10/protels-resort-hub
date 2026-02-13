@@ -114,12 +114,18 @@ export default function CMSBuilder() {
   const [showVersions, setShowVersions] = useState(false);
   const [pageId, setPageId] = useState<number | null>(null);
   const [pageTitle, setPageTitle] = useState("");
-  const [pageSlug, setPageSlug] = useState("");
+  const [pageSlug] = useState(params.slug || "");
   const [hasChanges, setHasChanges] = useState(false);
   const [viewMode, setViewMode] = useState<"preview" | "edit">("preview");
 
   const { data: pagesData } = useQuery<any[]>({
     queryKey: ["/api/cms/pages"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/pages", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    retry: 1,
   });
 
   useEffect(() => {
@@ -128,7 +134,6 @@ export default function CMSBuilder() {
       if (page) {
         setPageId(page.id);
         setPageTitle(page.title?.en || page.slug);
-        setPageSlug(page.slug);
       }
     }
   }, [pagesData, params.slug]);
