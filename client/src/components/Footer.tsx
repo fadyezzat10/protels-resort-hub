@@ -21,9 +21,9 @@ export default function Footer() {
   return (
     <footer className="bg-brand-blue text-white pt-12 pb-6 border-t border-brand-gold/10">
       <div className="container-padding">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
-          <div className="space-y-6 flex flex-col items-start">
-            <img src={logoSrc} alt={siteName} className="h-auto w-48 md:w-64 max-w-full object-contain object-left mb-2" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8 items-start">
+          <div className="flex flex-col items-start gap-4">
+            <img src={logoSrc} alt={siteName} className="h-auto w-44 md:w-56 max-w-full object-contain" />
             <p className="text-white/60 text-sm leading-relaxed max-w-xs font-sans">
               {description || t("about.desc")}
             </p>
