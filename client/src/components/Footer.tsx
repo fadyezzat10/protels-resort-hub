@@ -23,7 +23,7 @@ export default function Footer() {
       <div className="container-padding">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
           <div className="space-y-6 flex flex-col">
-            <img src={logoSrc} alt={siteName} className="h-32 md:h-[8.5rem] w-auto object-contain mb-2" />
+            <img src={logoSrc} alt={siteName} className="h-auto w-48 md:w-64 max-w-full object-contain mb-2" />
             <p className="text-white/60 text-sm leading-relaxed max-w-xs font-sans">
               {description || t("about.desc")}
             </p>
