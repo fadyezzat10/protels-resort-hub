@@ -10,7 +10,7 @@ This is a luxury hotel website for **PROTELS Hotels & Resorts**, a hospitality b
 - Protels Royal Bay Resort & Spa – Hurghada, Egypt
 - Protels La Plage – Zanzibar, Tanzania
 
-The website supports **6 languages** (English, Arabic, French, German, Spanish, Russian) with RTL support for Arabic.
+The website supports **8 languages** (English, Arabic, French, German, Spanish, Russian, Polish, Czech) with RTL support for Arabic.
 
 ## User Preferences
 
@@ -36,7 +36,7 @@ Preferred communication style: Simple, everyday language.
 
 **Internationalization (i18n):**
 - Custom i18n implementation in `client/src/lib/i18n.tsx`
-- 6 languages: EN, AR, FR, DE, ES, RU
+- 8 languages: EN, AR, FR, DE, ES, RU, PL, CS
 - Arabic uses RTL layout; all others LTR
 - Translations stored as a centralized object, not in separate files
 - Language switcher in the navbar header

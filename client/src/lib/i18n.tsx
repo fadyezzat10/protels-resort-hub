@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type Language = "en" | "ar" | "fr" | "de" | "es" | "ru";
+export type Language = "en" | "ar" | "fr" | "de" | "es" | "ru" | "pl" | "cs";
 
 interface I18nContextType {
   language: Language;
@@ -221,6 +221,76 @@ export const translations: Record<Language, Record<string, any>> = {
     "hotel.dining": "Питание",
     "hotel.facilities": "Удобства",
     "hotel.reviews": "Поделитесь Своим Опытом",
+  },
+  pl: {
+    "nav.home": "Strona Główna",
+    "nav.hotels": "Hotele i Kurorty",
+    "nav.gallery": "Galeria",
+    "nav.about": "O Nas",
+    "nav.contact": "Kontakt",
+    "nav.careers": "Kariera",
+    "nav.book": "Zarezerwuj",
+    "nav.companyProfile": "Profil Firmy",
+    "hero.title": "Doświadcz Luksusu nad Morzem",
+    "hero.subtitle": "Niezapomniane chwile w Egipcie i na Zanzibarze",
+    "hero.explore": "Odkryj Nasze Kurorty",
+    "featured.title": "Nasze Destynacje",
+    "featured.subtitle": "Odkryj naszą kolekcję luksusowych kurortów plażowych",
+    "footer.rights": "Wszelkie Prawa Zastrzeżone",
+    "contact.title": "Skontaktuj się z Nami",
+    "contact.address": "Adres",
+    "contact.phone": "Telefon",
+    "contact.email": "E-mail",
+    "contact.sales": "Sprzedaż",
+    "contact.reservations": "Rezerwacje",
+    "contact.mobile": "Komórkowy",
+    "about.title": "O PROTELS",
+    "about.desc": "PROTELS Hotels & Resorts oferuje wyjątkowe połączenie luksusu, komfortu i autentycznej gościnności w najpiękniejszych nadmorskich destynacjach na świecie.",
+    "gallery.title": "Galeria Zdjęć",
+    "hotel.view": "Zobacz Hotel",
+    "hotel.rooms": "Pokoje i Apartamenty",
+    "hotel.features": "Udogodnienia Kurortu",
+    "hotel.location": "Lokalizacja",
+    "hotel.overview": "Przegląd",
+    "hotel.accommodation": "Zakwaterowanie",
+    "hotel.dining": "Gastronomia",
+    "hotel.facilities": "Obiekty",
+    "hotel.reviews": "Podziel się Doświadczeniem",
+  },
+  cs: {
+    "nav.home": "Domů",
+    "nav.hotels": "Hotely a Resorty",
+    "nav.gallery": "Galerie",
+    "nav.about": "O Nás",
+    "nav.contact": "Kontakt",
+    "nav.careers": "Kariéra",
+    "nav.book": "Rezervovat",
+    "nav.companyProfile": "Profil Společnosti",
+    "hero.title": "Zažijte Luxus u Moře",
+    "hero.subtitle": "Nezapomenutelné chvíle v Egyptě a na Zanzibaru",
+    "hero.explore": "Prozkoumejte Naše Resorty",
+    "featured.title": "Naše Destinace",
+    "featured.subtitle": "Objevte naši kolekci luxusních plážových resortů",
+    "footer.rights": "Všechna Práva Vyhrazena",
+    "contact.title": "Kontaktujte Nás",
+    "contact.address": "Adresa",
+    "contact.phone": "Telefon",
+    "contact.email": "E-mail",
+    "contact.sales": "Prodej",
+    "contact.reservations": "Rezervace",
+    "contact.mobile": "Mobil",
+    "about.title": "O PROTELS",
+    "about.desc": "PROTELS Hotels & Resorts nabízí jedinečnou kombinaci luxusu, komfortu a autentické pohostinnosti v nejkrásnějších přímořských destinacích světa.",
+    "gallery.title": "Fotogalerie",
+    "hotel.view": "Zobrazit Hotel",
+    "hotel.rooms": "Pokoje a Apartmány",
+    "hotel.features": "Vybavení Resortu",
+    "hotel.location": "Poloha",
+    "hotel.overview": "Přehled",
+    "hotel.accommodation": "Ubytování",
+    "hotel.dining": "Stravování",
+    "hotel.facilities": "Zařízení",
+    "hotel.reviews": "Podělte se o Zážitek",
   }
 };
 
@@ -228,15 +298,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
 
   const t = (key: string) => {
-    return translations[language][key] || key;
+    return translations[language][key] || translations["en"][key] || key;
   };
 
   const dir = language === "ar" ? "rtl" : "ltr";
 
-  // Update document dir when language changes
   React.useEffect(() => {
     document.documentElement.dir = dir;
-    document.documentElement.lang = language;
+    document.documentElement.lang = language === "cs" ? "cs" : language;
   }, [dir, language]);
 
   return (

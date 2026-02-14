@@ -2,10 +2,11 @@ import { Link, useLocation } from "wouter";
 import { useI18n, type Language } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { useBookingLink, useHeaderLogo, useCMSAllSettings } from "@/lib/cms";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import defaultLogo from "@assets/سش.pngش_1770193463633.png";
+import { flagComponents } from "@/components/FlagIcons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,7 +60,11 @@ export default function Navbar() {
     { code: "de", label: "Deutsch" },
     { code: "es", label: "Español" },
     { code: "ru", label: "Русский" },
+    { code: "pl", label: "Polski" },
+    { code: "cs", label: "Čeština" },
   ];
+
+  const CurrentFlag = flagComponents[language];
 
   return (
     <nav
@@ -105,25 +110,29 @@ export default function Navbar() {
                   isScrolled ? "text-brand-blue hover:bg-brand-blue/5" : "text-white"
                 )}
               >
-                <Globe className="w-4 h-4" />
+                {CurrentFlag && <CurrentFlag className="w-5 h-3.5 rounded-[2px] shadow-sm" />}
                 {language.toUpperCase()}
                 <ChevronDown className="w-3 h-3 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 bg-white/95 backdrop-blur-md border-none shadow-lg">
-              {languages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                  className={cn(
-                    "text-xs font-medium uppercase tracking-wider cursor-pointer",
-                    language === lang.code ? "bg-brand-gold/10 text-brand-gold" : "text-gray-700 hover:text-brand-blue"
-                  )}
-                >
-                  <span className="w-6">{lang.code.toUpperCase()}</span>
-                  <span className="opacity-70 ml-2 text-[10px] capitalize hidden">{lang.label}</span>
-                </DropdownMenuItem>
-              ))}
+            <DropdownMenuContent align="end" className="w-44 bg-white/95 backdrop-blur-md border-none shadow-lg p-1">
+              {languages.map((lang) => {
+                const FlagComp = flagComponents[lang.code];
+                return (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code)}
+                    className={cn(
+                      "text-xs font-medium cursor-pointer flex items-center gap-2.5 px-3 py-2",
+                      language === lang.code ? "bg-brand-gold/10 text-brand-gold" : "text-gray-700 hover:text-brand-blue"
+                    )}
+                  >
+                    {FlagComp && <FlagComp className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0" />}
+                    <span className="uppercase tracking-wider w-5">{lang.code.toUpperCase()}</span>
+                    <span className="text-[10px] opacity-60 ml-auto">{lang.label}</span>
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
           
@@ -158,24 +167,28 @@ export default function Navbar() {
           
           <div className="py-4 border-b border-gray-100">
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Language</p>
-            <div className="grid grid-cols-3 gap-2">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    setLanguage(lang.code);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={cn(
-                    "px-2 py-2 text-xs font-medium uppercase tracking-wider rounded border transition-colors",
-                    language === lang.code 
-                      ? "bg-brand-gold text-white border-brand-gold" 
-                      : "bg-gray-50 text-gray-600 border-gray-200 hover:border-brand-gold/50"
-                  )}
-                >
-                  {lang.code}
-                </button>
-              ))}
+            <div className="grid grid-cols-4 gap-2">
+              {languages.map((lang) => {
+                const FlagComp = flagComponents[lang.code];
+                return (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      "flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-medium uppercase tracking-wider rounded border transition-colors",
+                      language === lang.code 
+                        ? "bg-brand-gold text-white border-brand-gold" 
+                        : "bg-gray-50 text-gray-600 border-gray-200 hover:border-brand-gold/50"
+                    )}
+                  >
+                    {FlagComp && <FlagComp className="w-4 h-3 rounded-[1px] shrink-0" />}
+                    {lang.code}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -1,9 +1,13 @@
 import { useEffect } from "react";
 import { useCMSSetting, useCMSSeo } from "@/lib/cms";
 import { useLocation } from "wouter";
+import { useI18n } from "@/lib/i18n";
+
+const SUPPORTED_LANGS = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
 
 export default function CMSHead() {
   const [location] = useLocation();
+  const { language } = useI18n();
   const { data: gtmId } = useCMSSetting("gtm_id");
   const { data: seo } = useCMSSeo(location);
   const { data: faviconUrl } = useCMSSetting("favicon_url");
@@ -61,6 +65,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       }
     }
   }, [faviconUrl]);
+
+  useEffect(() => {
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
+    const base = window.location.origin + location;
+    SUPPORTED_LANGS.forEach((lang) => {
+      const link = document.createElement("link");
+      link.rel = "alternate";
+      link.hreflang = lang;
+      link.href = base;
+      document.head.appendChild(link);
+    });
+    const xDefault = document.createElement("link");
+    xDefault.rel = "alternate";
+    xDefault.hreflang = "x-default";
+    xDefault.href = base;
+    document.head.appendChild(xDefault);
+    return () => {
+      document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
+    };
+  }, [location, language]);
 
   return null;
 }
