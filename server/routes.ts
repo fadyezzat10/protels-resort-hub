@@ -1083,6 +1083,12 @@ CMS STRUCTURE:
 
 SUPPORTED LANGUAGES with codes: English (en), Arabic (ar), French (fr), German (de), Spanish (es), Russian (ru), Polish (pl), Czech (cs)
 
+IMAGE/SCREENSHOT ANALYSIS:
+- Users can send you screenshots and images. Analyze them carefully.
+- When a user sends a screenshot of a page, identify what they want to change and use the appropriate tools to make the changes.
+- When a user sends an image to replace something, note the image URL/content and help them update the CMS accordingly.
+- Be specific about what you see in the image — mention colors, text, layout, issues.
+
 PROACTIVE BEHAVIOR:
 - When updating content, always use tools to make changes directly — don't just suggest.
 - When translating, offer to translate to ALL missing languages if only some are filled.
@@ -1457,10 +1463,25 @@ PROACTIVE BEHAVIOR:
         return res.status(400).json({ error: "messages array is required" });
       }
 
-      const trimmedMessages = messages.slice(-30).map((m: { role: string; content: string }) => ({
-        role: m.role as "user" | "assistant",
-        content: typeof m.content === "string" ? m.content.slice(0, 2000) : "",
-      }));
+      const trimmedMessages = messages.slice(-20).map((m: { role: string; content: string | any[]; images?: string[] }) => {
+        if (m.role === "user" && m.images && m.images.length > 0) {
+          const contentParts: any[] = [];
+          if (typeof m.content === "string" && m.content.trim()) {
+            contentParts.push({ type: "text", text: m.content.slice(0, 2000) });
+          }
+          for (const img of m.images.slice(0, 5)) {
+            contentParts.push({
+              type: "image_url",
+              image_url: { url: img, detail: "high" },
+            });
+          }
+          return { role: "user" as const, content: contentParts };
+        }
+        return {
+          role: m.role as "user" | "assistant",
+          content: typeof m.content === "string" ? m.content.slice(0, 2000) : "",
+        };
+      });
 
       const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
         { role: "system", content: CMS_ASSISTANT_SYSTEM },

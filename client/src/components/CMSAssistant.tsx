@@ -1,16 +1,17 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader2, Bot, Wrench, Sparkles, Maximize2, CheckCircle2, Languages, FileText, Search, PenLine, Globe } from "lucide-react";
+import { X, Send, Loader2, Bot, Sparkles, Maximize2, CheckCircle2, Languages, FileText, Search, PenLine, Globe, ImagePlus, Trash2 } from "lucide-react";
 import { useLocation } from "wouter";
 import ReactMarkdown from "react-markdown";
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  images?: string[];
   isGreeting?: boolean;
   toolCalls?: { name: string; args: any }[];
 }
 
-const GREETING = "👋 مرحبًا! أنا مساعد CMS الذكي.\n\nأقدر أساعدك في:\n- ✍️ كتابة محتوى احترافي\n- 🌍 ترجمة لـ 8 لغات\n- ✏️ تعديل الفنادق والصفحات والمقالات\n- 📊 تحليل المحتوى واقتراح تحسينات\n- 🔍 تحسين SEO\n- 📖 شرح استخدام لوحة التحكم\n\nHi! I'm your CMS AI Assistant. I can write content, translate to 8 languages, edit hotels/pages/blog directly, audit SEO, and guide you through the CMS.\n\n**Try the quick actions below or just type your request!**";
+const GREETING = "👋 مرحبًا! أنا مساعد CMS الذكي.\n\nأقدر أساعدك في:\n- ✍️ كتابة محتوى احترافي\n- 🌍 ترجمة لـ 8 لغات\n- ✏️ تعديل الفنادق والصفحات والمقالات\n- 📸 تحليل الصور والسكرين شوت\n- 📊 تحليل المحتوى واقتراح تحسينات\n- 🔍 تحسين SEO\n- 📖 شرح استخدام لوحة التحكم\n\nHi! I'm your CMS AI Assistant. I can write content, translate, edit hotels/pages/blog, **analyze screenshots & images**, audit SEO, and guide you through the CMS.\n\n**You can attach images/screenshots using the 📸 button!**";
 
 function detectArabic(text: string): boolean {
   const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
@@ -76,6 +77,15 @@ const quickActions: QuickAction[] = [
   },
 ];
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 interface CMSAssistantProps {
   mode?: "floating" | "fullpage";
 }
@@ -84,10 +94,12 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [, setLocation] = useLocation();
 
   const scrollToBottom = useCallback(() => {
@@ -118,20 +130,87 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
     }
   }, [isOpen, mode]);
 
+  const MAX_IMAGES = 5;
+  const MAX_FILE_SIZE = 4 * 1024 * 1024;
+
+  const processImageFile = async (file: File): Promise<string | null> => {
+    if (!file.type.startsWith("image/")) return null;
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`Image too large (max 4MB). "${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)}MB`);
+      return null;
+    }
+    return await fileToBase64(file);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const remaining = MAX_IMAGES - attachedImages.length;
+    const filesToProcess = Array.from(files).slice(0, remaining);
+
+    for (const file of filesToProcess) {
+      const base64 = await processImageFile(file);
+      if (base64) setAttachedImages((prev) => [...prev, base64]);
+    }
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = (index: number) => {
+    setAttachedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (!files) return;
+
+    const remaining = MAX_IMAGES - attachedImages.length;
+    const filesToProcess = Array.from(files).slice(0, remaining);
+
+    for (const file of filesToProcess) {
+      const base64 = await processImageFile(file);
+      if (base64) setAttachedImages((prev) => [...prev, base64]);
+    }
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (!file || attachedImages.length >= MAX_IMAGES) continue;
+        const base64 = await processImageFile(file);
+        if (base64) setAttachedImages((prev) => [...prev, base64]);
+      }
+    }
+  };
+
   const sendMessage = async (overrideText?: string) => {
     const trimmed = (overrideText || input).trim();
-    if (!trimmed || isLoading) return;
+    if ((!trimmed && attachedImages.length === 0) || isLoading) return;
 
-    const userMessage: ChatMessage = { role: "user", content: trimmed };
+    const userMessage: ChatMessage = {
+      role: "user",
+      content: trimmed || (attachedImages.length > 0 ? "ما رأيك في هذه الصورة؟ / What do you see in this image?" : ""),
+      images: attachedImages.length > 0 ? [...attachedImages] : undefined,
+    };
     const allMessages = [...messages, userMessage];
     setMessages(allMessages);
-    if (!overrideText) setInput("");
-    else setInput("");
+    setInput("");
+    setAttachedImages([]);
     setIsLoading(true);
 
     const apiMessages = allMessages
       .filter((m) => !m.isGreeting)
-      .map((m) => ({ role: m.role, content: m.content }));
+      .map((m) => ({
+        role: m.role,
+        content: m.content,
+        ...(m.images && m.images.length > 0 ? { images: m.images } : {}),
+      }));
 
     try {
       const response = await fetch("/api/cms-assistant", {
@@ -231,9 +310,90 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
 
   const clearChat = () => {
     setMessages([{ role: "assistant", content: GREETING, isGreeting: true }]);
+    setAttachedImages([]);
   };
 
   const showQuickActions = messages.length <= 1;
+
+  const ImagePreviewBar = () => {
+    if (attachedImages.length === 0) return null;
+    return (
+      <div className="flex gap-2 px-3 py-2 bg-gray-50 border-b border-gray-100 overflow-x-auto">
+        {attachedImages.map((img, i) => (
+          <div key={i} className="relative group shrink-0">
+            <img
+              src={img}
+              alt={`Attached ${i + 1}`}
+              className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+            />
+            <button
+              onClick={() => removeImage(i)}
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        ))}
+        <span className="text-[10px] text-gray-400 self-center shrink-0">
+          {attachedImages.length}/5
+        </span>
+      </div>
+    );
+  };
+
+  const InputArea = ({ compact }: { compact?: boolean }) => (
+    <div
+      className={compact ? "border-t border-gray-100 p-3 shrink-0" : "border-t border-gray-200 p-4 shrink-0"}
+      onDrop={handleDrop}
+      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+    >
+      <ImagePreviewBar />
+      <div className="flex gap-2 items-end">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleImageUpload}
+        />
+        <button
+          data-testid={compact ? "button-attach-floating" : "button-attach-fullpage"}
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isLoading || attachedImages.length >= 5}
+          title="Attach image / ارفق صورة"
+          className={compact ? "p-1.5 text-gray-400 hover:text-brand-gold disabled:opacity-30 transition-colors rounded-lg hover:bg-gray-50" : "p-2 text-gray-400 hover:text-brand-gold disabled:opacity-30 transition-colors rounded-lg hover:bg-gray-50"}
+        >
+          <ImagePlus className={compact ? "w-4 h-4" : "w-5 h-5"} />
+        </button>
+        <textarea
+          data-testid={compact ? "input-cms-assistant-floating" : "input-cms-assistant-fullpage"}
+          ref={compact ? undefined : inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          placeholder="اكتب طلبك هنا... / Type your request... (Ctrl+V to paste screenshot)"
+          rows={compact ? 1 : 2}
+          className={compact ? "flex-1 resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold" : "flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold"}
+          disabled={isLoading}
+        />
+        <button
+          data-testid={compact ? "button-send-floating" : "button-send-fullpage"}
+          onClick={() => sendMessage()}
+          disabled={(!input.trim() && attachedImages.length === 0) || isLoading}
+          className={compact ? "self-end p-2 bg-brand-gold text-white rounded-lg hover:bg-brand-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" : "self-end px-4 py-2.5 bg-brand-gold text-white rounded-lg hover:bg-brand-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"}
+        >
+          <Send className="w-4 h-4" />
+        </button>
+      </div>
+      {!compact && (
+        <p className="text-[10px] text-gray-400 mt-2 text-center">
+          Powered by GPT-4o Vision · Drag & drop or paste images · Can directly edit CMS content
+        </p>
+      )}
+    </div>
+  );
 
   if (mode === "fullpage") {
     return (
@@ -245,7 +405,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
             </div>
             <div>
               <h2 className="font-serif text-lg font-semibold">CMS AI Assistant</h2>
-              <p className="text-white/60 text-xs">Content writing, translation, editing & CMS guidance</p>
+              <p className="text-white/60 text-xs">Content writing, translation, editing, image analysis & CMS guidance</p>
             </div>
           </div>
           <button
@@ -290,32 +450,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="border-t border-gray-200 p-4 shrink-0">
-          <div className="flex gap-2">
-            <textarea
-              data-testid="input-cms-assistant-fullpage"
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="اكتب طلبك هنا... / Type your request..."
-              rows={2}
-              className="flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold"
-              disabled={isLoading}
-            />
-            <button
-              data-testid="button-send-fullpage"
-              onClick={() => sendMessage()}
-              disabled={!input.trim() || isLoading}
-              className="self-end px-4 py-2.5 bg-brand-gold text-white rounded-lg hover:bg-brand-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2 text-center">
-            Powered by GPT-4o · Can directly edit CMS content · Always review changes
-          </p>
-        </div>
+        <InputArea />
       </div>
     );
   }
@@ -341,7 +476,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
               </div>
               <div>
                 <h3 className="font-serif text-sm font-semibold">CMS AI Assistant</h3>
-                <p className="text-white/50 text-[10px]">GPT-4o · Content & CMS</p>
+                <p className="text-white/50 text-[10px]">GPT-4o Vision · Content & CMS</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -398,29 +533,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-gray-100 p-3 shrink-0">
-            <div className="flex gap-2">
-              <textarea
-                data-testid="input-cms-assistant-floating"
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="اكتب سؤالك هنا... / Type here..."
-                rows={1}
-                className="flex-1 resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold"
-                disabled={isLoading}
-              />
-              <button
-                data-testid="button-send-floating"
-                onClick={() => sendMessage()}
-                disabled={!input.trim() || isLoading}
-                className="self-end p-2 bg-brand-gold text-white rounded-lg hover:bg-brand-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+          <InputArea compact />
         </div>
       )}
     </>
@@ -459,6 +572,20 @@ function MessageBubble({ message, compact }: { message: ChatMessage; compact?: b
             })}
           </div>
         )}
+
+        {message.images && message.images.length > 0 && (
+          <div className={`flex gap-1.5 flex-wrap mb-2 ${message.images.length > 2 ? "max-h-32" : ""}`}>
+            {message.images.map((img, i) => (
+              <img
+                key={i}
+                src={img}
+                alt={`Attached ${i + 1}`}
+                className={`${compact ? "w-20 h-20" : "w-28 h-28"} object-cover rounded-lg border ${isUser ? "border-white/20" : "border-gray-200"}`}
+              />
+            ))}
+          </div>
+        )}
+
         {isUser ? (
           <div className={`${compact ? "text-xs" : "text-sm"} leading-relaxed whitespace-pre-wrap`}>
             {message.content}

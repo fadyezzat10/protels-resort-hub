@@ -138,9 +138,10 @@ The CMS injects dynamic metadata via `CMSHead` component (GTM scripts, SEO tags,
 
 **CMS AI Assistant:**
 - Floating bubble chat on all CMS pages + full page at `/controlpanal/ai-assistant`
-- Backend: `POST /api/cms-assistant` (auth required, streaming SSE, OpenAI gpt-4o-mini with function calling)
+- Backend: `POST /api/cms-assistant` (auth required, streaming SSE, OpenAI gpt-4o with function calling + vision)
 - Capabilities: Content writing, translation (8 languages), direct CMS editing (hotels, pages, blog, settings, SEO), CMS usage guidance
-- Function calling tools: update_hotel, update_setting, update_page_content, update_page, update_blog_post, update_seo, get_hotels, get_pages, get_settings, get_blog_posts, translate_text
+- **Image/Screenshot Support:** Users can attach images (up to 5, max 4MB each) via file picker, drag & drop, or Ctrl+V paste. Images sent as base64 data URLs and processed via GPT-4o Vision.
+- Function calling tools: update_hotel, update_setting, update_page_content, update_page, update_blog_post, update_seo, get_hotels, get_pages, get_settings, get_blog_posts, get_seo_settings, get_page_contents, translate_text, create_page, create_blog_post, bulk_translate_hotel
 - Component: `client/src/components/CMSAssistant.tsx` (shared between floating and fullpage modes)
 - Full page: `client/src/pages/cms/CMSAIAssistant.tsx`
 
