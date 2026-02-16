@@ -117,6 +117,15 @@ export const pageContents = pgTable("page_contents", {
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
+export const chatConversations = pgTable("chat_conversations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  messages: jsonb("messages").notNull().$type<any[]>().default(sql`'[]'::jsonb`),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertChatConversationSchema = createInsertSchema(chatConversations).omit({ id: true, updatedAt: true });
+
 export const insertPageVersionSchema = createInsertSchema(pageVersions).omit({ id: true, createdAt: true });
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertMediaSchema = createInsertSchema(media).omit({ id: true, createdAt: true });
@@ -144,3 +153,5 @@ export type InsertPageVersion = z.infer<typeof insertPageVersionSchema>;
 export type PageVersion = typeof pageVersions.$inferSelect;
 export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
 export type PageContent = typeof pageContents.$inferSelect;
+export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
+export type ChatConversation = typeof chatConversations.$inferSelect;

@@ -1472,6 +1472,40 @@ PROACTIVE BEHAVIOR:
     }
   }
 
+  app.get("/api/chat-history", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.session as any).userId;
+      const conv = await storage.getChatConversation(userId);
+      res.json({ messages: conv?.messages || [] });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post("/api/chat-history", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.session as any).userId;
+      const { messages } = req.body;
+      if (!Array.isArray(messages)) {
+        return res.status(400).json({ error: "messages array required" });
+      }
+      await storage.saveChatConversation(userId, messages);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.delete("/api/chat-history", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.session as any).userId;
+      await storage.clearChatConversation(userId);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   app.post("/api/cms-assistant", requireAuth, async (req, res) => {
     try {
       const { messages } = req.body;

@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { desc } from "drizzle-orm";
 import { and } from "drizzle-orm";
 import {
-  users, pages, hotels, media, globalSettings, seoSettings, blogPosts, pageVersions, pageContents,
+  users, pages, hotels, media, globalSettings, seoSettings, blogPosts, pageVersions, pageContents, chatConversations,
   type User, type InsertUser,
   type Page, type InsertPage,
   type Hotel, type InsertHotel,
@@ -13,6 +13,7 @@ import {
   type BlogPost, type InsertBlogPost,
   type PageVersion, type InsertPageVersion,
   type PageContent, type InsertPageContent,
+  type ChatConversation,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -75,6 +76,11 @@ export interface IStorage {
   getAllPageContents(): Promise<PageContent[]>;
   upsertPageContent(pagePath: string, contentKey: string, contentType: string, value: string): Promise<PageContent>;
   deletePageContent(id: number): Promise<void>;
+
+  // Chat Conversations
+  getChatConversation(userId: number): Promise<ChatConversation | undefined>;
+  saveChatConversation(userId: number, messages: any[]): Promise<ChatConversation>;
+  clearChatConversation(userId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -272,6 +278,26 @@ export class DatabaseStorage implements IStorage {
   }
   async deletePageContent(id: number) {
     await db.delete(pageContents).where(eq(pageContents.id, id));
+  }
+
+  async getChatConversation(userId: number) {
+    const [conv] = await db.select().from(chatConversations).where(eq(chatConversations.userId, userId));
+    return conv;
+  }
+  async saveChatConversation(userId: number, messages: any[]) {
+    const existing = await this.getChatConversation(userId);
+    if (existing) {
+      const [updated] = await db.update(chatConversations)
+        .set({ messages, updatedAt: new Date() })
+        .where(eq(chatConversations.id, existing.id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(chatConversations).values({ userId, messages }).returning();
+    return created;
+  }
+  async clearChatConversation(userId: number) {
+    await db.delete(chatConversations).where(eq(chatConversations.userId, userId));
   }
 }
 

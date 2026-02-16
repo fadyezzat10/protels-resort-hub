@@ -97,10 +97,50 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [, setLocation] = useLocation();
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const saveChatHistory = useCallback((msgs: ChatMessage[]) => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      const toSave = msgs.filter(m => !m.isGreeting).map(m => ({
+        role: m.role,
+        content: m.content,
+        ...(m.toolCalls ? { toolCalls: m.toolCalls } : {}),
+      }));
+      fetch("/api/chat-history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ messages: toSave }),
+      }).catch(() => {});
+    }, 1000);
+  }, []);
+
+  const loadChatHistory = useCallback(async () => {
+    try {
+      const res = await fetch("/api/chat-history", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.messages && data.messages.length > 0) {
+          const greeting: ChatMessage = { role: "assistant", content: GREETING, isGreeting: true };
+          const loaded: ChatMessage[] = data.messages.map((m: any) => ({
+            role: m.role,
+            content: m.content,
+            toolCalls: m.toolCalls,
+          }));
+          setMessages([greeting, ...loaded]);
+          setHasGreeted(true);
+          return true;
+        }
+      }
+    } catch {}
+    return false;
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -111,18 +151,16 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    if (mode === "fullpage" && !hasGreeted) {
-      setMessages([{ role: "assistant", content: GREETING, isGreeting: true }]);
-      setHasGreeted(true);
+    if ((mode === "fullpage" || isOpen) && !historyLoaded) {
+      setHistoryLoaded(true);
+      loadChatHistory().then(hadHistory => {
+        if (!hadHistory && !hasGreeted) {
+          setMessages([{ role: "assistant", content: GREETING, isGreeting: true }]);
+          setHasGreeted(true);
+        }
+      });
     }
-  }, [mode, hasGreeted]);
-
-  useEffect(() => {
-    if (isOpen && !hasGreeted) {
-      setMessages([{ role: "assistant", content: GREETING, isGreeting: true }]);
-      setHasGreeted(true);
-    }
-  }, [isOpen, hasGreeted]);
+  }, [mode, isOpen, historyLoaded, hasGreeted, loadChatHistory]);
 
   useEffect(() => {
     if ((isOpen || mode === "fullpage") && inputRef.current) {
@@ -307,6 +345,10 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
       ]);
     } finally {
       setIsLoading(false);
+      setMessages(prev => {
+        saveChatHistory(prev);
+        return prev;
+      });
     }
   };
 
@@ -320,6 +362,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   const clearChat = () => {
     setMessages([{ role: "assistant", content: GREETING, isGreeting: true }]);
     setAttachedImages([]);
+    fetch("/api/chat-history", { method: "DELETE", credentials: "include" }).catch(() => {});
   };
 
   const showQuickActions = messages.length <= 1;
