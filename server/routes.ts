@@ -1044,5 +1044,349 @@ Help guests feel confident, informed, and ready to book by clicking "Book Now".`
     }
   });
 
+  // ──────── CMS AI ASSISTANT ────────
+  const CMS_ASSISTANT_SYSTEM = `You are the PROTELS CMS AI Assistant — an intelligent content management helper for the PROTELS Hotels & Resorts website.
+
+You help CMS administrators with:
+1. **Content Writing** — Write professional hotel descriptions, page content, blog articles in any of the 8 supported languages (EN, AR, FR, DE, ES, RU, PL, CS).
+2. **Translation** — Translate content between languages while maintaining luxury hospitality tone.
+3. **CMS Guidance** — Explain how to use the CMS features (pages, hotels, blog, media, SEO, settings, theme, users).
+4. **Direct Content Editing** — When asked, use tools to directly update content in the CMS.
+
+LANGUAGE RULE:
+- Respond in the same language the user writes in.
+- Arabic input → Arabic reply. English → English. etc.
+
+TONE: Professional, knowledgeable, luxury hospitality brand voice. Concise but thorough.
+
+CMS STRUCTURE:
+- Dashboard: Overview stats at /controlpanal/dashboard
+- Pages: Create/edit CMS pages with multilingual content (title & content as JSON with language keys)
+- Hotels: Manage 4 properties — Crystal Beach (Marsa Alam), Beach Club & Spa (Marsa Alam), Royal Bay (Hurghada), La Plage (Zanzibar). Each has description (multilingual JSONB), features, rooms, dining, gallery, map links, hero video, theme colors, tab config.
+- Blog: Articles with multilingual title/content/excerpt, SEO fields, featured images
+- Media Library: Upload images/files
+- SEO: Per-page meta titles, descriptions, OG tags, robots, canonical URLs
+- Settings: GTM, favicon, site name, contact info, social links, hero settings, header/footer config
+- Theme: Global colors (primary, secondary, accent, background, text), fonts, logo sizing
+- Users: Role-based access (super_admin, content_manager, editor, viewer)
+
+SUPPORTED LANGUAGES: English (en), Arabic (ar), French (fr), German (de), Spanish (es), Russian (ru), Polish (pl), Czech (cs)
+
+When users ask to update content, use the available tools. Always confirm what you did after making changes.`;
+
+  const cmsAssistantTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+    {
+      type: "function",
+      function: {
+        name: "update_hotel",
+        description: "Update a hotel's data. Can update description (multilingual), features, rooms, dining, gallery, mapLink, heroVideo, theme, tabConfig, or status.",
+        parameters: {
+          type: "object",
+          properties: {
+            hotel_slug: { type: "string", description: "Hotel slug: crystal-beach, beach-club, la-plage, or royal-bay" },
+            updates: {
+              type: "object",
+              description: "Fields to update. For description, use {\"en\": \"...\", \"ar\": \"...\", ...} format. For features, use string array.",
+              additionalProperties: true,
+            },
+          },
+          required: ["hotel_slug", "updates"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "update_setting",
+        description: "Update a global CMS setting. Keys include: site_name, contact_email, contact_phone, contact_address, hero_title (JSONB), hero_subtitle (JSONB), hero_images, booking_link, header_logo, footer_description (JSONB), social_links (JSONB), gtm_id, favicon_url.",
+        parameters: {
+          type: "object",
+          properties: {
+            key: { type: "string", description: "Setting key" },
+            value: { description: "Setting value (string or JSON object)" },
+          },
+          required: ["key", "value"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "update_page_content",
+        description: "Update live page content. Used for inline-editable text on the website. The contentKey format is typically the element identifier, and pagePath includes language suffix like /__en, /__ar.",
+        parameters: {
+          type: "object",
+          properties: {
+            pagePath: { type: "string", description: "Page path with language, e.g. /__en, /hotels__ar" },
+            contentKey: { type: "string", description: "Content key identifier" },
+            value: { type: "string", description: "New content value (can include HTML)" },
+          },
+          required: ["pagePath", "contentKey", "value"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "update_page",
+        description: "Update a CMS page's title or content. Title and content are multilingual JSONB objects.",
+        parameters: {
+          type: "object",
+          properties: {
+            page_id: { type: "number", description: "Page ID" },
+            updates: {
+              type: "object",
+              properties: {
+                title: { type: "object", description: "Multilingual title {\"en\": \"...\", \"ar\": \"...\", ...}" },
+                content: { type: "object", description: "Multilingual content {\"en\": \"...\", \"ar\": \"...\", ...}" },
+                status: { type: "string", enum: ["draft", "published"] },
+              },
+            },
+          },
+          required: ["page_id", "updates"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "update_blog_post",
+        description: "Update a blog post. Title, content, excerpt are multilingual JSONB.",
+        parameters: {
+          type: "object",
+          properties: {
+            post_id: { type: "number", description: "Blog post ID" },
+            updates: {
+              type: "object",
+              additionalProperties: true,
+              description: "Fields to update: title, content, excerpt (JSONB), status, slug, featuredImage, metaTitle, metaDescription",
+            },
+          },
+          required: ["post_id", "updates"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "update_seo",
+        description: "Update SEO settings for a specific page path.",
+        parameters: {
+          type: "object",
+          properties: {
+            pagePath: { type: "string", description: "Page path like /, /hotels, /about" },
+            metaTitle: { type: "string" },
+            metaDescription: { type: "string" },
+            ogTitle: { type: "string" },
+            ogDescription: { type: "string" },
+            ogImage: { type: "string" },
+            robots: { type: "string" },
+            canonicalUrl: { type: "string" },
+          },
+          required: ["pagePath"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_hotels",
+        description: "Get all hotels data to review current content before making changes.",
+        parameters: { type: "object", properties: {} },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_pages",
+        description: "Get all CMS pages to review current content.",
+        parameters: { type: "object", properties: {} },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_settings",
+        description: "Get all global CMS settings.",
+        parameters: { type: "object", properties: {} },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_blog_posts",
+        description: "Get all blog posts to review.",
+        parameters: { type: "object", properties: {} },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "translate_text",
+        description: "Translate given text to a target language while maintaining luxury hospitality tone.",
+        parameters: {
+          type: "object",
+          properties: {
+            text: { type: "string", description: "Text to translate" },
+            targetLanguage: { type: "string", description: "Target language code: en, ar, fr, de, es, ru, pl, cs" },
+            context: { type: "string", description: "Context hint: hotel_description, page_content, blog, marketing" },
+          },
+          required: ["text", "targetLanguage"],
+        },
+      },
+    },
+  ];
+
+  async function executeCmsToolCall(name: string, args: any): Promise<string> {
+    try {
+      switch (name) {
+        case "get_hotels": {
+          const hotels = await storage.getHotels();
+          return JSON.stringify(hotels.map(h => ({ id: h.id, slug: h.slug, name: h.name, description: h.description, features: h.features, status: h.status })));
+        }
+        case "get_pages": {
+          const pages = await storage.getPages();
+          return JSON.stringify(pages.map(p => ({ id: p.id, slug: p.slug, title: p.title, status: p.status })));
+        }
+        case "get_settings": {
+          const settings = await storage.getSettings();
+          const result: Record<string, any> = {};
+          for (const s of settings) result[s.key] = s.value;
+          return JSON.stringify(result);
+        }
+        case "get_blog_posts": {
+          const posts = await storage.getBlogPosts();
+          return JSON.stringify(posts.map(p => ({ id: p.id, slug: p.slug, title: p.title, status: p.status })));
+        }
+        case "update_hotel": {
+          const hotel = await storage.getHotelBySlug(args.hotel_slug);
+          if (!hotel) return JSON.stringify({ error: `Hotel '${args.hotel_slug}' not found` });
+          const updated = await storage.updateHotel(hotel.id, args.updates);
+          return JSON.stringify({ success: true, hotel: updated?.name });
+        }
+        case "update_setting": {
+          const result = await storage.upsertSetting(args.key, args.value);
+          return JSON.stringify({ success: true, key: result.key });
+        }
+        case "update_page_content": {
+          const result = await storage.upsertPageContent(args.pagePath, args.contentKey, "text", args.value);
+          return JSON.stringify({ success: true, id: result.id });
+        }
+        case "update_page": {
+          const updated = await storage.updatePage(args.page_id, args.updates);
+          if (!updated) return JSON.stringify({ error: "Page not found" });
+          return JSON.stringify({ success: true, page: updated.slug });
+        }
+        case "update_blog_post": {
+          const updated = await storage.updateBlogPost(args.post_id, args.updates);
+          if (!updated) return JSON.stringify({ error: "Blog post not found" });
+          return JSON.stringify({ success: true, post: updated.slug });
+        }
+        case "update_seo": {
+          const { pagePath, ...seoData } = args;
+          const result = await storage.upsertSeo({ pagePath, ...seoData });
+          return JSON.stringify({ success: true, id: result.id });
+        }
+        case "translate_text": {
+          const langNames: Record<string, string> = { en: "English", ar: "Arabic", fr: "French", de: "German", es: "Spanish", ru: "Russian", pl: "Polish", cs: "Czech" };
+          const resp = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: `You are a professional translator for a luxury hotel brand. Translate the following text to ${langNames[args.targetLanguage] || args.targetLanguage}. Maintain the luxury hospitality tone. Context: ${args.context || "general"}. Return ONLY the translated text, nothing else.` },
+              { role: "user", content: args.text },
+            ],
+            max_tokens: 2000,
+            temperature: 0.3,
+          });
+          return resp.choices[0]?.message?.content || "Translation failed";
+        }
+        default:
+          return JSON.stringify({ error: `Unknown tool: ${name}` });
+      }
+    } catch (e: any) {
+      return JSON.stringify({ error: e.message });
+    }
+  }
+
+  app.post("/api/cms-assistant", requireAuth, async (req, res) => {
+    try {
+      const { messages } = req.body;
+      if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: "messages array is required" });
+      }
+
+      const trimmedMessages = messages.slice(-30).map((m: { role: string; content: string }) => ({
+        role: m.role as "user" | "assistant",
+        content: typeof m.content === "string" ? m.content.slice(0, 2000) : "",
+      }));
+
+      const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+        { role: "system", content: CMS_ASSISTANT_SYSTEM },
+        ...trimmedMessages,
+      ];
+
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+
+      let continueLoop = true;
+      let currentMessages = chatMessages;
+
+      while (continueLoop) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: currentMessages,
+          tools: cmsAssistantTools,
+          tool_choice: "auto",
+          stream: false,
+          max_tokens: 4000,
+          temperature: 0.7,
+        });
+
+        const choice = response.choices[0];
+        const msg = choice.message;
+
+        if (msg.tool_calls && msg.tool_calls.length > 0) {
+          currentMessages.push(msg as any);
+
+          for (const toolCall of msg.tool_calls) {
+            const tc = toolCall as any;
+            const fnName = tc.function.name;
+            const fnArgs = JSON.parse(tc.function.arguments);
+            
+            res.write(`data: ${JSON.stringify({ tool_call: fnName, args: fnArgs })}\n\n`);
+            
+            const result = await executeCmsToolCall(fnName, fnArgs);
+
+            currentMessages.push({
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: result,
+            } as any);
+          }
+        } else {
+          const content = msg.content || "";
+          res.write(`data: ${JSON.stringify({ content })}\n\n`);
+          continueLoop = false;
+        }
+
+        if (choice.finish_reason === "stop" || choice.finish_reason === "length") {
+          continueLoop = false;
+        }
+      }
+
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+    } catch (error: any) {
+      console.error("CMS assistant error:", error);
+      if (res.headersSent) {
+        res.write(`data: ${JSON.stringify({ error: "Something went wrong. Please try again." })}\n\n`);
+        res.end();
+      } else {
+        res.status(500).json({ error: "Failed to get response" });
+      }
+    }
+  });
+
   return httpServer;
 }

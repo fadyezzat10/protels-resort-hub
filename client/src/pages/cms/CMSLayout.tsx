@@ -17,6 +17,7 @@ import {
   BookOpen,
   Palette,
   Users,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ const navItems = [
   { href: "/controlpanal/settings", label: "Settings", icon: Settings },
   { href: "/controlpanal/theme", label: "Theme", icon: Palette },
   { href: "/controlpanal/users", label: "Users", icon: Users },
+  { href: "/controlpanal/ai-assistant", label: "AI Assistant", icon: Bot },
 ];
 
 export default function CMSLayout({ children }: { children: React.ReactNode }) {

@@ -136,6 +136,14 @@ The CMS injects dynamic metadata via `CMSHead` component (GTM scripts, SEO tags,
 - `theme` (JSONB) – Per-hotel color overrides (primaryColor, secondaryColor, accentColor)
 - `tabConfig` (JSONB) – Tab ordering and visibility config for hotel detail page tabs
 
+**CMS AI Assistant:**
+- Floating bubble chat on all CMS pages + full page at `/controlpanal/ai-assistant`
+- Backend: `POST /api/cms-assistant` (auth required, streaming SSE, OpenAI gpt-4o-mini with function calling)
+- Capabilities: Content writing, translation (8 languages), direct CMS editing (hotels, pages, blog, settings, SEO), CMS usage guidance
+- Function calling tools: update_hotel, update_setting, update_page_content, update_page, update_blog_post, update_seo, get_hotels, get_pages, get_settings, get_blog_posts, translate_text
+- Component: `client/src/components/CMSAssistant.tsx` (shared between floating and fullpage modes)
+- Full page: `client/src/pages/cms/CMSAIAssistant.tsx`
+
 **User Roles:**
 - `super_admin` – Full CMS access including user management and settings
 - `content_manager` – Content editing (pages, hotels, blog) but no settings/users

@@ -99,7 +99,9 @@ import BlogArticle from "@/pages/BlogArticle";
 import CMSHead from "@/components/CMSHead";
 import CMSTheme from "./pages/cms/CMSTheme";
 import CMSUsers from "./pages/cms/CMSUsers";
+import CMSAIAssistant from "./pages/cms/CMSAIAssistant";
 import ThemeProvider from "@/components/ThemeProvider";
+import CMSAssistant from "@/components/CMSAssistant";
 
 function Router() {
   return (
@@ -135,6 +137,7 @@ function Router() {
       <Route path="/controlpanal/builder/:slug" component={CMSBuilder} />
       <Route path="/controlpanal/users" component={CMSUsers} />
       <Route path="/controlpanal/visual-edit/:slug" component={VisualEditor} />
+      <Route path="/controlpanal/ai-assistant" component={CMSAIAssistant} />
       
       {/* Dynamic hotel page routing with sections */}
       <Route path="/hotels/:hotelId" component={HotelDetails} />
@@ -162,6 +165,13 @@ function ChatbotWrapper() {
   return <BookingAssistant />;
 }
 
+function CMSAssistantWrapper() {
+  const [location] = useLocation();
+  const isCMS = location.startsWith("/controlpanal") && location !== "/controlpanal" && !location.includes("/ai-assistant");
+  if (!isCMS) return null;
+  return <CMSAssistant mode="floating" />;
+}
+
 function App() {
   return (
     <GlobalErrorBoundary>
@@ -177,6 +187,7 @@ function App() {
               <AdminToolbar />
               <FloatingEditToolbar />
               <ChatbotWrapper />
+              <CMSAssistantWrapper />
               </ThemeProvider>
             </EditModeProvider>
           </I18nProvider>
