@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { X, Send, Loader2, Bot, Sparkles, Maximize2, CheckCircle2, Languages, FileText, Search, PenLine, Globe, ImagePlus, Trash2 } from "lucide-react";
 import { useLocation } from "wouter";
 import ReactMarkdown from "react-markdown";
@@ -91,7 +91,9 @@ interface CMSAssistantProps {
 }
 
 export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    try { return sessionStorage.getItem("cms-chat-open") === "true"; } catch { return false; }
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
@@ -100,9 +102,14 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   const [historyLoaded, setHistoryLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const floatingInputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [, setLocation] = useLocation();
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    try { sessionStorage.setItem("cms-chat-open", isOpen ? "true" : "false"); } catch {}
+  }, [isOpen]);
 
   const saveChatHistory = useCallback((msgs: ChatMessage[]) => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -163,8 +170,10 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   }, [mode, isOpen, historyLoaded, hasGreeted, loadChatHistory]);
 
   useEffect(() => {
-    if ((isOpen || mode === "fullpage") && inputRef.current) {
+    if (mode === "fullpage" && inputRef.current) {
       inputRef.current.focus();
+    } else if (isOpen && floatingInputRef.current) {
+      floatingInputRef.current.focus();
     }
   }, [isOpen, mode]);
 
@@ -420,7 +429,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
         </button>
         <textarea
           data-testid={compact ? "input-cms-assistant-floating" : "input-cms-assistant-fullpage"}
-          ref={compact ? undefined : inputRef}
+          ref={compact ? floatingInputRef : inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -592,7 +601,7 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
   );
 }
 
-function MessageBubble({ message, compact }: { message: ChatMessage; compact?: boolean }) {
+const MessageBubble = memo(function MessageBubble({ message, compact }: { message: ChatMessage; compact?: boolean }) {
   const isUser = message.role === "user";
   const isArabic = detectArabic(message.content);
 
@@ -652,4 +661,4 @@ function MessageBubble({ message, compact }: { message: ChatMessage; compact?: b
       </div>
     </div>
   );
-}
+});
