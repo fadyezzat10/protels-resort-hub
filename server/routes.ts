@@ -1045,34 +1045,50 @@ Help guests feel confident, informed, and ready to book by clicking "Book Now".`
   });
 
   // ──────── CMS AI ASSISTANT ────────
-  const CMS_ASSISTANT_SYSTEM = `You are the PROTELS CMS AI Assistant — an intelligent content management helper for the PROTELS Hotels & Resorts website.
+  const CMS_ASSISTANT_SYSTEM = `You are the PROTELS CMS AI Assistant — an expert-level intelligent content management system for the PROTELS Hotels & Resorts website. You are extremely capable and proactive.
 
-You help CMS administrators with:
-1. **Content Writing** — Write professional hotel descriptions, page content, blog articles in any of the 8 supported languages (EN, AR, FR, DE, ES, RU, PL, CS).
-2. **Translation** — Translate content between languages while maintaining luxury hospitality tone.
-3. **CMS Guidance** — Explain how to use the CMS features (pages, hotels, blog, media, SEO, settings, theme, users).
-4. **Direct Content Editing** — When asked, use tools to directly update content in the CMS.
+CAPABILITIES:
+1. **Content Writing** — Write professional, SEO-optimized hotel descriptions, page content, blog articles in any of 8 languages (EN, AR, FR, DE, ES, RU, PL, CS). Use luxury hospitality tone.
+2. **Translation** — Translate content between any languages. Maintain brand voice and cultural nuance. Can bulk-translate hotel descriptions to ALL languages at once.
+3. **Content Creation** — Create new pages, blog articles with full multilingual support.
+4. **Content Editing** — Directly update any CMS content: hotels, pages, blog posts, settings, SEO, inline page content.
+5. **SEO Optimization** — Write meta titles, descriptions, OG tags. Audit and improve SEO across pages.
+6. **CMS Guidance** — Expert knowledge of every CMS feature. Guide users step-by-step.
+7. **Data Analysis** — Read and analyze current content, find missing translations, suggest improvements.
 
 LANGUAGE RULE:
-- Respond in the same language the user writes in.
-- Arabic input → Arabic reply. English → English. etc.
+- ALWAYS respond in the same language the user writes in.
+- Arabic/Egyptian input → Arabic reply. English → English. Mixed → use the dominant language.
+- When writing content for the website, use formal Modern Standard Arabic (not Egyptian dialect).
 
-TONE: Professional, knowledgeable, luxury hospitality brand voice. Concise but thorough.
+PERSONALITY: You are like a senior content manager + developer assistant combined. You are proactive — when asked to do something, you do it thoroughly. If asked to translate, translate to ALL requested languages. If asked to create a blog post, fill in ALL fields including SEO. If something is missing, fix it without being asked.
+
+RESPONSE FORMAT: Use **markdown** formatting for readability — bold, bullet points, headers, code blocks when showing data.
 
 CMS STRUCTURE:
-- Dashboard: Overview stats at /controlpanal/dashboard
-- Pages: Create/edit CMS pages with multilingual content (title & content as JSON with language keys)
-- Hotels: Manage 4 properties — Crystal Beach (Marsa Alam), Beach Club & Spa (Marsa Alam), Royal Bay (Hurghada), La Plage (Zanzibar). Each has description (multilingual JSONB), features, rooms, dining, gallery, map links, hero video, theme colors, tab config.
-- Blog: Articles with multilingual title/content/excerpt, SEO fields, featured images
-- Media Library: Upload images/files
-- SEO: Per-page meta titles, descriptions, OG tags, robots, canonical URLs
-- Settings: GTM, favicon, site name, contact info, social links, hero settings, header/footer config
-- Theme: Global colors (primary, secondary, accent, background, text), fonts, logo sizing
-- Users: Role-based access (super_admin, content_manager, editor, viewer)
+- **Dashboard** (/controlpanal/dashboard): Overview stats — pages, hotels, media, users, blog posts counts
+- **Pages** (/controlpanal/pages): CMS pages with multilingual title & content (JSONB with language keys like {"en": "...", "ar": "..."}). Status: draft/published. Slug-based routing.
+- **Hotels** (/controlpanal/hotels): 4 properties:
+  - Crystal Beach Resort (slug: crystal-beach) — Marsa Alam, Egypt. All-inclusive beach resort.
+  - Beach Club & SPA (slug: beach-club) — Marsa Alam, Egypt. Modern resort with aquapark.
+  - La Plage (slug: la-plage) — Zanzibar, Tanzania. Boutique barefoot luxury.
+  - Royal Bay Resort & Spa (slug: royal-bay) — Hurghada, Egypt. Grand family resort.
+  Each hotel has: description (multilingual JSONB), features (string[]), rooms (string[]), roomDetails (JSON array with name, size, bed, view, amenities, images, description), dining (JSON with main restaurant + specialty + bars), gallery (string[]), mapLink, heroVideo (MP4 URL), theme (JSONB colors), tabConfig (JSONB tab visibility/order).
+- **Blog** (/controlpanal/blog): Articles with multilingual title/content/excerpt (JSONB), slug, featured image, hotel linking, SEO fields (metaTitle, metaDescription), status draft/published.
+- **Media Library** (/controlpanal/media): Upload images/files, get URLs.
+- **SEO** (/controlpanal/seo): Per-URL-path meta titles, descriptions, OG tags (title/desc/image), robots directives, canonical URLs.
+- **Settings** (/controlpanal/settings): site_name, contact_email, contact_phone, contact_address, hero_title (JSONB multilingual), hero_subtitle (JSONB multilingual), hero_images, booking_link, header_logo, footer_description (JSONB multilingual), social_links (JSONB: facebook/instagram/linkedin), gtm_id, favicon_url.
+- **Theme** (/controlpanal/theme): Global CSS colors (primary, secondary, accent, background, text), font families (heading, body), logo dimensions.
+- **Users** (/controlpanal/users): Roles — super_admin (full access), content_manager (content but no settings/users), editor (edit only, no delete), viewer (read-only).
 
-SUPPORTED LANGUAGES: English (en), Arabic (ar), French (fr), German (de), Spanish (es), Russian (ru), Polish (pl), Czech (cs)
+SUPPORTED LANGUAGES with codes: English (en), Arabic (ar), French (fr), German (de), Spanish (es), Russian (ru), Polish (pl), Czech (cs)
 
-When users ask to update content, use the available tools. Always confirm what you did after making changes.`;
+PROACTIVE BEHAVIOR:
+- When updating content, always use tools to make changes directly — don't just suggest.
+- When translating, offer to translate to ALL missing languages if only some are filled.
+- When creating content, fill in all possible fields including SEO metadata.
+- After making changes, provide a clear summary of what was done with ✅ checkmarks.
+- If you detect missing translations or content gaps, mention them proactively.`;
 
   const cmsAssistantTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     {
@@ -1235,6 +1251,75 @@ When users ask to update content, use the available tools. Always confirm what y
         },
       },
     },
+    {
+      type: "function",
+      function: {
+        name: "create_page",
+        description: "Create a new CMS page with multilingual title and content.",
+        parameters: {
+          type: "object",
+          properties: {
+            slug: { type: "string", description: "URL slug for the page (lowercase, hyphens)" },
+            title: { type: "object", description: "Multilingual title {\"en\": \"...\", \"ar\": \"...\", ...}" },
+            content: { type: "object", description: "Multilingual content {\"en\": \"...\", \"ar\": \"...\", ...}" },
+            status: { type: "string", enum: ["draft", "published"], description: "Page status" },
+          },
+          required: ["slug", "title", "content"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "create_blog_post",
+        description: "Create a new blog post with multilingual title, content, excerpt and SEO fields.",
+        parameters: {
+          type: "object",
+          properties: {
+            slug: { type: "string", description: "URL slug" },
+            title: { type: "object", description: "Multilingual title JSONB" },
+            content: { type: "object", description: "Multilingual content JSONB" },
+            excerpt: { type: "object", description: "Multilingual excerpt/summary JSONB" },
+            featuredImage: { type: "string", description: "Featured image URL" },
+            metaTitle: { type: "string", description: "SEO meta title" },
+            metaDescription: { type: "string", description: "SEO meta description" },
+            status: { type: "string", enum: ["draft", "published"] },
+          },
+          required: ["slug", "title", "content"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "bulk_translate_hotel",
+        description: "Translate a hotel's description to ALL missing languages at once. Reads current description, identifies missing languages, and translates to fill them all.",
+        parameters: {
+          type: "object",
+          properties: {
+            hotel_slug: { type: "string", description: "Hotel slug: crystal-beach, beach-club, la-plage, or royal-bay" },
+            source_language: { type: "string", description: "Source language to translate FROM (default: en)" },
+          },
+          required: ["hotel_slug"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_seo_settings",
+        description: "Get all SEO settings to review and audit.",
+        parameters: { type: "object", properties: {} },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_page_contents",
+        description: "Get all inline page content (live edit content) to review.",
+        parameters: { type: "object", properties: {} },
+      },
+    },
   ];
 
   async function executeCmsToolCall(name: string, args: any): Promise<string> {
@@ -1300,6 +1385,63 @@ When users ask to update content, use the available tools. Always confirm what y
           });
           return resp.choices[0]?.message?.content || "Translation failed";
         }
+        case "create_page": {
+          const page = await storage.createPage({
+            slug: args.slug,
+            title: args.title,
+            content: args.content,
+            status: args.status || "draft",
+          });
+          return JSON.stringify({ success: true, page: { id: page.id, slug: page.slug } });
+        }
+        case "create_blog_post": {
+          const post = await storage.createBlogPost({
+            slug: args.slug,
+            title: args.title,
+            content: args.content,
+            excerpt: args.excerpt || {},
+            featuredImage: args.featuredImage || null,
+            metaTitle: args.metaTitle || null,
+            metaDescription: args.metaDescription || null,
+            status: args.status || "draft",
+          });
+          return JSON.stringify({ success: true, post: { id: post.id, slug: post.slug } });
+        }
+        case "bulk_translate_hotel": {
+          const allLangs = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
+          const langNames: Record<string, string> = { en: "English", ar: "Arabic", fr: "French", de: "German", es: "Spanish", ru: "Russian", pl: "Polish", cs: "Czech" };
+          const hotel = await storage.getHotelBySlug(args.hotel_slug);
+          if (!hotel) return JSON.stringify({ error: `Hotel '${args.hotel_slug}' not found` });
+          const desc = (hotel.description as Record<string, string>) || {};
+          const sourceLang = args.source_language || "en";
+          const sourceText = desc[sourceLang];
+          if (!sourceText) return JSON.stringify({ error: `No ${sourceLang} description found to translate from` });
+          const missingLangs = allLangs.filter(l => l !== sourceLang && (!desc[l] || desc[l].trim().length < 10));
+          if (missingLangs.length === 0) return JSON.stringify({ success: true, message: "All languages already have descriptions", existing: Object.keys(desc) });
+          const newDesc = { ...desc };
+          for (const lang of missingLangs) {
+            const resp = await openai.chat.completions.create({
+              model: "gpt-4o-mini",
+              messages: [
+                { role: "system", content: `You are a professional translator for a luxury hotel brand. Translate the following hotel description to ${langNames[lang]}. Maintain the luxury hospitality tone and marketing appeal. Return ONLY the translated text.` },
+                { role: "user", content: sourceText },
+              ],
+              max_tokens: 2000,
+              temperature: 0.3,
+            });
+            newDesc[lang] = resp.choices[0]?.message?.content || "";
+          }
+          await storage.updateHotel(hotel.id, { description: newDesc });
+          return JSON.stringify({ success: true, hotel: hotel.name, translated: missingLangs, total_languages: Object.keys(newDesc).length });
+        }
+        case "get_seo_settings": {
+          const seoSettings = await storage.getSeoSettings();
+          return JSON.stringify(seoSettings);
+        }
+        case "get_page_contents": {
+          const contents = await storage.getAllPageContents();
+          return JSON.stringify(contents.slice(0, 100));
+        }
         default:
           return JSON.stringify({ error: `Unknown tool: ${name}` });
       }
@@ -1334,7 +1476,7 @@ When users ask to update content, use the available tools. Always confirm what y
 
       while (continueLoop) {
         const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "gpt-4o",
           messages: currentMessages,
           tools: cmsAssistantTools,
           tool_choice: "auto",
