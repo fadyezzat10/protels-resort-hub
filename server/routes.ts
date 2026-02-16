@@ -1352,7 +1352,15 @@ PROACTIVE BEHAVIOR:
         case "update_hotel": {
           const hotel = await storage.getHotelBySlug(args.hotel_slug);
           if (!hotel) return JSON.stringify({ error: `Hotel '${args.hotel_slug}' not found` });
-          const updated = await storage.updateHotel(hotel.id, args.updates);
+          const updates = args.updates || {};
+          const { hotel_slug, ...rest } = args;
+          const mergedUpdates = { ...rest, ...updates };
+          delete mergedUpdates.updates;
+          if (mergedUpdates.description && typeof mergedUpdates.description === "object") {
+            const existing = (hotel.description as Record<string, string>) || {};
+            mergedUpdates.description = { ...existing, ...mergedUpdates.description };
+          }
+          const updated = await storage.updateHotel(hotel.id, mergedUpdates);
           return JSON.stringify({ success: true, hotel: updated?.name });
         }
         case "update_setting": {
@@ -1364,12 +1372,20 @@ PROACTIVE BEHAVIOR:
           return JSON.stringify({ success: true, id: result.id });
         }
         case "update_page": {
-          const updated = await storage.updatePage(args.page_id, args.updates);
+          const pageUpdates = args.updates || {};
+          const { page_id, ...pageRest } = args;
+          const pageMerged = { ...pageRest, ...pageUpdates };
+          delete pageMerged.updates;
+          const updated = await storage.updatePage(args.page_id, pageMerged);
           if (!updated) return JSON.stringify({ error: "Page not found" });
           return JSON.stringify({ success: true, page: updated.slug });
         }
         case "update_blog_post": {
-          const updated = await storage.updateBlogPost(args.post_id, args.updates);
+          const postUpdates = args.updates || {};
+          const { post_id, ...postRest } = args;
+          const postMerged = { ...postRest, ...postUpdates };
+          delete postMerged.updates;
+          const updated = await storage.updateBlogPost(args.post_id, postMerged);
           if (!updated) return JSON.stringify({ error: "Blog post not found" });
           return JSON.stringify({ success: true, post: updated.slug });
         }
@@ -1491,11 +1507,22 @@ PROACTIVE BEHAVIOR:
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
+      res.setHeader("X-Accel-Buffering", "no");
+      res.flushHeaders();
+
+      const sendSSE = (data: any) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+        if (typeof (res as any).flush === "function") (res as any).flush();
+      };
 
       let continueLoop = true;
       let currentMessages = chatMessages;
+      let iterations = 0;
+      const MAX_ITERATIONS = 10;
 
-      while (continueLoop) {
+      while (continueLoop && iterations < MAX_ITERATIONS) {
+        iterations++;
+        
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: currentMessages,
@@ -1513,23 +1540,34 @@ PROACTIVE BEHAVIOR:
           currentMessages.push(msg as any);
 
           for (const toolCall of msg.tool_calls) {
-            const tc = toolCall as any;
-            const fnName = tc.function.name;
-            const fnArgs = JSON.parse(tc.function.arguments);
-            
-            res.write(`data: ${JSON.stringify({ tool_call: fnName, args: fnArgs })}\n\n`);
-            
-            const result = await executeCmsToolCall(fnName, fnArgs);
+            try {
+              const tc = toolCall as any;
+              const fnName = tc.function.name;
+              const fnArgs = JSON.parse(tc.function.arguments);
+              
+              console.log(`[cms-assistant] Executing tool: ${fnName}`, JSON.stringify(fnArgs).substring(0, 200));
+              sendSSE({ tool_call: fnName, args: fnArgs });
+              
+              const result = await executeCmsToolCall(fnName, fnArgs);
+              console.log(`[cms-assistant] Tool ${fnName} result:`, result.substring(0, 300));
 
-            currentMessages.push({
-              role: "tool",
-              tool_call_id: toolCall.id,
-              content: result,
-            } as any);
+              currentMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: result,
+              } as any);
+            } catch (toolError: any) {
+              console.error(`[cms-assistant] Tool execution error:`, toolError);
+              currentMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: JSON.stringify({ error: toolError.message || "Tool execution failed" }),
+              } as any);
+            }
           }
         } else {
           const content = msg.content || "";
-          res.write(`data: ${JSON.stringify({ content })}\n\n`);
+          sendSSE({ content });
           continueLoop = false;
         }
 
@@ -1538,13 +1576,15 @@ PROACTIVE BEHAVIOR:
         }
       }
 
-      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      sendSSE({ done: true });
       res.end();
     } catch (error: any) {
-      console.error("CMS assistant error:", error);
+      console.error("CMS assistant error:", error?.message || error);
       if (res.headersSent) {
-        res.write(`data: ${JSON.stringify({ error: "Something went wrong. Please try again." })}\n\n`);
-        res.end();
+        try {
+          res.write(`data: ${JSON.stringify({ error: "Something went wrong. Please try again." })}\n\n`);
+          res.end();
+        } catch {}
       } else {
         res.status(500).json({ error: "Failed to get response" });
       }

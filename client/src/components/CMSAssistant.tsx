@@ -230,59 +230,68 @@ export default function CMSAssistant({ mode = "floating" }: CMSAssistantProps) {
       const decoder = new TextDecoder();
       let assistantContent = "";
       const collectedToolCalls: { name: string; args: any }[] = [];
+      let sseBuffer = "";
+
+      const updateAssistantMessage = (content: string, tools?: { name: string; args: any }[]) => {
+        setMessages((prev) => {
+          const newMsgs = [...prev];
+          const lastIdx = newMsgs.length - 1;
+          if (lastIdx >= 0 && newMsgs[lastIdx].role === "assistant" && !newMsgs[lastIdx].isGreeting) {
+            newMsgs[lastIdx] = {
+              ...newMsgs[lastIdx],
+              content,
+              toolCalls: tools && tools.length > 0 ? tools : newMsgs[lastIdx].toolCalls,
+            };
+          } else {
+            newMsgs.push({
+              role: "assistant",
+              content,
+              toolCalls: tools && tools.length > 0 ? tools : undefined,
+            });
+          }
+          return newMsgs;
+        });
+      };
+
+      const processSSELine = (line: string) => {
+        if (!line.startsWith("data: ")) return;
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.done) return;
+          if (data.error) {
+            assistantContent = data.error;
+            updateAssistantMessage(assistantContent);
+            return;
+          }
+          if (data.tool_call) {
+            collectedToolCalls.push({ name: data.tool_call, args: data.args });
+            updateAssistantMessage(assistantContent, [...collectedToolCalls]);
+          }
+          if (data.content) {
+            assistantContent = data.content;
+            updateAssistantMessage(assistantContent, collectedToolCalls.length > 0 ? [...collectedToolCalls] : undefined);
+          }
+        } catch (parseErr) {
+          console.warn("[CMS Assistant] Failed to parse SSE:", line, parseErr);
+        }
+      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const text = decoder.decode(value, { stream: true });
-        const lines = text.split("\n");
+        sseBuffer += decoder.decode(value, { stream: true });
+        const parts = sseBuffer.split("\n");
+        sseBuffer = parts.pop() || "";
 
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.done) break;
-            if (data.error) {
-              assistantContent = data.error;
-              break;
-            }
-            if (data.tool_call) {
-              collectedToolCalls.push({ name: data.tool_call, args: data.args });
-              setMessages((prev) => {
-                const newMsgs = [...prev];
-                const lastIdx = newMsgs.length - 1;
-                if (lastIdx >= 0 && newMsgs[lastIdx].role === "assistant" && !newMsgs[lastIdx].isGreeting) {
-                  newMsgs[lastIdx] = { ...newMsgs[lastIdx], toolCalls: [...collectedToolCalls] };
-                } else {
-                  newMsgs.push({ role: "assistant", content: "", toolCalls: [...collectedToolCalls] });
-                }
-                return newMsgs;
-              });
-            }
-            if (data.content) {
-              assistantContent = data.content;
-              setMessages((prev) => {
-                const newMsgs = [...prev];
-                const lastIdx = newMsgs.length - 1;
-                if (lastIdx >= 0 && newMsgs[lastIdx].role === "assistant" && !newMsgs[lastIdx].isGreeting) {
-                  newMsgs[lastIdx] = {
-                    ...newMsgs[lastIdx],
-                    content: assistantContent,
-                    toolCalls: collectedToolCalls.length > 0 ? collectedToolCalls : undefined,
-                  };
-                } else {
-                  newMsgs.push({
-                    role: "assistant",
-                    content: assistantContent,
-                    toolCalls: collectedToolCalls.length > 0 ? collectedToolCalls : undefined,
-                  });
-                }
-                return newMsgs;
-              });
-            }
-          } catch {}
+        for (const part of parts) {
+          const trimmed = part.trim();
+          if (trimmed) processSSELine(trimmed);
         }
+      }
+
+      if (sseBuffer.trim()) {
+        processSSELine(sseBuffer.trim());
       }
 
       if (!assistantContent && collectedToolCalls.length === 0) {
