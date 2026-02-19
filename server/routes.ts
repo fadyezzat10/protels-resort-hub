@@ -64,11 +64,25 @@ export async function registerRoutes(
     })
   );
 
-  app.use("/uploads", (req, res, next) => {
+  app.use("/uploads", async (req, res, next) => {
     const filePath = path.join(uploadDir, req.path);
     if (fs.existsSync(filePath)) {
       return res.sendFile(filePath);
     }
+
+    try {
+      const objService = new ObjectStorageService();
+      const fileName = req.path.startsWith("/") ? req.path.slice(1) : req.path;
+      const file = await objService.searchPublicObject(fileName);
+      if (file) {
+        res.set({
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "public, max-age=86400",
+        });
+        return await objService.downloadObject(file, res, 86400);
+      }
+    } catch {}
+
     next();
   });
 
@@ -277,12 +291,46 @@ export async function registerRoutes(
   app.post("/api/cms/media", requireAuth, upload.single("file"), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+      let fileUrl = `/uploads/${req.file.filename}`;
+
+      try {
+        const objService = new ObjectStorageService();
+        const publicPaths = objService.getPublicObjectSearchPaths();
+        if (publicPaths.length > 0) {
+          const bucketPath = publicPaths[0];
+          const { bucketName, objectName } = (() => {
+            const fullPath = `${bucketPath}/${req.file!.filename}`;
+            const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+            const parts = p.split("/");
+            return { bucketName: parts[1], objectName: parts.slice(2).join("/") };
+          })();
+
+          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+          const bucket = objectStorageClient.bucket(bucketName);
+          const objFile = bucket.file(objectName);
+
+          const localPath = path.join(uploadDir, req.file!.filename);
+          await new Promise<void>((resolve, reject) => {
+            fs.createReadStream(localPath)
+              .pipe(objFile.createWriteStream({ metadata: { contentType: req.file!.mimetype } }))
+              .on("finish", () => resolve())
+              .on("error", (err: Error) => reject(err));
+          });
+
+          fileUrl = `/uploads/${req.file!.filename}`;
+          console.log(`[media] Uploaded to Object Storage: ${req.file!.filename}`);
+        }
+      } catch (objErr: any) {
+        console.warn(`[media] Object Storage upload failed, using local: ${objErr.message}`);
+      }
+
       const file = await storage.createMedia({
         filename: req.file.filename,
         originalName: req.file.originalname,
         mimeType: req.file.mimetype,
         size: req.file.size,
-        url: `/uploads/${req.file.filename}`,
+        url: fileUrl,
         alt: req.body.alt || "",
       });
       res.json(file);
