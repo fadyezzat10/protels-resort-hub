@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Plus, Pencil, Trash2, LayoutDashboard, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, LayoutDashboard, ExternalLink, Globe } from "lucide-react";
 import { useLocation } from "wouter";
 
 const SLUG_TO_ROUTE: Record<string, string> = {
@@ -15,6 +15,7 @@ const SLUG_TO_ROUTE: Record<string, string> = {
   gallery: "/gallery",
   blog: "/blog",
 };
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,12 +53,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
+const LANGUAGES = [
+  { code: "en", label: "English", flag: "🇬🇧", dir: "ltr" },
+  { code: "ar", label: "العربية", flag: "🇪🇬", dir: "rtl" },
+  { code: "fr", label: "Français", flag: "🇫🇷", dir: "ltr" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪", dir: "ltr" },
+  { code: "es", label: "Español", flag: "🇪🇸", dir: "ltr" },
+  { code: "ru", label: "Русский", flag: "🇷🇺", dir: "ltr" },
+  { code: "pl", label: "Polski", flag: "🇵🇱", dir: "ltr" },
+  { code: "cs", label: "Čeština", flag: "🇨🇿", dir: "ltr" },
+] as const;
+
+type LangCode = typeof LANGUAGES[number]["code"];
+
 interface PageForm {
   slug: string;
-  titleEn: string;
-  titleAr: string;
-  contentEn: string;
-  contentAr: string;
+  title: Record<string, string>;
+  content: Record<string, string>;
   metaTitle: string;
   metaDescription: string;
   status: string;
@@ -65,10 +77,8 @@ interface PageForm {
 
 const emptyForm: PageForm = {
   slug: "",
-  titleEn: "",
-  titleAr: "",
-  contentEn: "",
-  contentAr: "",
+  title: {},
+  content: {},
   metaTitle: "",
   metaDescription: "",
   status: "draft",
@@ -81,6 +91,7 @@ export default function CMSPages() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<PageForm>(emptyForm);
+  const [activeLang, setActiveLang] = useState<LangCode>("en");
 
   const { data: pages = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/cms/pages"],
@@ -131,8 +142,8 @@ export default function CMSPages() {
     e.preventDefault();
     const payload = {
       slug: form.slug,
-      title: { en: form.titleEn, ar: form.titleAr },
-      content: { en: form.contentEn, ar: form.contentAr },
+      title: form.title,
+      content: form.content,
       metaTitle: form.metaTitle,
       metaDescription: form.metaDescription,
       status: form.status,
@@ -148,20 +159,20 @@ export default function CMSPages() {
     setEditingId(page.id);
     setForm({
       slug: page.slug || "",
-      titleEn: page.title?.en || "",
-      titleAr: page.title?.ar || "",
-      contentEn: page.content?.en || "",
-      contentAr: page.content?.ar || "",
+      title: page.title || {},
+      content: page.content || {},
       metaTitle: page.metaTitle || "",
       metaDescription: page.metaDescription || "",
       status: page.status || "draft",
     });
+    setActiveLang("en");
     setDialogOpen(true);
   };
 
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setActiveLang("en");
     setDialogOpen(true);
   };
 
@@ -169,6 +180,20 @@ export default function CMSPages() {
     const newStatus = page.status === "published" ? "draft" : "published";
     updateMutation.mutate({ id: page.id, data: { status: newStatus } });
   };
+
+  const setTitle = (lang: string, value: string) => {
+    setForm({ ...form, title: { ...form.title, [lang]: value } });
+  };
+
+  const setContent = (lang: string, value: string) => {
+    setForm({ ...form, content: { ...form.content, [lang]: value } });
+  };
+
+  const filledLangs = LANGUAGES.filter(
+    (l) => (form.title[l.code] || "").trim() || (form.content[l.code] || "").trim()
+  );
+
+  const currentLang = LANGUAGES.find((l) => l.code === activeLang)!;
 
   return (
     <CMSLayout>
@@ -188,6 +213,7 @@ export default function CMSPages() {
             <TableRow>
               <TableHead>Title</TableHead>
               <TableHead>Slug</TableHead>
+              <TableHead>Languages</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Last Updated</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -196,86 +222,111 @@ export default function CMSPages() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-gray-400">
+                <TableCell colSpan={6} className="text-center py-8 text-gray-400">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : pages.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-gray-400">
+                <TableCell colSpan={6} className="text-center py-8 text-gray-400">
                   No pages found. Create your first page.
                 </TableCell>
               </TableRow>
             ) : (
-              pages.map((page: any) => (
-                <TableRow key={page.id} data-testid={`row-page-${page.id}`}>
-                  <TableCell className="font-medium">{page.title?.en || page.slug}</TableCell>
-                  <TableCell className="text-gray-500">/{page.slug}</TableCell>
-                  <TableCell>
-                    <Badge
-                      data-testid={`badge-status-${page.id}`}
-                      className="cursor-pointer"
-                      variant={page.status === "published" ? "default" : "secondary"}
-                      onClick={() => toggleStatus(page)}
-                    >
-                      {page.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-500">
-                    {page.updatedAt ? new Date(page.updatedAt).toLocaleDateString() : "—"}
-                  </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    {SLUG_TO_ROUTE[page.slug] ? (
+              pages.map((page: any) => {
+                const translatedLangs = LANGUAGES.filter(
+                  (l) => (page.title?.[l.code] || "").trim() || (page.content?.[l.code] || "").trim()
+                );
+                return (
+                  <TableRow key={page.id} data-testid={`row-page-${page.id}`}>
+                    <TableCell className="font-medium">{page.title?.en || page.slug}</TableCell>
+                    <TableCell className="text-gray-500">/{page.slug}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 flex-wrap">
+                        {translatedLangs.length > 0 ? (
+                          translatedLangs.map((l) => (
+                            <span
+                              key={l.code}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-blue-50 text-blue-700 border border-blue-200"
+                              title={l.label}
+                            >
+                              {l.flag} {l.code.toUpperCase()}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-400 text-xs">—</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        data-testid={`badge-status-${page.id}`}
+                        className="cursor-pointer"
+                        variant={page.status === "published" ? "default" : "secondary"}
+                        onClick={() => toggleStatus(page)}
+                      >
+                        {page.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-gray-500">
+                      {page.updatedAt ? new Date(page.updatedAt).toLocaleDateString() : "—"}
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                      {SLUG_TO_ROUTE[page.slug] ? (
+                        <Button
+                          data-testid={`button-liveedit-page-${page.id}`}
+                          variant="ghost"
+                          size="sm"
+                          title="تعديل مباشر على الصفحة"
+                          onClick={() => {
+                            window.open(SLUG_TO_ROUTE[page.slug], "_blank");
+                          }}
+                        >
+                          <ExternalLink className="w-4 h-4 text-green-600" />
+                        </Button>
+                      ) : (
+                        <Button
+                          data-testid={`button-builder-page-${page.id}`}
+                          variant="ghost"
+                          size="sm"
+                          title="Visual Editor"
+                          onClick={() => setLocation(`/controlpanal/visual-edit/${page.slug}`)}
+                        >
+                          <LayoutDashboard className="w-4 h-4 text-blue-500" />
+                        </Button>
+                      )}
                       <Button
-                        data-testid={`button-liveedit-page-${page.id}`}
+                        data-testid={`button-edit-page-${page.id}`}
                         variant="ghost"
                         size="sm"
-                        title="تعديل مباشر على الصفحة"
-                        onClick={() => {
-                          window.open(SLUG_TO_ROUTE[page.slug], "_blank");
-                        }}
+                        onClick={() => openEdit(page)}
                       >
-                        <ExternalLink className="w-4 h-4 text-green-600" />
+                        <Pencil className="w-4 h-4" />
                       </Button>
-                    ) : (
                       <Button
-                        data-testid={`button-builder-page-${page.id}`}
+                        data-testid={`button-delete-page-${page.id}`}
                         variant="ghost"
                         size="sm"
-                        title="Visual Editor"
-                        onClick={() => setLocation(`/controlpanal/visual-edit/${page.slug}`)}
+                        onClick={() => setDeleteId(page.id)}
                       >
-                        <LayoutDashboard className="w-4 h-4 text-blue-500" />
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </Button>
-                    )}
-                    <Button
-                      data-testid={`button-edit-page-${page.id}`}
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEdit(page)}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      data-testid={`button-delete-page-${page.id}`}
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeleteId(page.id)}
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Page" : "Create New Page"}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Globe className="w-5 h-5" />
+              {editingId ? "Edit Page" : "Create New Page"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4" data-testid="form-page">
             <div>
@@ -288,51 +339,76 @@ export default function CMSPages() {
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Language</label>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {LANGUAGES.map((lang) => {
+                  const hasTrans = (form.title[lang.code] || "").trim() || (form.content[lang.code] || "").trim();
+                  return (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      data-testid={`tab-lang-${lang.code}`}
+                      onClick={() => setActiveLang(lang.code)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${
+                        activeLang === lang.code
+                          ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                          : hasTrans
+                          ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                          : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.code.toUpperCase()}</span>
+                      {hasTrans && activeLang !== lang.code && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {filledLangs.length > 0 && (
+                <p className="text-xs text-gray-400 mb-2">
+                  {filledLangs.length} / {LANGUAGES.length} languages filled
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">{currentLang.flag}</span>
+                <span className="font-medium text-sm">{currentLang.label}</span>
+              </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Title (English)</label>
+                <label className="text-sm font-medium mb-1 block">
+                  Title ({currentLang.label})
+                </label>
                 <Input
-                  data-testid="input-page-title-en"
-                  value={form.titleEn}
-                  onChange={(e) => setForm({ ...form, titleEn: e.target.value })}
-                  placeholder="English title"
-                  required
+                  data-testid={`input-page-title-${activeLang}`}
+                  value={form.title[activeLang] || ""}
+                  onChange={(e) => setTitle(activeLang, e.target.value)}
+                  placeholder={`Title in ${currentLang.label}`}
+                  dir={currentLang.dir}
+                  required={activeLang === "en"}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Title (Arabic)</label>
-                <Input
-                  data-testid="input-page-title-ar"
-                  value={form.titleAr}
-                  onChange={(e) => setForm({ ...form, titleAr: e.target.value })}
-                  placeholder="Arabic title"
-                  dir="rtl"
+                <label className="text-sm font-medium mb-1 block">
+                  Content ({currentLang.label})
+                </label>
+                <Textarea
+                  data-testid={`input-page-content-${activeLang}`}
+                  value={form.content[activeLang] || ""}
+                  onChange={(e) => setContent(activeLang, e.target.value)}
+                  placeholder={`Content in ${currentLang.label}`}
+                  rows={6}
+                  dir={currentLang.dir}
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Content (English)</label>
-                <Textarea
-                  data-testid="input-page-content-en"
-                  value={form.contentEn}
-                  onChange={(e) => setForm({ ...form, contentEn: e.target.value })}
-                  placeholder="English content"
-                  rows={5}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Content (Arabic)</label>
-                <Textarea
-                  data-testid="input-page-content-ar"
-                  value={form.contentAr}
-                  onChange={(e) => setForm({ ...form, contentAr: e.target.value })}
-                  placeholder="Arabic content"
-                  rows={5}
-                  dir="rtl"
-                />
-              </div>
-            </div>
+
             <div>
               <label className="text-sm font-medium mb-1 block">Meta Title</label>
               <Input
