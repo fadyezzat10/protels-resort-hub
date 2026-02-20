@@ -3,18 +3,20 @@ import Hero from "@/components/Hero";
 import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
-import { useMergedHotels } from "@/lib/cms";
+import { useMergedHotels, usePageHeroImage } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
+
 export default function Hotels() {
   const { t } = useI18n();
   const { hotels } = useMergedHotels();
+  const heroImg = usePageHeroImage("hotels", "/uploads/page-heroes/hotels-hero-aerial.jpg");
 
   return (
     <div className="min-h-screen bg-brand-white">
       <Navbar />
       
       <Hero 
-        image="/uploads/page-heroes/hotels-hero-aerial.jpg"
+        image={heroImg}
         title={t("nav.hotels")}
         subtitle="Our Collection"
         height="half"

@@ -236,6 +236,14 @@ export function useHeroContent(language: string) {
   return { heroTitle, heroSubtitle, heroImages, heroVideo };
 }
 
+export function usePageHeroImage(pageKey: string, fallback: string): string {
+  const { data: settings } = useCMSAllSettings();
+  const settingKey = `page_hero_${pageKey}`;
+  const value = settings?.[settingKey];
+  if (typeof value === "string" && value) return value;
+  return fallback;
+}
+
 export function useFooterContent(language: string) {
   const { data: settings } = useCMSAllSettings();
 

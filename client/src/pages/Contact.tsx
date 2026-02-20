@@ -3,7 +3,7 @@ import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import { useI18n } from "@/lib/i18n";
-const heroImg = "/uploads/page-heroes/hotel-beach-club.jpg";
+import { usePageHeroImage } from "@/lib/cms";
 import { Mail, Phone, MapPin, Smartphone, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -66,6 +66,7 @@ const hotelsContactInfo = [
 
 export default function Contact() {
   const { t, language } = useI18n();
+  const heroImg = usePageHeroImage("contact", "/uploads/page-heroes/hotel-beach-club.jpg");
 
   return (
     <div className="min-h-screen bg-brand-white">

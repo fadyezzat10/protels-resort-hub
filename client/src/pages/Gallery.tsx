@@ -1,14 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
-import { useMergedHotels, useCMSMedia } from "@/lib/cms";
+import { useMergedHotels, useCMSMedia, usePageHeroImage } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
-const heroImg = "/uploads/page-heroes/hotel-la-plage.jpg";
 
 export default function Gallery() {
   const { t } = useI18n();
   const { hotels } = useMergedHotels();
   const { data: cmsMedia } = useCMSMedia();
+  const heroImg = usePageHeroImage("gallery", "/uploads/page-heroes/hotel-la-plage.jpg");
   
   const hotelImages = hotels.map(h => ({ src: h.image, title: h.name }));
 

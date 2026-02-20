@@ -1,13 +1,126 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns } from "lucide-react";
+import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns, Upload, Loader2, X, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+
+const PAGE_HEROES = [
+  { key: "page_hero_home", label: "Home Page (Slider)", isSlider: true },
+  { key: "page_hero_hotels", label: "Hotels & Resorts Page", isSlider: false },
+  { key: "page_hero_about", label: "About Us Page", isSlider: false },
+  { key: "page_hero_contact", label: "Contact Page", isSlider: false },
+  { key: "page_hero_gallery", label: "Gallery Page", isSlider: false },
+];
+
+function HeroImageUploader({ settingKey, label, currentValue, isSlider, onSave, isPending }: {
+  settingKey: string;
+  label: string;
+  currentValue: string | string[];
+  isSlider: boolean;
+  onSave: (key: string, value: any) => void;
+  isPending: boolean;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const images: string[] = isSlider
+    ? (Array.isArray(currentValue) ? currentValue : [])
+    : (typeof currentValue === "string" && currentValue ? [currentValue] : []);
+
+  const handleUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append("file", files[i]);
+        const res = await fetch("/api/cms/media", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Upload failed");
+        const data = await res.json();
+        uploaded.push(data.url);
+      }
+      if (isSlider) {
+        onSave(settingKey, [...images, ...uploaded]);
+      } else {
+        onSave(settingKey, uploaded[0]);
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }, [images, isSlider, settingKey, onSave]);
+
+  const removeImage = useCallback((idx: number) => {
+    if (isSlider) {
+      const updated = images.filter((_, i) => i !== idx);
+      onSave(settingKey, updated);
+    } else {
+      onSave(settingKey, "");
+    }
+  }, [images, isSlider, settingKey, onSave]);
+
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h4 className="font-medium text-sm">{label}</h4>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading || isPending}
+          className="gap-2"
+        >
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          {uploading ? "Uploading..." : (isSlider ? "Add Images" : "Upload Image")}
+        </Button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          multiple={isSlider}
+          className="hidden"
+          onChange={handleUpload}
+        />
+      </div>
+      {images.length > 0 ? (
+        <div className={`grid ${isSlider ? "grid-cols-3 md:grid-cols-5" : "grid-cols-1"} gap-2`}>
+          {images.map((img, idx) => (
+            <div key={idx} className="relative group">
+              <img
+                src={img}
+                alt={`Hero ${idx + 1}`}
+                className={`rounded border object-cover w-full ${isSlider ? "h-20" : "h-32 max-w-xs"}`}
+              />
+              <button
+                onClick={() => removeImage(idx)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center h-20 bg-gray-50 rounded border border-dashed text-gray-400 text-sm">
+          <ImageIcon className="w-5 h-5 mr-2" /> No image set — using default
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function CMSSettings() {
   const { toast } = useToast();
@@ -26,6 +139,7 @@ export default function CMSSettings() {
   const [heroSubtitleAr, setHeroSubtitleAr] = useState("");
   const [heroImagesText, setHeroImagesText] = useState("");
   const [heroVideoUrl, setHeroVideoUrl] = useState("");
+  const [pageHeroes, setPageHeroes] = useState<Record<string, any>>({});
   const [footerDescEn, setFooterDescEn] = useState("");
   const [footerDescAr, setFooterDescAr] = useState("");
   const [socialLinks, setSocialLinks] = useState({
@@ -101,6 +215,17 @@ export default function CMSSettings() {
           linkedin: social.linkedin || "",
         });
       }
+
+      const heroes: Record<string, any> = {};
+      for (const ph of PAGE_HEROES) {
+        const val = findSetting(ph.key);
+        if (val) heroes[ph.key] = val;
+      }
+      const heroImagesVal = findSetting("hero_images");
+      if (Array.isArray(heroImagesVal) && heroImagesVal.length > 0) {
+        heroes["page_hero_home"] = heroImagesVal;
+      }
+      setPageHeroes(heroes);
 
       const navConfig = findSetting("header_nav_config");
       if (Array.isArray(navConfig) && navConfig.length > 0) {
@@ -222,6 +347,35 @@ export default function CMSSettings() {
                 <p className="text-xs text-gray-400 mt-1">Optional: A background video plays behind the hero slider. Upload in Media Library first.</p>
                 {heroVideoUrl && <video data-testid="video-preview-hero" src={heroVideoUrl} controls muted className="mt-2 w-full max-w-sm rounded border" />}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <ImageIcon className="w-5 h-5 text-brand-blue" /> Page Hero Images
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-gray-400">Upload hero background images for each page. Changes apply immediately after save.</p>
+              {PAGE_HEROES.map((ph) => (
+                <HeroImageUploader
+                  key={ph.key}
+                  settingKey={ph.key}
+                  label={ph.label}
+                  currentValue={pageHeroes[ph.key] || (ph.isSlider ? [] : "")}
+                  isSlider={ph.isSlider}
+                  onSave={(key, value) => {
+                    if (key === "page_hero_home") {
+                      saveSetting("hero_images", value);
+                    } else {
+                      saveSetting(key, value);
+                    }
+                    setPageHeroes(prev => ({ ...prev, [key]: value }));
+                  }}
+                  isPending={saveMutation.isPending}
+                />
+              ))}
             </CardContent>
           </Card>
 

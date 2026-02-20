@@ -4,7 +4,7 @@ import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
 import { useI18n } from "@/lib/i18n";
 import { useEditMode } from "@/lib/editMode";
-import { useCMSPage } from "@/lib/cms";
+import { useCMSPage, usePageHeroImage } from "@/lib/cms";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Anchor, Sun, Heart, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,17 +15,16 @@ import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.
 import beachClubImg from "@assets/DSC05597.png11_1770196278235.png";
 import royalBayImg from "@assets/WhatsApp_Image_2025-12-22_at_12.58.16_PM_(1)_1770197117342.jpeg";
 import laPlageImg from "@assets/22_1770196761222.png";
-const aboutHeroImg = "/uploads/page-heroes/about-hero-aerial.jpg";
-
 export default function About() {
   const { t, language } = useI18n();
   const { data: cmsAbout } = useCMSPage("about");
   const { isEditMode, pageContent, updateContent, uploadImage, setSelectedKey } = useEditMode();
   const heroFileRef = useRef<HTMLInputElement>(null);
   const [heroUploading, setHeroUploading] = useState(false);
+  const aboutHeroImg = usePageHeroImage("about", "/uploads/page-heroes/about-hero-aerial.jpg");
 
   const heroImgKey = "img:about.hero.bg";
-  const heroSrc = pageContent[heroImgKey] ?? aboutHeroImg;
+  const heroSrc = aboutHeroImg;
 
   const handleHeroImageClick = useCallback(() => {
     if (isEditMode) {
