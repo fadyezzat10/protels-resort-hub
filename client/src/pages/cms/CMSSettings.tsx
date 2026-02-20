@@ -252,6 +252,7 @@ export default function CMSSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cms/settings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/public/settings"] });
       toast({ title: "Setting saved successfully" });
     },
     onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
