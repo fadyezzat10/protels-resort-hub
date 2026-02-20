@@ -16,7 +16,8 @@ interface HotelCardProps {
 
 export default function HotelCard({ hotel, featured = false, index = 0 }: HotelCardProps) {
   const { t, language } = useI18n();
-  const bookingLink = useBookingLink();
+  const globalBookingLink = useBookingLink();
+  const bookingLink = hotel.bookingLink || globalBookingLink;
 
   return (
     <motion.div

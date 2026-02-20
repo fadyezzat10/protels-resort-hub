@@ -53,6 +53,7 @@ export const hotels = pgTable("hotels", {
   heroVideo: text("hero_video"),
   theme: jsonb("theme").$type<Record<string, any>>(),
   tabConfig: jsonb("tab_config").$type<{ tabs: { id: string; label: string; visible: boolean; order: number }[] }>(),
+  bookingLink: text("booking_link"),
   status: text("status").notNull().default("draft"),
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),

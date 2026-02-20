@@ -126,6 +126,7 @@ function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
     heroVideo: cmsHotel.heroVideo || staticHotel.heroVideo,
     theme: cmsHotel.theme || staticHotel.theme,
     tabConfig: cmsHotel.tabConfig || staticHotel.tabConfig,
+    bookingLink: cmsHotel.bookingLink || staticHotel.bookingLink,
   };
 }
 
@@ -159,6 +160,7 @@ export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean }
       roomDetails: ch.roomDetails || [],
       gallery: ch.gallery || [],
       mapLink: ch.mapLink,
+      bookingLink: ch.bookingLink,
     }));
 
   return { hotels: [...merged, ...newCMSHotels], isLoading };
@@ -207,6 +209,7 @@ export function useMergedHotel(hotelId: string): { hotel: StaticHotel | null; is
         heroVideo: cmsHotel.heroVideo,
         theme: cmsHotel.theme,
         tabConfig: cmsHotel.tabConfig,
+        bookingLink: cmsHotel.bookingLink,
       },
       isLoading,
     };

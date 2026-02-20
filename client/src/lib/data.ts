@@ -89,6 +89,7 @@ export interface Hotel {
   heroVideo?: string;
   theme?: { primaryColor?: string; secondaryColor?: string; accentColor?: string };
   tabConfig?: { tabs: { id: string; label: string; visible: boolean; order: number }[] };
+  bookingLink?: string;
 }
 
 export const hotels: Hotel[] = [

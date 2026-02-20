@@ -29,7 +29,8 @@ export default function HotelDetails() {
   
   const { hotel: mergedHotel } = useMergedHotel(hotelId || "");
   const hotel = mergedHotel || staticHotels.find(h => h.id === hotelId);
-  const bookingLink = useBookingLink();
+  const globalBookingLink = useBookingLink();
+  const bookingLink = hotel?.bookingLink || globalBookingLink;
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
 
   if (!hotel) return <NotFound />;
@@ -97,6 +98,7 @@ export default function HotelDetails() {
         title={hotel.name}
         subtitle={hotel.location}
         height="large"
+        bookingLink={bookingLink}
         editPrefix={`hotel.${hotel.id}.hero`}
       />
 

@@ -94,6 +94,7 @@ interface HotelForm {
   roomDetails: RoomDetail[];
   gallery: string[];
   mapLink: string;
+  bookingLink: string;
   status: string;
   sortOrder: number;
   heroVideo: string;
@@ -123,6 +124,7 @@ const emptyForm: HotelForm = {
   roomDetails: [],
   gallery: [],
   mapLink: "",
+  bookingLink: "",
   status: "draft",
   sortOrder: 0,
   heroVideo: "",
@@ -247,6 +249,7 @@ export default function CMSHotels() {
     roomDetails: form.roomDetails,
     gallery: form.gallery,
     mapLink: form.mapLink || null,
+    bookingLink: form.bookingLink || null,
     status: form.status,
     sortOrder: form.sortOrder,
     heroVideo: form.heroVideo || null,
@@ -291,6 +294,7 @@ export default function CMSHotels() {
       roomDetails: hotel.roomDetails || [],
       gallery: hotel.gallery || [],
       mapLink: hotel.mapLink || "",
+      bookingLink: hotel.bookingLink || "",
       status: hotel.status || "draft",
       sortOrder: hotel.sortOrder || 0,
       heroVideo: hotel.heroVideo || "",
@@ -1122,6 +1126,30 @@ export default function CMSHotels() {
                     className="text-sm text-brand-blue hover:underline mt-2 inline-block"
                   >
                     فتح في خرائط جوجل ↗
+                  </a>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-1.5 block flex items-center gap-2">
+                  <Link2 className="w-4 h-4" />
+                  رابط الحجز الخاص بالفندق
+                </label>
+                <Input
+                  data-testid="input-hotel-booking-link"
+                  value={form.bookingLink}
+                  onChange={(e) => setForm({ ...form, bookingLink: e.target.value })}
+                  placeholder="https://protels.book-onlinenow.net/..."
+                />
+                <p className="text-xs text-gray-400 mt-1">رابط صفحة الحجز الخاصة بهذا الفندق. لو فاضي هيستخدم الرابط العام من الإعدادات.</p>
+                {form.bookingLink && (
+                  <a
+                    href={form.bookingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-brand-blue hover:underline mt-2 inline-block"
+                  >
+                    فتح صفحة الحجز ↗
                   </a>
                 )}
               </div>
