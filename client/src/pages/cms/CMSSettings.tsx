@@ -154,6 +154,7 @@ export default function CMSSettings() {
   const [rbDescEn, setRbDescEn] = useState("");
   const [rbDescAr, setRbDescAr] = useState("");
   const [rbVisible, setRbVisible] = useState(true);
+  const [rbUploadProgress, setRbUploadProgress] = useState<number | null>(null);
   const [pageHeroes, setPageHeroes] = useState<Record<string, any>>({});
   const [footerDescEn, setFooterDescEn] = useState("");
   const [footerDescAr, setFooterDescAr] = useState("");
@@ -420,6 +421,7 @@ export default function CMSSettings() {
                     size="sm"
                     variant="outline"
                     className="gap-2"
+                    disabled={rbUploadProgress !== null}
                     onClick={() => {
                       const input = document.createElement("input");
                       input.type = "file";
@@ -429,29 +431,61 @@ export default function CMSSettings() {
                         if (!file) return;
                         const formData = new FormData();
                         formData.append("file", file);
-                        toast({ title: "Uploading video...", description: `${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)` });
-                        try {
-                          const res = await fetch("/api/cms/media", {
-                            method: "POST",
-                            body: formData,
-                            credentials: "include",
-                          });
-                          if (!res.ok) throw new Error("Upload failed");
-                          const data = await res.json();
-                          setRbVideoUrl(data.url);
-                          await saveSettingAsync("royal_bay_video_url", data.url);
-                          toast({ title: "Video uploaded and saved!" });
-                        } catch (err: any) {
-                          toast({ title: "Upload failed", description: err.message, variant: "destructive" });
-                        }
+                        setRbUploadProgress(0);
+                        const xhr = new XMLHttpRequest();
+                        xhr.open("POST", "/api/cms/media");
+                        xhr.withCredentials = true;
+                        xhr.upload.onprogress = (ev) => {
+                          if (ev.lengthComputable) {
+                            setRbUploadProgress(Math.round((ev.loaded / ev.total) * 100));
+                          }
+                        };
+                        xhr.onload = async () => {
+                          if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                              const data = JSON.parse(xhr.responseText);
+                              setRbVideoUrl(data.url);
+                              await saveSettingAsync("royal_bay_video_url", data.url);
+                              toast({ title: "Video uploaded and saved!" });
+                            } catch {
+                              toast({ title: "Upload failed", variant: "destructive" });
+                            }
+                          } else {
+                            toast({ title: "Upload failed", description: `Server error (${xhr.status})`, variant: "destructive" });
+                          }
+                          setRbUploadProgress(null);
+                        };
+                        xhr.onerror = () => {
+                          toast({ title: "Upload failed", description: "Network error", variant: "destructive" });
+                          setRbUploadProgress(null);
+                        };
+                        xhr.send(formData);
                       };
                       input.click();
                     }}
                   >
-                    <Upload className="w-4 h-4" /> Upload MP4 File
+                    {rbUploadProgress !== null ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {rbUploadProgress !== null ? `Uploading... ${rbUploadProgress}%` : "Upload MP4 File"}
                   </Button>
                   <span className="text-xs text-gray-400 self-center">or paste a YouTube / MP4 link above</span>
                 </div>
+                {rbUploadProgress !== null && (
+                  <div className="mt-2">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="text-sm font-medium text-brand-blue">{rbUploadProgress}%</span>
+                      <span className="text-xs text-gray-400">{rbUploadProgress < 100 ? "Uploading..." : "Processing..."}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-300 ease-out"
+                        style={{
+                          width: `${rbUploadProgress}%`,
+                          background: "linear-gradient(90deg, hsl(215 45% 15%), hsl(215 45% 35%))",
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
                 {rbVideoUrl && (() => {
                   const ytId = getYouTubeId(rbVideoUrl);
                   if (ytId) {
