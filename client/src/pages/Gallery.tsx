@@ -3,7 +3,7 @@ import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { useMergedHotels, useCMSMedia } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
-import heroImg from "@/assets/images/hotel-la-plage.jpg";
+const heroImg = "/uploads/page-heroes/hotel-la-plage.jpg";
 
 export default function Gallery() {
   const { t } = useI18n();

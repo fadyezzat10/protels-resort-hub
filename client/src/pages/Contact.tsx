@@ -3,7 +3,7 @@ import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import { useI18n } from "@/lib/i18n";
-import heroImg from "@/assets/images/hotel-beach-club.jpg";
+const heroImg = "/uploads/page-heroes/hotel-beach-club.jpg";
 import { Mail, Phone, MapPin, Smartphone, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

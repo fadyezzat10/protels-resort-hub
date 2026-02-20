@@ -5,8 +5,6 @@ import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import { useMergedHotels } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
-import heroImg from "@/assets/images/hotels-hero-aerial.jpg";
-
 export default function Hotels() {
   const { t } = useI18n();
   const { hotels } = useMergedHotels();
@@ -16,7 +14,7 @@ export default function Hotels() {
       <Navbar />
       
       <Hero 
-        image={heroImg}
+        image="/uploads/page-heroes/hotels-hero-aerial.jpg"
         title={t("nav.hotels")}
         subtitle="Our Collection"
         height="half"
