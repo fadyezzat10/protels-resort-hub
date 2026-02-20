@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns, Upload, Loader2, X, ImageIcon } from "lucide-react";
+import { getYouTubeId } from "@/pages/Home";
+import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns, Upload, Loader2, X, ImageIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -147,6 +148,12 @@ export default function CMSSettings() {
   const [heroSubtitleAr, setHeroSubtitleAr] = useState("");
   const [heroImagesText, setHeroImagesText] = useState("");
   const [heroVideoUrl, setHeroVideoUrl] = useState("");
+  const [rbVideoUrl, setRbVideoUrl] = useState("");
+  const [rbTitleEn, setRbTitleEn] = useState("");
+  const [rbTitleAr, setRbTitleAr] = useState("");
+  const [rbDescEn, setRbDescEn] = useState("");
+  const [rbDescAr, setRbDescAr] = useState("");
+  const [rbVisible, setRbVisible] = useState(true);
   const [pageHeroes, setPageHeroes] = useState<Record<string, any>>({});
   const [footerDescEn, setFooterDescEn] = useState("");
   const [footerDescAr, setFooterDescAr] = useState("");
@@ -209,6 +216,21 @@ export default function CMSSettings() {
         setHeroImagesText(heroImages.join("\n"));
       }
       setHeroVideoUrl(findSetting("hero_video") || "");
+
+      setRbVideoUrl(findSetting("royal_bay_video_url") || "");
+      const rbTitle = findSetting("royal_bay_video_title");
+      if (rbTitle && typeof rbTitle === "object") {
+        setRbTitleEn(rbTitle.en || "");
+        setRbTitleAr(rbTitle.ar || "");
+      }
+      const rbDesc = findSetting("royal_bay_video_description");
+      if (rbDesc && typeof rbDesc === "object") {
+        setRbDescEn(rbDesc.en || "");
+        setRbDescAr(rbDesc.ar || "");
+      }
+      const rbVis = findSetting("royal_bay_video_visible");
+      setRbVisible(rbVis !== false);
+
       const footerDesc = findSetting("footer_description");
       if (footerDesc && typeof footerDesc === "object") {
         setFooterDescEn(footerDesc.en || "");
@@ -359,6 +381,79 @@ export default function CMSSettings() {
                 <p className="text-xs text-gray-400 mt-1">Optional: A background video plays behind the hero slider. Upload in Media Library first.</p>
                 {heroVideoUrl && <video data-testid="video-preview-hero" src={heroVideoUrl} controls muted className="mt-2 w-full max-w-sm rounded border" />}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Video className="w-5 h-5 text-brand-blue" /> Royal Bay Video Section
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-gray-400">Manage the Royal Bay Resort video section shown on the Home page. Supports YouTube links and MP4 URLs.</p>
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium">Show on Home page</label>
+                <Button
+                  size="sm"
+                  variant={rbVisible ? "default" : "outline"}
+                  onClick={() => {
+                    const newVal = !rbVisible;
+                    setRbVisible(newVal);
+                    saveSetting("royal_bay_video_visible", newVal);
+                  }}
+                  disabled={saveMutation.isPending}
+                  className="gap-1"
+                >
+                  {rbVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  {rbVisible ? "Visible" : "Hidden"}
+                </Button>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Video URL (YouTube or MP4)</label>
+                <div className="flex gap-2">
+                  <Input value={rbVideoUrl} onChange={(e) => setRbVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4" />
+                  <Button size="sm" onClick={() => saveSetting("royal_bay_video_url", rbVideoUrl)} disabled={saveMutation.isPending}><Save className="w-4 h-4" /></Button>
+                </div>
+                {rbVideoUrl && (() => {
+                  const ytId = getYouTubeId(rbVideoUrl);
+                  if (ytId) {
+                    return (
+                      <div className="mt-2 aspect-video max-w-sm rounded border overflow-hidden">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytId}`}
+                          className="w-full h-full"
+                          allow="encrypted-media"
+                          allowFullScreen
+                        />
+                      </div>
+                    );
+                  }
+                  return <video src={rbVideoUrl} controls muted className="mt-2 w-full max-w-sm rounded border" />;
+                })()}
+              </div>
+              <div className="border-t pt-4">
+                <label className="text-sm font-medium mb-1 block">Title (English)</label>
+                <Input value={rbTitleEn} onChange={(e) => setRbTitleEn(e.target.value)} placeholder="Protels Royal Bay Resort & Spa" />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Title (Arabic)</label>
+                <Input dir="rtl" value={rbTitleAr} onChange={(e) => setRbTitleAr(e.target.value)} placeholder="بروتيلز رويال باي ريزورت آند سبا" />
+              </div>
+              <Button size="sm" onClick={() => saveSetting("royal_bay_video_title", { en: rbTitleEn, ar: rbTitleAr })} disabled={saveMutation.isPending} className="w-full">
+                <Save className="w-4 h-4 mr-2" /> Save Title
+              </Button>
+              <div className="border-t pt-4">
+                <label className="text-sm font-medium mb-1 block">Description (English)</label>
+                <Textarea value={rbDescEn} onChange={(e) => setRbDescEn(e.target.value)} placeholder="Opening Summer 2026 in Hurghada, Egypt" rows={3} />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Description (Arabic)</label>
+                <Textarea dir="rtl" value={rbDescAr} onChange={(e) => setRbDescAr(e.target.value)} placeholder="الافتتاح صيف 2026 في الغردقة، مصر" rows={3} />
+              </div>
+              <Button size="sm" onClick={() => saveSetting("royal_bay_video_description", { en: rbDescEn, ar: rbDescAr })} disabled={saveMutation.isPending} className="w-full">
+                <Save className="w-4 h-4 mr-2" /> Save Description
+              </Button>
             </CardContent>
           </Card>
 

@@ -4,8 +4,10 @@ import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
-import { useMergedHotels, useHeroContent, useBookingLink } from "@/lib/cms";
+import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
+import { Play } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
 
 import slider1 from "@assets/Gemini_Generated_Image_g6moaog6moaog6mo_1770195209224.png";
 import slider2 from "@assets/DSC05597.png11_1770195240514.png";
@@ -15,11 +17,104 @@ import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.png";
 
 const staticSliderImages = [slider1, slider2, slider3, slider4, slider5];
 
+export function getYouTubeId(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+  return match ? match[1] : null;
+}
+
+function RoyalBayVideoSection({ videoUrl, title, description }: { videoUrl: string; title: string; description: string }) {
+  const [playing, setPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const youtubeId = getYouTubeId(videoUrl);
+  const isYoutube = !!youtubeId;
+
+  const handlePlay = useCallback(() => {
+    setPlaying(true);
+    if (!isYoutube && videoRef.current) {
+      videoRef.current.play();
+    }
+  }, [isYoutube]);
+
+  return (
+    <section className="py-20 bg-brand-white" data-testid="royal-bay-video-section">
+      <div className="container-padding">
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <span className="text-brand-gold uppercase tracking-widest font-medium text-sm mb-2 block">
+            Coming Soon
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-brand-blue font-medium mb-4">
+            {title || "Protels Royal Bay Resort & Spa"}
+          </h2>
+          <div className="w-24 h-1 bg-brand-gold mx-auto mb-6" />
+          <p className="text-gray-600 text-lg leading-relaxed">
+            {description || "Opening Summer 2026 in Hurghada, Egypt"}
+          </p>
+        </div>
+
+        <div className="relative w-full max-w-5xl mx-auto aspect-video rounded-xl overflow-hidden shadow-2xl group">
+          {isYoutube ? (
+            playing ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                title={title}
+              />
+            ) : (
+              <>
+                <img
+                  src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
+                  alt={title}
+                  className="w-full h-full object-cover"
+                />
+                <div
+                  data-testid="royal-bay-play-overlay"
+                  className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer group-hover:bg-black/40 transition-colors"
+                  onClick={handlePlay}
+                >
+                  <div className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <Play className="w-8 h-8 text-brand-blue ml-1" fill="currentColor" />
+                  </div>
+                </div>
+              </>
+            )
+          ) : (
+            <>
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                className="w-full h-full object-cover"
+                controls={playing}
+                playsInline
+                preload="metadata"
+                data-testid="royal-bay-video-player"
+              />
+              {!playing && (
+                <div
+                  data-testid="royal-bay-mp4-play-overlay"
+                  className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer group-hover:bg-black/40 transition-colors"
+                  onClick={handlePlay}
+                >
+                  <div className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <Play className="w-8 h-8 text-brand-blue ml-1" fill="currentColor" />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const { t, language } = useI18n();
   const { hotels } = useMergedHotels();
   const { heroTitle, heroSubtitle, heroImages, heroVideo } = useHeroContent(language);
   const bookingLink = useBookingLink();
+  const royalBay = useRoyalBayVideo(language);
 
   const finalHeroImages = heroImages.length > 0 ? heroImages : staticSliderImages;
 
@@ -35,6 +130,14 @@ export default function Home() {
         bookingLink={bookingLink}
         editPrefix="home.hero"
       />
+
+      {royalBay.visible && royalBay.videoUrl && (
+        <RoyalBayVideoSection
+          videoUrl={royalBay.videoUrl}
+          title={royalBay.title}
+          description={royalBay.description}
+        />
+      )}
 
       <section className="py-20 container-padding">
         <div className="text-center max-w-2xl mx-auto mb-16">

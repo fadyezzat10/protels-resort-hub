@@ -244,6 +244,17 @@ export function usePageHeroImage(pageKey: string, fallback: string): string {
   return fallback;
 }
 
+export function useRoyalBayVideo(language: string) {
+  const { data: settings } = useCMSAllSettings();
+  
+  const videoUrl = settings?.royal_bay_video_url || "";
+  const title = settings?.royal_bay_video_title?.[language] || settings?.royal_bay_video_title?.en || "";
+  const description = settings?.royal_bay_video_description?.[language] || settings?.royal_bay_video_description?.en || "";
+  const visible = settings?.royal_bay_video_visible !== false;
+
+  return { videoUrl, title, description, visible };
+}
+
 export function useFooterContent(language: string) {
   const { data: settings } = useCMSAllSettings();
 
