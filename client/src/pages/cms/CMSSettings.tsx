@@ -429,37 +429,44 @@ export default function CMSSettings() {
                       input.onchange = async (e) => {
                         const file = (e.target as HTMLInputElement).files?.[0];
                         if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
                         setRbUploadProgress(0);
-                        const xhr = new XMLHttpRequest();
-                        xhr.open("POST", "/api/cms/media");
-                        xhr.withCredentials = true;
-                        xhr.upload.onprogress = (ev) => {
-                          if (ev.lengthComputable) {
-                            setRbUploadProgress(Math.round((ev.loaded / ev.total) * 100));
-                          }
-                        };
-                        xhr.onload = async () => {
-                          if (xhr.status >= 200 && xhr.status < 300) {
-                            try {
-                              const data = JSON.parse(xhr.responseText);
-                              setRbVideoUrl(data.url);
-                              await saveSettingAsync("royal_bay_video_url", data.url);
-                              toast({ title: "Video uploaded and saved!" });
-                            } catch {
-                              toast({ title: "Upload failed", variant: "destructive" });
+                        try {
+                          const urlRes = await fetch("/api/cms/video-upload-url", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                            body: JSON.stringify({ filename: file.name, contentType: file.type || "video/mp4" }),
+                          });
+                          if (!urlRes.ok) throw new Error("Failed to get upload URL");
+                          const { uploadUrl, serveUrl } = await urlRes.json();
+
+                          const xhr = new XMLHttpRequest();
+                          xhr.open("PUT", uploadUrl);
+                          xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
+                          xhr.upload.onprogress = (ev) => {
+                            if (ev.lengthComputable) {
+                              setRbUploadProgress(Math.round((ev.loaded / ev.total) * 100));
                             }
-                          } else {
-                            toast({ title: "Upload failed", description: `Server error (${xhr.status})`, variant: "destructive" });
-                          }
+                          };
+                          xhr.onload = async () => {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                              setRbVideoUrl(serveUrl);
+                              await saveSettingAsync("royal_bay_video_url", serveUrl);
+                              toast({ title: "Video uploaded and saved!" });
+                            } else {
+                              toast({ title: "Upload failed", description: `Storage error (${xhr.status})`, variant: "destructive" });
+                            }
+                            setRbUploadProgress(null);
+                          };
+                          xhr.onerror = () => {
+                            toast({ title: "Upload failed", description: "Network error", variant: "destructive" });
+                            setRbUploadProgress(null);
+                          };
+                          xhr.send(file);
+                        } catch (err: any) {
+                          toast({ title: "Upload failed", description: err.message, variant: "destructive" });
                           setRbUploadProgress(null);
-                        };
-                        xhr.onerror = () => {
-                          toast({ title: "Upload failed", description: "Network error", variant: "destructive" });
-                          setRbUploadProgress(null);
-                        };
-                        xhr.send(formData);
+                        }
                       };
                       input.click();
                     }}

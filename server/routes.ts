@@ -288,6 +288,43 @@ export async function registerRoutes(
     res.json(await storage.getMediaFiles());
   });
 
+  app.post("/api/cms/video-upload-url", requireAuth, async (req, res) => {
+    try {
+      const { filename, contentType } = req.body;
+      if (!filename) return res.status(400).json({ message: "filename required" });
+
+      const objService = new ObjectStorageService();
+      const publicPaths = objService.getPublicObjectSearchPaths();
+      if (!publicPaths.length) return res.status(500).json({ message: "Object Storage not configured" });
+
+      const bucketPath = publicPaths[0];
+      const safeName = `video-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(filename)}`;
+      const fullPath = `${bucketPath}/${safeName}`;
+      const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+      const parts = p.split("/");
+      const bucketName = parts[1];
+      const objectName = parts.slice(2).join("/");
+
+      const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+
+      const [signedUrl] = await file.getSignedUrl({
+        version: "v4",
+        action: "write",
+        expires: Date.now() + 15 * 60 * 1000,
+        contentType: contentType || "video/mp4",
+      });
+
+      const serveUrl = `/uploads/${safeName}`;
+
+      res.json({ uploadUrl: signedUrl, serveUrl, filename: safeName });
+    } catch (e: any) {
+      console.error("[video-upload-url] Error:", e.message);
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   app.post("/api/cms/media", requireAuth, upload.single("file"), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
