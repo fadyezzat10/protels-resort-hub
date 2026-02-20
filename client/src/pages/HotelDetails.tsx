@@ -24,7 +24,8 @@ export default function HotelDetails() {
 
   const params = matchHotels ? paramsHotels : paramsRoot;
   const hotelId = params?.hotelId || location.split('/').filter(Boolean).pop() || "";
-  const activeSection = params?.section || "overview";
+  const rawSection = params?.section || "overview";
+  const activeSection = rawSection === "rooms" ? "accommodation" : rawSection;
   const basePath = matchHotels ? `/hotels/${hotelId}` : `/${hotelId}`;
   
   const { hotel: mergedHotel } = useMergedHotel(hotelId || "");
@@ -44,13 +45,16 @@ export default function HotelDetails() {
     { id: "contact", label: t("nav.contact"), order: 6 },
   ];
 
+  const normalizeTabId = (id: string) => id === "rooms" ? "accommodation" : id;
+
   const tabs = hotel.tabConfig?.tabs
     ? hotel.tabConfig.tabs
         .filter((t) => t.visible !== false)
         .sort((a, b) => a.order - b.order)
         .map((t) => {
-          const def = defaultTabs.find((d) => d.id === t.id);
-          return { id: t.id, label: def?.label || t.label };
+          const nid = normalizeTabId(t.id);
+          const def = defaultTabs.find((d) => d.id === nid);
+          return { id: nid, label: def?.label || t.label };
         })
     : defaultTabs;
 
