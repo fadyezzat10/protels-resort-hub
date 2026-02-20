@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useBookingLink } from "@/lib/cms";
-import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, useCallback } from "react";
 import EditableText from "@/components/EditableText";
 import { useEditMode } from "@/lib/editMode";
@@ -34,6 +33,8 @@ export default function Hero({
   const cmsBookingLink = useBookingLink();
   const finalBookingLink = bookingLinkProp || cmsBookingLink;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { isEditMode, pageContent, updateContent, uploadImage, setSelectedKey } = useEditMode();
   const fileRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -44,14 +45,24 @@ export default function Hero({
     if (heroImages.length <= 1) return;
 
     const timer = setInterval(() => {
+      setPrevIndex(currentIndex);
+      setIsTransitioning(true);
       setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+      setTimeout(() => setIsTransitioning(false), 2000);
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [heroImages.length]);
+  }, [heroImages.length, currentIndex]);
+
+  const getImgSrc = (idx: number) => {
+    const key = `img:${editPrefix}.bg.${idx}`;
+    return pageContent[key] ?? heroImages[idx];
+  };
+
+  const currentSrc = getImgSrc(currentIndex);
+  const prevSrc = getImgSrc(prevIndex);
 
   const imgKey = `img:${editPrefix}.bg.${currentIndex}`;
-  const currentSrc = pageContent[imgKey] ?? heroImages[currentIndex];
 
   const handleImageClick = useCallback(() => {
     if (isEditMode) {
@@ -97,37 +108,28 @@ export default function Hero({
             className="absolute inset-0 w-full h-full object-cover"
           />
           {heroImages.length > 0 && (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                className="absolute inset-0 w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.3 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 2, ease: "easeInOut" }}
-              >
-                <img src={currentSrc} alt="Overlay" className="w-full h-full object-cover mix-blend-overlay" />
-              </motion.div>
-            </AnimatePresence>
+            <div className="absolute inset-0 w-full h-full">
+              <img src={currentSrc} alt="Overlay" className="w-full h-full object-cover mix-blend-overlay opacity-30" />
+            </div>
           )}
         </div>
       ) : (
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={currentIndex}
-            className="absolute inset-0 w-full h-full"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2, ease: "easeInOut" }}
-          >
-            <img 
-              src={currentSrc} 
-              alt="Luxury Resort" 
-              className="w-full h-full object-cover"
+        <div className="absolute inset-0 w-full h-full">
+          {prevIndex !== currentIndex && (
+            <img
+              src={prevSrc}
+              alt="Resort"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ opacity: isTransitioning ? 0 : 1, transition: "opacity 2s ease-in-out" }}
             />
-          </motion.div>
-        </AnimatePresence>
+          )}
+          <img
+            src={currentSrc}
+            alt="Luxury Resort"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: 1, transition: "opacity 2s ease-in-out" }}
+          />
+        </div>
       )}
       
       <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" /> 
@@ -162,12 +164,7 @@ export default function Hero({
       )}
 
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center container-padding pt-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-          className="max-w-5xl"
-        >
+        <div className="max-w-5xl animate-fade-in-up">
           {subtitle && (
             <EditableText
               contentKey={`${editPrefix}.subtitle`}
@@ -198,7 +195,7 @@ export default function Hero({
               </Button>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {heroImages.length > 1 && (
