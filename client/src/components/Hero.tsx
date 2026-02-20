@@ -115,20 +115,24 @@ export default function Hero({
         </div>
       ) : (
         <div className="absolute inset-0 w-full h-full">
+          <img
+            src={currentSrc}
+            alt="Luxury Resort"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ zIndex: 1 }}
+          />
           {prevIndex !== currentIndex && (
             <img
               src={prevSrc}
               alt="Resort"
               className="absolute inset-0 w-full h-full object-cover"
-              style={{ opacity: isTransitioning ? 0 : 1, transition: "opacity 2s ease-in-out" }}
+              style={{ 
+                zIndex: 2, 
+                opacity: isTransitioning ? 0 : 1, 
+                transition: "opacity 2s ease-in-out" 
+              }}
             />
           )}
-          <img
-            src={currentSrc}
-            alt="Luxury Resort"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ opacity: 1, transition: "opacity 2s ease-in-out" }}
-          />
         </div>
       )}
       
