@@ -415,6 +415,43 @@ export default function CMSSettings() {
                   <Input value={rbVideoUrl} onChange={(e) => setRbVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4" />
                   <Button size="sm" onClick={() => saveSetting("royal_bay_video_url", rbVideoUrl)} disabled={saveMutation.isPending}><Save className="w-4 h-4" /></Button>
                 </div>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => {
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = "video/*";
+                      input.onchange = async (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        toast({ title: "Uploading video...", description: `${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)` });
+                        try {
+                          const res = await fetch("/api/cms/media", {
+                            method: "POST",
+                            body: formData,
+                            credentials: "include",
+                          });
+                          if (!res.ok) throw new Error("Upload failed");
+                          const data = await res.json();
+                          setRbVideoUrl(data.url);
+                          await saveSettingAsync("royal_bay_video_url", data.url);
+                          toast({ title: "Video uploaded and saved!" });
+                        } catch (err: any) {
+                          toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    <Upload className="w-4 h-4" /> Upload MP4 File
+                  </Button>
+                  <span className="text-xs text-gray-400 self-center">or paste a YouTube / MP4 link above</span>
+                </div>
                 {rbVideoUrl && (() => {
                   const ytId = getYouTubeId(rbVideoUrl);
                   if (ytId) {

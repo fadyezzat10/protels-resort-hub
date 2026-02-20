@@ -42,7 +42,7 @@ const upload = multer({
       cb(null, uniqueName);
     },
   }),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 100 * 1024 * 1024 },
 });
 
 export async function registerRoutes(
