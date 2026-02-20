@@ -21,7 +21,7 @@ export default function About() {
   const { isEditMode, pageContent, updateContent, uploadImage, setSelectedKey } = useEditMode();
   const heroFileRef = useRef<HTMLInputElement>(null);
   const [heroUploading, setHeroUploading] = useState(false);
-  const aboutHeroImg = usePageHeroImage("about", "/uploads/page-heroes/about-hero-aerial.jpg");
+  const aboutHeroImg = usePageHeroImage("about", "");
 
   const heroImgKey = "img:about.hero.bg";
   const heroSrc = aboutHeroImg;

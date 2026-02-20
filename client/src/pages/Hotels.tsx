@@ -9,7 +9,7 @@ import { useI18n } from "@/lib/i18n";
 export default function Hotels() {
   const { t } = useI18n();
   const { hotels } = useMergedHotels();
-  const heroImg = usePageHeroImage("hotels", "/uploads/page-heroes/hotels-hero-aerial.jpg");
+  const heroImg = usePageHeroImage("hotels", "");
 
   return (
     <div className="min-h-screen bg-brand-white">

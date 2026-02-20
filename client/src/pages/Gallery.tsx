@@ -8,7 +8,7 @@ export default function Gallery() {
   const { t } = useI18n();
   const { hotels } = useMergedHotels();
   const { data: cmsMedia } = useCMSMedia();
-  const heroImg = usePageHeroImage("gallery", "/uploads/page-heroes/hotel-la-plage.jpg");
+  const heroImg = usePageHeroImage("gallery", "");
   
   const hotelImages = hotels.map(h => ({ src: h.image, title: h.name }));
 

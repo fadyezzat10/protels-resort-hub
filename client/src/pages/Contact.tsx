@@ -66,7 +66,7 @@ const hotelsContactInfo = [
 
 export default function Contact() {
   const { t, language } = useI18n();
-  const heroImg = usePageHeroImage("contact", "/uploads/page-heroes/hotel-beach-club.jpg");
+  const heroImg = usePageHeroImage("contact", "");
 
   return (
     <div className="min-h-screen bg-brand-white">
