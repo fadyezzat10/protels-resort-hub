@@ -33,8 +33,6 @@ export default function Hero({
   const cmsBookingLink = useBookingLink();
   const finalBookingLink = bookingLinkProp || cmsBookingLink;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [prevIndex, setPrevIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const { isEditMode, pageContent, updateContent, uploadImage, setSelectedKey } = useEditMode();
   const fileRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -45,22 +43,16 @@ export default function Hero({
     if (heroImages.length <= 1) return;
 
     const timer = setInterval(() => {
-      setPrevIndex(currentIndex);
-      setIsTransitioning(true);
       setCurrentIndex((prev) => (prev + 1) % heroImages.length);
-      setTimeout(() => setIsTransitioning(false), 2000);
-    }, 5000);
+    }, 6000);
 
     return () => clearInterval(timer);
-  }, [heroImages.length, currentIndex]);
+  }, [heroImages.length]);
 
   const getImgSrc = (idx: number) => {
     const key = `img:${editPrefix}.bg.${idx}`;
     return pageContent[key] ?? heroImages[idx];
   };
-
-  const currentSrc = getImgSrc(currentIndex);
-  const prevSrc = getImgSrc(prevIndex);
 
   const imgKey = `img:${editPrefix}.bg.${currentIndex}`;
 
@@ -109,30 +101,25 @@ export default function Hero({
           />
           {heroImages.length > 0 && (
             <div className="absolute inset-0 w-full h-full">
-              <img src={currentSrc} alt="Overlay" className="w-full h-full object-cover mix-blend-overlay opacity-30" />
+              <img src={getImgSrc(currentIndex)} alt="Overlay" className="w-full h-full object-cover mix-blend-overlay opacity-30" />
             </div>
           )}
         </div>
       ) : (
         <div className="absolute inset-0 w-full h-full">
-          <img
-            src={currentSrc}
-            alt="Luxury Resort"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ zIndex: 1 }}
-          />
-          {prevIndex !== currentIndex && (
+          {heroImages.map((_, idx) => (
             <img
-              src={prevSrc}
-              alt="Resort"
+              key={idx}
+              src={getImgSrc(idx)}
+              alt={`Resort ${idx + 1}`}
               className="absolute inset-0 w-full h-full object-cover"
-              style={{ 
-                zIndex: 2, 
-                opacity: isTransitioning ? 0 : 1, 
-                transition: "opacity 2s ease-in-out" 
+              style={{
+                opacity: idx === currentIndex ? 1 : 0,
+                transition: "opacity 1.5s ease-in-out",
+                zIndex: idx === currentIndex ? 2 : 1,
               }}
             />
-          )}
+          ))}
         </div>
       )}
       
@@ -208,7 +195,7 @@ export default function Hero({
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              className={`w-2 h-2 rounded-full transition-all duration-500 ${
                 idx === currentIndex ? "bg-brand-gold w-8" : "bg-white/50 hover:bg-white"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
