@@ -163,8 +163,8 @@ export default function HotelDetails() {
                             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" className="group-hover:fill-white"/>
                           </svg>
                           <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">Google Reviews</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">{t("hotel.googleReviews")}</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -184,7 +184,7 @@ export default function HotelDetails() {
                           </svg>
                           <div className="text-left">
                             <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">TripAdvisor</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -201,7 +201,7 @@ export default function HotelDetails() {
                           </div>
                           <div className="text-left">
                             <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">HolidayCheck</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -228,8 +228,8 @@ export default function HotelDetails() {
                             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" className="group-hover:fill-white"/>
                           </svg>
                           <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">Google Reviews</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">{t("hotel.googleReviews")}</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -249,7 +249,7 @@ export default function HotelDetails() {
                           </svg>
                           <div className="text-left">
                             <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">TripAdvisor</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -276,8 +276,8 @@ export default function HotelDetails() {
                             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" className="group-hover:fill-white"/>
                           </svg>
                           <div className="text-left">
-                            <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">Google Reviews</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">{t("hotel.googleReviews")}</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -297,7 +297,7 @@ export default function HotelDetails() {
                           </svg>
                           <div className="text-left">
                             <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">TripAdvisor</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -314,7 +314,7 @@ export default function HotelDetails() {
                           </div>
                           <div className="text-left">
                             <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">HolidayCheck</span>
-                            <span className="font-bold">Write a Review</span>
+                            <span className="font-bold">{t("hotel.writeReview")}</span>
                           </div>
                         </a>
                       </Button>
@@ -325,7 +325,7 @@ export default function HotelDetails() {
                 {/* All-Inclusive Plan Section for La Plage */}
                 {isLaPlage && (
                   <div className="mt-16 pt-12 border-t border-[#8B5A2B]/10">
-                    <h2 className="text-3xl font-serif text-[var(--color-brand-blue)] mb-4">The All-Inclusive Experience</h2>
+                    <h2 className="text-3xl font-serif text-[var(--color-brand-blue)] mb-4">{t("hotel.allInclusive")}</h2>
                     <p className="text-[#5D4E40] text-lg mb-10 max-w-3xl">
                       Indulge in a carefree escape where every detail is taken care of. Our comprehensive all-inclusive plan is designed to let you fully immerse yourself in the island's rhythm without a worry.
                     </p>
@@ -336,7 +336,7 @@ export default function HotelDetails() {
                         <div className="w-12 h-12 rounded-full bg-[var(--color-brand-gold)]/10 flex items-center justify-center mb-6 text-[var(--color-brand-gold)]">
                            <Utensils className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">Dining & Drinks</h3>
+                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">{t("hotel.diningDrinks")}</h3>
                         <ul className="space-y-3 text-[#5D4E40]">
                           <li className="flex items-start gap-3 text-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-gold)] mt-2 shrink-0" />
@@ -362,7 +362,7 @@ export default function HotelDetails() {
                         <div className="w-12 h-12 rounded-full bg-[var(--color-brand-blue)]/10 flex items-center justify-center mb-6 text-[var(--color-brand-blue)]">
                            <Waves className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">Activities & Wellness</h3>
+                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">{t("hotel.activitiesLeisure")}</h3>
                         <ul className="space-y-3 text-[#5D4E40]">
                           <li className="flex items-start gap-3 text-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-blue)] mt-2 shrink-0" />
@@ -388,7 +388,7 @@ export default function HotelDetails() {
                         <div className="w-12 h-12 rounded-full bg-[#8B5A2B]/10 flex items-center justify-center mb-6 text-[#8B5A2B]">
                            <Sparkles className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">Services</h3>
+                        <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-4">{t("hotel.comfortService")}</h3>
                         <ul className="space-y-3 text-[#5D4E40]">
                           <li className="flex items-start gap-3 text-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#8B5A2B] mt-2 shrink-0" />
@@ -418,8 +418,8 @@ export default function HotelDetails() {
             {activeSection === "accommodation" && (
               <section className="animate-in fade-in duration-500">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-serif text-brand-blue">Accommodation</h2>
-                  <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.roomDetails?.length || hotel.rooms.length} Room Types</span>
+                  <h2 className="text-3xl font-serif text-brand-blue">{t("hotel.accommodation")}</h2>
+                  <span className="text-sm text-gray-500 uppercase tracking-wider">{hotel.roomDetails?.length || hotel.rooms.length} {t("hotel.roomTypes")}</span>
                 </div>
                 
                 {hotel.id === "crystal-beach" || hotel.id === "beach-club" || hotel.id === "la-plage" ? (
@@ -457,7 +457,7 @@ export default function HotelDetails() {
                               className="w-full bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold tracking-wide"
                               onClick={() => setSelectedRoom(room)}
                             >
-                              View Room
+                              {t("hotel.viewRoom")}
                             </Button>
                           </div>
                         </div>
@@ -475,7 +475,7 @@ export default function HotelDetails() {
                         <p className="text-sm text-gray-500">Luxury amenities • Garden or Sea View • King Size Bed</p>
                       </div>
                       <Button asChild variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-none whitespace-nowrap">
-                        <a href={bookingLink} target="_blank">Check Rates</a>
+                        <a href={bookingLink} target="_blank">{t("hotel.checkRates")}</a>
                       </Button>
                     </div>
                   ))}
@@ -487,7 +487,7 @@ export default function HotelDetails() {
             {/* Dining */}
             {activeSection === "dining" && (
               <section className="animate-in fade-in duration-500">
-                <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>Dining & Drinks</h2>
+                <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>{t("hotel.diningDrinks")}</h2>
                 
                 {/* El Dokka Restaurant Section - Hidden for La Plage */}
                 {!isLaPlage && (
@@ -518,7 +518,7 @@ export default function HotelDetails() {
                         Enjoy a selection of grilled specialties, traditional dishes, and freshly prepared meals that bring the true taste of the region to your table.
                       </p>
                       <Button className="bg-[#C8A97E] hover:bg-[#b0936a] text-white px-8 py-6 rounded-full text-lg font-medium transition-all hover:scale-105">
-                        View Menu
+                        {t("hotel.viewMenu")}
                       </Button>
                     </div>
 
@@ -573,19 +573,19 @@ export default function HotelDetails() {
                         </div>
                         <div className="flex items-center gap-3 text-sm text-gray-500">
                            <Wine className="w-4 h-4 text-brand-gold" />
-                           <span>Extensive Wine Selection</span>
+                           <span>{t("hotel.extensiveWine")}</span>
                         </div>
                       </div>
 
                       <Button className="w-fit bg-brand-gold hover:bg-brand-gold/90 text-white px-8 py-6 rounded-full text-lg font-medium transition-all hover:translate-x-1 shadow-md hover:shadow-lg">
-                        View Menu
+                        {t("hotel.viewMenu")}
                       </Button>
                     </div>
                   </div>
 
                   {/* Gallery Slider (Scroll Snap) */}
                   <div className="p-8 border-t border-gray-100/50">
-                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">Gallery Highlights</h4>
+                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">{t("hotel.galleryHighlights")}</h4>
                     <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
                       {[1, 2, 3, 4, 5, 6].map((num) => (
                         <div key={num} className="snap-center shrink-0 w-[280px] md:w-[320px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
@@ -631,14 +631,14 @@ export default function HotelDetails() {
                       </p>
 
                       <Button className="w-fit bg-[#1a2332] hover:bg-[#2c3b55] text-white px-8 py-6 rounded-full text-lg font-medium transition-all hover:translate-x-1 shadow-md hover:shadow-lg">
-                        Reserve Your Table
+                        {t("hotel.reserveTable")}
                       </Button>
                     </div>
                   </div>
 
                   {/* Gallery Slider (Scroll Snap) */}
                   <div className="p-8 border-t border-gray-100/50">
-                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">Atmosphere</h4>
+                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">{t("hotel.atmosphere")}</h4>
                     <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
                       {[1, 2, 3].map((num) => (
                         <div key={num} className="snap-center shrink-0 w-[280px] md:w-[320px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
@@ -698,7 +698,7 @@ export default function HotelDetails() {
                                      <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
                                         <Wine className="w-6 h-6 text-[#8B5A2B]" />
                                      </div>
-                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Beachfront Dining Experience</h3>
+                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">{t("hotel.beachfrontDining")}</h3>
                                   </div>
                                   <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-8 max-w-3xl">
                                     Indulge in a romantic barefoot luxury dining experience right on the soft white sands of Zanzibar. Savor fresh, locally sourced seafood and Swahili-inspired cuisine under the shade of palms or beneath a canopy of stars. With the sound of gentle waves as your soundtrack, our beachfront setting offers an unforgettable culinary journey.
@@ -756,7 +756,7 @@ export default function HotelDetails() {
                                      <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
                                         <Coffee className="w-6 h-6 text-[#8B5A2B]" />
                                      </div>
-                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">The Lounge – Bar & Terrace</h3>
+                                     <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">{t("hotel.loungeBar")}</h3>
                                   </div>
                                   <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-6 max-w-3xl">
                                     Embrace the slow rhythm of island life at The Lounge – Bar & Terrace, an open-air sanctuary designed with natural materials and a relaxed African coastal vibe. Sip on refreshing handcrafted cocktails and savor light snacks in a calm, breezy atmosphere perfect for daytime relaxation. As golden hour approaches, this elegant yet laid-back space becomes the ultimate setting for unforgettable sunset moments.
@@ -965,7 +965,7 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#C8A97E]/10 rounded-full">
                                 <Dumbbell className="w-6 h-6 text-[#C8A97E]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[#1a2332]">Fitness Center</h3>
+                             <h3 className="text-3xl font-serif text-[#1a2332]">{t("hotel.fitnessCenter")}</h3>
                           </div>
                           <p className="text-gray-600 leading-relaxed text-lg font-light mb-8 max-w-3xl">
                             Stay active during your stay with our fully equipped fitness center, featuring modern cardio machines, strength training equipment, and a bright, comfortable atmosphere suitable for all fitness levels.
@@ -1018,7 +1018,7 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#C8A97E]/10 rounded-full">
                                 <Sparkles className="w-6 h-6 text-[#C8A97E]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[#1a2332]">Spa & Wellness Center</h3>
+                             <h3 className="text-3xl font-serif text-[#1a2332]">{t("hotel.spaWellness")}</h3>
                           </div>
                           <p className="text-gray-600 leading-relaxed text-lg font-light mb-8 max-w-3xl">
                             Experience ultimate relaxation at our Spa & Wellness Center, designed to provide a peaceful escape during your stay. Enjoy professional massage rooms, soothing ambiance, and modern wellness facilities that help rejuvenate both body and mind.
@@ -1070,7 +1070,7 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#C8A97E]/10 rounded-full">
                                 <Umbrella className="w-6 h-6 text-[#C8A97E]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[#1a2332]">Private Beach</h3>
+                             <h3 className="text-3xl font-serif text-[#1a2332]">{t("hotel.privateBeach")}</h3>
                           </div>
                           <p className="text-gray-600 leading-relaxed text-lg font-light mb-8 max-w-3xl">
                             Relax on our exclusive private beach, featuring soft golden sand and crystal-clear turquoise waters. Unwind in our modern white cabanas or on comfortable sunbeds under the shade of palm trees, enjoying a peaceful atmosphere and premium beach service.
@@ -1129,7 +1129,7 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#C8A97E]/10 rounded-full">
                                 <Waves className="w-6 h-6 text-[#C8A97E]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[#1a2332]">Pools & Aquapark</h3>
+                             <h3 className="text-3xl font-serif text-[#1a2332]">{t("hotel.poolsAquapark")}</h3>
                           </div>
                           <p className="text-gray-600 leading-relaxed text-lg font-light mb-8 max-w-3xl">
                             Dive into relaxation and fun with our multiple swimming pools and exciting aquapark. Whether you prefer lounging by the pool with a refreshing drink or enjoying thrilling water slides, our resort offers the perfect water experience for all ages.
@@ -1182,7 +1182,7 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
                                 <Umbrella className="w-6 h-6 text-[#8B5A2B]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Pristine Beachfront</h3>
+                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">{t("hotel.pristineBeachfront")}</h3>
                           </div>
                           <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-8 max-w-3xl">
                             Step onto the powder-soft white sands of our private Zanzibar beach. Framed by swaying coconut palms and the turquoise Indian Ocean, this is your sanctuary for pure island relaxation. Whether basking in the sun or taking a barefoot stroll at low tide, experience the authentic soul of the coast.
@@ -1238,7 +1238,7 @@ export default function HotelDetails() {
                              <div className="p-2 bg-[#8B5A2B]/10 rounded-full">
                                 <Waves className="w-6 h-6 text-[#8B5A2B]" />
                              </div>
-                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">Swimming Pools</h3>
+                             <h3 className="text-3xl font-serif text-[var(--color-brand-blue)]">{t("hotel.swimmingPools")}</h3>
                           </div>
                           <p className="text-[#5D4E40] leading-relaxed text-lg font-light mb-8 max-w-3xl">
                             Unwind in our stunning swimming pools, designed to blend seamlessly with the natural island landscape. Relax on comfortable sun loungers, enjoy refreshing dips, and let the gentle rhythm of Zanzibar wash over you in our peaceful aquatic sanctuary.
@@ -1296,14 +1296,14 @@ export default function HotelDetails() {
             {/* Contact */}
             {activeSection === "contact" && (
               <section className="mb-20 animate-in fade-in duration-500">
-                <h2 className="text-3xl font-serif text-brand-blue mb-8">Location & Contact</h2>
+                <h2 className="text-3xl font-serif text-brand-blue mb-8">{t("hotel.locationContact")}</h2>
                 <div className="bg-white border border-gray-100 p-8">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                      <div className="space-y-4">
                        <div className="flex items-start gap-3">
                          <MapPin className="w-5 h-5 text-brand-gold mt-1" />
                          <div>
-                           <span className="block font-bold text-brand-blue mb-1">Address</span>
+                           <span className="block font-bold text-brand-blue mb-1">{t("hotel.address")}</span>
                            <span className="text-gray-600">{hotel.location}</span>
                            {hotel.mapLink && (
                              <a 
@@ -1312,7 +1312,7 @@ export default function HotelDetails() {
                                rel="noopener noreferrer" 
                                className="text-xs font-bold text-brand-gold uppercase tracking-wider hover:underline flex items-center gap-1 mt-2"
                              >
-                               View on Google Maps
+                               {t("hotel.viewOnMaps")}
                              </a>
                            )}
                          </div>
@@ -1320,7 +1320,7 @@ export default function HotelDetails() {
                        <div className="flex items-start gap-3">
                          <Phone className="w-5 h-5 text-brand-gold mt-1" />
                          <div>
-                           <span className="block font-bold text-brand-blue mb-1">Phone</span>
+                           <span className="block font-bold text-brand-blue mb-1">{t("hotel.phone")}</span>
                            <span className="text-gray-600">+20 65 3380063</span>
                            <span className="text-gray-600">+20 150 092 5579</span>
                          </div>
@@ -1328,7 +1328,7 @@ export default function HotelDetails() {
                        <div className="flex items-start gap-3">
                          <Mail className="w-5 h-5 text-brand-gold mt-1" />
                          <div>
-                           <span className="block font-bold text-brand-blue mb-1">Email</span>
+                           <span className="block font-bold text-brand-blue mb-1">{t("hotel.email")}</span>
                            <span className="text-gray-600">res.cb@protels.com
 </span>
                          </div>
@@ -1386,16 +1386,16 @@ export default function HotelDetails() {
           <div className="hidden lg:block">
             <div className="sticky top-[160px] space-y-8 w-[90%] ml-auto">
               <div className="bg-brand-blue text-white p-8 shadow-xl">
-                <h3 className="text-2xl font-serif mb-2 text-brand-gold">Book Your Stay</h3>
-                <p className="text-white/70 mb-6 text-sm">Best rates guaranteed. No booking fees.</p>
+                <h3 className="text-2xl font-serif mb-2 text-brand-gold">{t("hotel.bookYourStay")}</h3>
+                <p className="text-white/70 mb-6 text-sm">{t("hotel.bestRates")}</p>
                 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                    <span className="text-white/60">Check-in</span>
+                    <span className="text-white/60">{t("hotel.checkIn")}</span>
                     <span>14:00</span>
                   </div>
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                    <span className="text-white/60">Check-out</span>
+                    <span className="text-white/60">{t("hotel.checkOut")}</span>
                     <span>12:00</span>
                   </div>
                 </div>
@@ -1406,14 +1406,14 @@ export default function HotelDetails() {
                   </a>
                 </Button>
                 
-                <p className="text-center text-xs text-white/40 mt-4">Secure payment via our official booking engine</p>
+                <p className="text-center text-xs text-white/40 mt-4">{t("hotel.securePayment")}</p>
               </div>
 
               <div className="bg-white p-6 border border-gray-100 shadow-sm">
-                <h4 className="font-bold text-brand-blue mb-4">Need Assistance?</h4>
-                <p className="text-gray-600 text-sm mb-4">Our concierge team is available 24/7 to help plan your perfect stay.</p>
+                <h4 className="font-bold text-brand-blue mb-4">{t("hotel.needAssistance")}</h4>
+                <p className="text-gray-600 text-sm mb-4">{t("hotel.conciergeAvailable")}</p>
                 <Button variant="outline" className="w-full text-brand-blue border-brand-blue hover:bg-brand-blue hover:text-white">
-                  Contact Concierge
+                  {t("hotel.contactConcierge")}
                 </Button>
               </div>
             </div>

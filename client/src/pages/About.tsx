@@ -96,18 +96,18 @@ export default function About() {
   const features = [
     {
       icon: <Star className="w-6 h-6" />,
-      title: "Authentic Hospitality",
-      desc: "Service that comes from the heart, anticipating your every need with warmth and grace."
+      title: t("about.authenticHospitality"),
+      desc: t("about.authenticHospitalityDesc")
     },
     {
       icon: <Anchor className="w-6 h-6" />,
-      title: "Prime Locations",
-      desc: "Resorts nestled in the most breathtaking coastal destinations, celebrating nature's beauty."
+      title: t("about.primeLocations"),
+      desc: t("about.primeLocationsDesc")
     },
     {
       icon: <Sun className="w-6 h-6" />,
-      title: "Curated Experiences",
-      desc: "From sunrise yoga to culinary journeys, we craft moments that linger in your memory."
+      title: t("about.curatedExperiences"),
+      desc: t("about.curatedExperiencesDesc")
     }
   ];
 
@@ -142,12 +142,12 @@ export default function About() {
               {heroUploading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="text-sm font-bold">جاري الرفع...</span>
+                  <span className="text-sm font-bold">{t("cms.uploading")}</span>
                 </>
               ) : (
                 <>
                   <Camera className="w-5 h-5" />
-                  <span className="text-sm font-bold">تغيير صورة الخلفية</span>
+                  <span className="text-sm font-bold">{t("cms.changeBackground")}</span>
                 </>
               )}
             </button>
@@ -251,10 +251,10 @@ export default function About() {
             className="text-center mb-20"
           >
             <span className="text-brand-gold text-xs font-bold tracking-widest uppercase mb-3 block">
-              Our Collection
+              {t("about.ourCollection")}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif text-brand-blue">
-              Discover Our Resorts
+              {t("about.discoverResorts")}
             </h2>
           </motion.div>
 
@@ -330,9 +330,9 @@ export default function About() {
               />
               <ul className="space-y-4">
                 {[
-                  "Personalized service tailored to your preferences",
-                  "Immersive cultural and culinary experiences",
-                  "Holistic wellness and rejuvenation"
+                  t("about.personalizedService"),
+                  t("about.immersiveCultural"),
+                  t("about.holisticWellness")
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-white/90">
                     <div className="w-1.5 h-1.5 bg-brand-gold rounded-full" />
@@ -388,7 +388,7 @@ export default function About() {
               className="text-xl text-gray-600 mb-12 font-light leading-relaxed"
             />
             <Button size="lg" className="bg-brand-blue hover:bg-brand-blue/90 text-white px-10 py-6 text-lg rounded-none uppercase tracking-widest" asChild>
-               <a href="/hotels">Explore Our Resorts</a>
+               <a href="/hotels">{t("about.exploreResorts")}</a>
             </Button>
           </motion.div>
         </div>
