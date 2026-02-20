@@ -50,8 +50,7 @@ export default function Hero({
   }, [heroImages.length]);
 
   const getImgSrc = (idx: number) => {
-    const key = `img:${editPrefix}.bg.${idx}`;
-    return pageContent[key] ?? heroImages[idx];
+    return heroImages[idx];
   };
 
   const imgKey = `img:${editPrefix}.bg.${currentIndex}`;
