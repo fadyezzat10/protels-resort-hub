@@ -22,11 +22,12 @@ function HeroImageUploader({ settingKey, label, currentValue, isSlider, onSave, 
   label: string;
   currentValue: string | string[];
   isSlider: boolean;
-  onSave: (key: string, value: any) => void;
+  onSave: (key: string, value: any) => Promise<void>;
   isPending: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
 
   const images: string[] = isSlider
     ? (Array.isArray(currentValue) ? currentValue : [])
@@ -46,31 +47,38 @@ function HeroImageUploader({ settingKey, label, currentValue, isSlider, onSave, 
           body: formData,
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Upload failed");
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || "Upload failed");
+        }
         const data = await res.json();
         uploaded.push(data.url);
       }
-      if (isSlider) {
-        onSave(settingKey, [...images, ...uploaded]);
-      } else {
-        onSave(settingKey, uploaded[0]);
-      }
-    } catch (err) {
+      const newValue = isSlider ? [...images, ...uploaded] : uploaded[0];
+      await onSave(settingKey, newValue);
+      toast({ title: "Hero image saved successfully" });
+    } catch (err: any) {
       console.error("Upload error:", err);
+      toast({ title: "Upload failed", description: err.message || "Please try again", variant: "destructive" });
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
-  }, [images, isSlider, settingKey, onSave]);
+  }, [images, isSlider, settingKey, onSave, toast]);
 
-  const removeImage = useCallback((idx: number) => {
-    if (isSlider) {
-      const updated = images.filter((_, i) => i !== idx);
-      onSave(settingKey, updated);
-    } else {
-      onSave(settingKey, "");
+  const removeImage = useCallback(async (idx: number) => {
+    try {
+      if (isSlider) {
+        const updated = images.filter((_, i) => i !== idx);
+        await onSave(settingKey, updated);
+      } else {
+        await onSave(settingKey, "");
+      }
+      toast({ title: "Image removed" });
+    } catch (err: any) {
+      toast({ title: "Failed to remove image", variant: "destructive" });
     }
-  }, [images, isSlider, settingKey, onSave]);
+  }, [images, isSlider, settingKey, onSave, toast]);
 
   return (
     <div className="border rounded-lg p-4 space-y-3">
@@ -84,7 +92,7 @@ function HeroImageUploader({ settingKey, label, currentValue, isSlider, onSave, 
           className="gap-2"
         >
           {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-          {uploading ? "Uploading..." : (isSlider ? "Add Images" : "Upload Image")}
+          {uploading ? "Uploading & Saving..." : (isSlider ? "Add Images" : "Upload Image")}
         </Button>
         <input
           ref={fileRef}
@@ -253,13 +261,16 @@ export default function CMSSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cms/settings"] });
       queryClient.invalidateQueries({ queryKey: ["/api/public/settings"] });
-      toast({ title: "Setting saved successfully" });
     },
     onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const saveSetting = (key: string, value: any) => {
     saveMutation.mutate({ key, value });
+  };
+
+  const saveSettingAsync = async (key: string, value: any) => {
+    await saveMutation.mutateAsync({ key, value });
   };
 
   return (
@@ -366,12 +377,9 @@ export default function CMSSettings() {
                   label={ph.label}
                   currentValue={pageHeroes[ph.key] || (ph.isSlider ? [] : "")}
                   isSlider={ph.isSlider}
-                  onSave={(key, value) => {
-                    if (key === "page_hero_home") {
-                      saveSetting("hero_images", value);
-                    } else {
-                      saveSetting(key, value);
-                    }
+                  onSave={async (key, value) => {
+                    const saveKey = key === "page_hero_home" ? "hero_images" : key;
+                    await saveSettingAsync(saveKey, value);
                     setPageHeroes(prev => ({ ...prev, [key]: value }));
                   }}
                   isPending={saveMutation.isPending}
