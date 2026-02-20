@@ -25,7 +25,7 @@ export default function HotelDetails() {
   const params = matchHotels ? paramsHotels : paramsRoot;
   const hotelId = params?.hotelId || location.split('/').filter(Boolean).pop() || "";
   const rawSection = params?.section || "overview";
-  const activeSection = rawSection === "rooms" ? "accommodation" : rawSection;
+  const activeSection = rawSection === "rooms" ? "accommodation" : rawSection === "location" ? "contact" : rawSection;
   const basePath = matchHotels ? `/hotels/${hotelId}` : `/${hotelId}`;
   
   const { hotel: mergedHotel } = useMergedHotel(hotelId || "");
@@ -40,12 +40,16 @@ export default function HotelDetails() {
     { id: "overview", label: t("hotel.overview"), order: 1 },
     { id: "accommodation", label: t("hotel.accommodation"), order: 2 },
     { id: "dining", label: t("hotel.dining"), order: 3 },
-    { id: "facilities", label: t("hotel.facilities"), order: 4 },
-    { id: "gallery", label: t("nav.gallery"), order: 5 },
-    { id: "contact", label: t("nav.contact"), order: 6 },
+    { id: "gallery", label: t("nav.gallery"), order: 4 },
+    { id: "facilities", label: t("hotel.facilities"), order: 5 },
+    { id: "contact", label: t("hotel.location"), order: 6 },
   ];
 
-  const normalizeTabId = (id: string) => id === "rooms" ? "accommodation" : id;
+  const normalizeTabId = (id: string) => {
+    if (id === "rooms") return "accommodation";
+    if (id === "location") return "contact";
+    return id;
+  };
 
   const tabs = hotel.tabConfig?.tabs
     ? hotel.tabConfig.tabs
