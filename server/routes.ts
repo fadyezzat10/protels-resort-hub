@@ -305,20 +305,26 @@ export async function registerRoutes(
       const bucketName = parts[1];
       const objectName = parts.slice(2).join("/");
 
-      const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-
-      const [signedUrl] = await file.getSignedUrl({
-        version: "v4",
-        action: "write",
-        expires: Date.now() + 15 * 60 * 1000,
-        contentType: contentType || "video/mp4",
-      });
+      const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+      const signRes = await fetch(
+        `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bucket_name: bucketName,
+            object_name: objectName,
+            method: "PUT",
+            expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+          }),
+        }
+      );
+      if (!signRes.ok) throw new Error(`Failed to sign URL: ${signRes.status}`);
+      const { signed_url: uploadUrl } = await signRes.json();
 
       const serveUrl = `/uploads/${safeName}`;
 
-      res.json({ uploadUrl: signedUrl, serveUrl, filename: safeName });
+      res.json({ uploadUrl, serveUrl, filename: safeName });
     } catch (e: any) {
       console.error("[video-upload-url] Error:", e.message);
       res.status(500).json({ message: e.message });
