@@ -721,9 +721,9 @@ export default function CMSSettings() {
             <CardContent>
               <div>
                 <label className="text-sm font-medium mb-1 block">Google Tag ID</label>
-                <p className="text-xs text-gray-400 mb-2">يدعم GTM-XXXXXXX أو G-XXXXXXX أو AW-XXXXXXX</p>
+                <p className="text-xs text-gray-400 mb-2">يدعم أكتر من ID مفصولين بفاصلة (مثال: G-XXXXX, AW-XXXXX, GTM-XXXXX)</p>
                 <div className="flex gap-2">
-                  <Input data-testid="input-setting-gtm-id" value={gtmId} onChange={(e) => setGtmId(e.target.value)} placeholder="GTM-XXXXXXX / G-XXXXXXX / AW-XXXXXXX" />
+                  <Input data-testid="input-setting-gtm-id" value={gtmId} onChange={(e) => setGtmId(e.target.value)} placeholder="G-XXXXX, AW-XXXXX, GTM-XXXXX" />
                   <Button data-testid="button-save-gtm-id" size="sm" onClick={() => saveSetting("gtm_id", gtmId)} disabled={saveMutation.isPending}><Save className="w-4 h-4" /></Button>
                 </div>
               </div>

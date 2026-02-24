@@ -14,11 +14,15 @@ export default function CMSHead() {
 
   useEffect(() => {
     if (gtmId && typeof gtmId === "string" && gtmId.trim()) {
-      const id = gtmId.trim();
-      if (id.startsWith("GTM-")) {
-        if (!document.getElementById("gtm-script")) {
+      const ids = gtmId.split(",").map((s: string) => s.trim()).filter(Boolean);
+      const gtmIds = ids.filter((id: string) => id.startsWith("GTM-"));
+      const gtagIds = ids.filter((id: string) => id.startsWith("G-") || id.startsWith("AW-"));
+
+      gtmIds.forEach((id: string) => {
+        const scriptId = `gtm-script-${id}`;
+        if (!document.getElementById(scriptId)) {
           const script = document.createElement("script");
-          script.id = "gtm-script";
+          script.id = scriptId;
           script.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -26,19 +30,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','${id}');`;
           document.head.appendChild(script);
         }
-      } else if (id.startsWith("G-") || id.startsWith("AW-")) {
-        if (!document.getElementById("gtag-script")) {
-          const loader = document.createElement("script");
-          loader.id = "gtag-script";
-          loader.async = true;
-          loader.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
-          document.head.appendChild(loader);
+      });
 
-          const config = document.createElement("script");
-          config.id = "gtag-config";
-          config.innerHTML = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${id}');`;
-          document.head.appendChild(config);
-        }
+      if (gtagIds.length > 0 && !document.getElementById("gtag-script")) {
+        const loader = document.createElement("script");
+        loader.id = "gtag-script";
+        loader.async = true;
+        loader.src = `https://www.googletagmanager.com/gtag/js?id=${gtagIds[0]}`;
+        document.head.appendChild(loader);
+
+        const config = document.createElement("script");
+        config.id = "gtag-config";
+        const configs = gtagIds.map((id: string) => `gtag('config','${id}');`).join("");
+        config.innerHTML = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${configs}`;
+        document.head.appendChild(config);
       }
     }
   }, [gtmId]);
