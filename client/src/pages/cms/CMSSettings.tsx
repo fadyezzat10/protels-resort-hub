@@ -720,9 +720,10 @@ export default function CMSSettings() {
             </CardHeader>
             <CardContent>
               <div>
-                <label className="text-sm font-medium mb-1 block">GTM Container ID</label>
+                <label className="text-sm font-medium mb-1 block">Google Tag ID</label>
+                <p className="text-xs text-gray-400 mb-2">يدعم GTM-XXXXXXX أو G-XXXXXXX أو AW-XXXXXXX</p>
                 <div className="flex gap-2">
-                  <Input data-testid="input-setting-gtm-id" value={gtmId} onChange={(e) => setGtmId(e.target.value)} placeholder="GTM-XXXXXXX" />
+                  <Input data-testid="input-setting-gtm-id" value={gtmId} onChange={(e) => setGtmId(e.target.value)} placeholder="GTM-XXXXXXX / G-XXXXXXX / AW-XXXXXXX" />
                   <Button data-testid="button-save-gtm-id" size="sm" onClick={() => saveSetting("gtm_id", gtmId)} disabled={saveMutation.isPending}><Save className="w-4 h-4" /></Button>
                 </div>
               </div>

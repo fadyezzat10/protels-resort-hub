@@ -14,15 +14,31 @@ export default function CMSHead() {
 
   useEffect(() => {
     if (gtmId && typeof gtmId === "string" && gtmId.trim()) {
-      if (!document.getElementById("gtm-script")) {
-        const script = document.createElement("script");
-        script.id = "gtm-script";
-        script.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      const id = gtmId.trim();
+      if (id.startsWith("GTM-")) {
+        if (!document.getElementById("gtm-script")) {
+          const script = document.createElement("script");
+          script.id = "gtm-script";
+          script.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${gtmId}');`;
-        document.head.appendChild(script);
+})(window,document,'script','dataLayer','${id}');`;
+          document.head.appendChild(script);
+        }
+      } else if (id.startsWith("G-") || id.startsWith("AW-")) {
+        if (!document.getElementById("gtag-script")) {
+          const loader = document.createElement("script");
+          loader.id = "gtag-script";
+          loader.async = true;
+          loader.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+          document.head.appendChild(loader);
+
+          const config = document.createElement("script");
+          config.id = "gtag-config";
+          config.innerHTML = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${id}');`;
+          document.head.appendChild(config);
+        }
       }
     }
   }, [gtmId]);
