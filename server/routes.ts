@@ -1057,7 +1057,7 @@ AVAILABLE HOTELS:
       const info = hotelInfoMap[hotel];
       prompt += `\nCURRENT HOTEL CONTEXT: ${info.name} – ${info.location} (${info.category}, ${info.concept})`;
     } else {
-      prompt += `\nThe user has not selected a specific hotel. Ask them warmly: "في بالك مرسى علم ولا زنجبار؟ خليني أساعدك تختار 😉" and help them choose based on their preferences.`;
+      prompt += `\nThe user has not selected a specific hotel. Ask them warmly: "في بالك مرسى علم ولا زنجبار ولا الغردقة؟ خليني أساعدك تختار 😉" and help them choose based on their preferences. Mention that Hurghada (Royal Bay) is opening soon.`;
     }
 
     return prompt;
