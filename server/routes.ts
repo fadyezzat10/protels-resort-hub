@@ -11,9 +11,8 @@ import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
 import { insertBlogPostSchema, pageVersions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
-import { createRequire } from "module";
-const _require = createRequire(import.meta.url);
-const { PDFParse } = _require("pdf-parse");
+import * as pdfParsePkg from "pdf-parse";
+const PDFParse = (pdfParsePkg as any).PDFParse || (pdfParsePkg as any).default?.PDFParse;
 import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
 
 declare module "express-session" {
