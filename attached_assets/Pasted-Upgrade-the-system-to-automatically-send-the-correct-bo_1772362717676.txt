@@ -1,0 +1,78 @@
+Upgrade the system to automatically send the correct booking link when strong booking signals appear.
+
+==============================
+1) BOOKING LINKS MAP
+==============================
+
+Add this:
+
+const bookingLinkMap = {
+  "crystal-beach": "https://protels-crystal.book-onlinenow.net/",
+  "la-plage": "https://protels-laplage.book-onlinenow.net/",
+  "beach-club": "https://protels-beachclub.book-onlinenow.net/",
+  "royal-bay": null
+};
+
+==============================
+2) SMART BOOKING SIGNAL DETECTION
+==============================
+
+Create bookingSignals tracking per session.
+
+Define signals:
+
+- Mentions nights: (يوم، يومين، ليالي، nights, days)
+- Mentions guest count: numbers like 2,3,4 + أشخاص / guests
+- Mentions months: (يناير، فبراير، مارس، أبريل، مايو، يونيو، يوليو، أغسطس، سبتمبر، أكتوبر، نوفمبر، ديسمبر)
+- Mentions date formats (contains "/" or "-")
+- Positive confirmation words: (تمام، كويس، مناسب، اوك، ok)
+
+If 2 or more signals appear during conversation:
+Set bookingIntent = true
+
+==============================
+3) AFTER OPENAI RESPONSE
+==============================
+
+If bookingIntent = true AND bookingLinkMap[selectedHotel] exists:
+
+Append to assistant reply:
+
+"\n\n🔗 يمكنك إتمام الحجز مباشرة من خلال الرابط التالي:\n" 
++ bookingLinkMap[selectedHotel]
+
+If selectedHotel is "royal-bay":
+
+Replace reply with:
+
+"Protels Royal Bay Resort & Spa – Hurghada قيد الافتتاح قريبًا ✨  
+ترقبوا الإعلان الرسمي لبدء الحجوزات قريبًا."
+
+==============================
+4) IMPORTANT RULES
+==============================
+
+- Do NOT require user to say "احجز"
+- Do NOT remove conversation memory
+- Do NOT remove multi-hotel logic
+- Do NOT mix hotel data
+- Keep responses natural and sales-oriented
+- Mention hotel name in first response
+- Ask smart follow-up questions when needed
+
+==============================
+EXPECTED BEHAVIOR
+==============================
+
+User:
+"زنجبار"
+"يومين"
+"4 أشخاص"
+
+Assistant:
+Confirms details
+Then automatically includes:
+
+https://protels-laplage.book-onlinenow.net/
+
+WITHOUT needing the word "احجز"

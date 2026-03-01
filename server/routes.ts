@@ -1126,7 +1126,25 @@ AVAILABLE HOTELS:
     }
   });
 
-  const conversations: Record<string, { messages: Array<{ role: "user" | "assistant"; content: string }>; hotel: string | null; lastActive: number }> = {};
+  const bookingLinkMap: Record<string, string | null> = {
+    "crystal-beach": "https://protels-crystal.book-onlinenow.net/",
+    "la-plage": "https://protels-laplage.book-onlinenow.net/",
+    "beach-club": "https://protels-beachclub.book-onlinenow.net/",
+    "royal-bay": null,
+  };
+
+  function detectBookingSignals(text: string): string[] {
+    const lower = text.toLowerCase();
+    const signals: string[] = [];
+    if (/يوم|يومين|ليال|ليله|ليلة|ليلتين|nights?|days?/i.test(lower)) signals.push("nights");
+    if (/\d+\s*(أشخاص|شخص|ضيوف|ضيف|guests?|persons?|people|adults?|أفراد|فرد)/i.test(lower)) signals.push("guests");
+    if (/(يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر|january|february|march|april|may|june|july|august|september|october|november|december)/i.test(lower)) signals.push("month");
+    if (/\d{1,2}[\/\-]\d{1,2}/.test(lower)) signals.push("date");
+    if (/(تمام|كويس|مناسب|اوك|أوك|ok|okay|ماشي|موافق|يلا|احجز|عايز احجز|ابوك|book)/i.test(lower)) signals.push("confirm");
+    return signals;
+  }
+
+  const conversations: Record<string, { messages: Array<{ role: "user" | "assistant"; content: string }>; hotel: string | null; lastActive: number; bookingSignals: Set<string>; bookingLinkSent: boolean }> = {};
 
   setInterval(() => {
     const now = Date.now();
@@ -1159,7 +1177,7 @@ AVAILABLE HOTELS:
       const sid = sessionId && typeof sessionId === "string" ? sessionId : clientIp;
 
       if (!conversations[sid]) {
-        conversations[sid] = { messages: [], hotel: null, lastActive: Date.now() };
+        conversations[sid] = { messages: [], hotel: null, lastActive: Date.now(), bookingSignals: new Set(), bookingLinkSent: false };
       }
       const session = conversations[sid];
       session.lastActive = Date.now();
@@ -1190,6 +1208,11 @@ AVAILABLE HOTELS:
         session.hotel = selectedHotel;
       }
 
+      const newSignals = detectBookingSignals(message);
+      for (const s of newSignals) {
+        session.bookingSignals.add(s);
+      }
+
       session.messages.push({ role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) });
 
       const recentMessages = session.messages.slice(-MAX_MESSAGES);
@@ -1210,7 +1233,15 @@ AVAILABLE HOTELS:
         temperature: 0.7,
       });
 
-      const reply = completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+      let reply = completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+
+      if (selectedHotel === "royal-bay" && session.bookingSignals.size >= 2) {
+        reply = "Protels Royal Bay Resort & Spa – Hurghada قيد الافتتاح قريبًا ✨\nترقبوا الإعلان الرسمي لبدء الحجوزات قريبًا.";
+      } else if (selectedHotel && session.bookingSignals.size >= 2 && !session.bookingLinkSent && bookingLinkMap[selectedHotel]) {
+        reply += "\n\n🔗 يمكنك إتمام الحجز مباشرة من خلال الرابط التالي:\n" + bookingLinkMap[selectedHotel];
+        session.bookingLinkSent = true;
+      }
+
       session.messages.push({ role: "assistant", content: reply });
       res.json({ reply });
     } catch (error: any) {
