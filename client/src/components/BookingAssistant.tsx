@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useLocation } from "wouter";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -16,8 +17,15 @@ function detectArabic(text: string): boolean {
   return arabicPattern.test(text);
 }
 
+function detectHotelFromPath(pathname: string): string | null {
+  const match = pathname.match(/\/hotels\/([^/]+)/);
+  if (match) return match[1];
+  return null;
+}
+
 export default function BookingAssistant() {
   const { language } = useI18n();
+  const [location] = useLocation();
   const siteIsArabic = language === "ar";
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -29,6 +37,7 @@ export default function BookingAssistant() {
   const [hasGreeted, setHasGreeted] = useState(false);
 
   const isRTL = chatLang === "ar";
+  const currentHotel = detectHotelFromPath(location);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,12 +64,16 @@ export default function BookingAssistant() {
 
   async function getBotResponse(message: string): Promise<string> {
     try {
+      const body: Record<string, string> = { message };
+      if (currentHotel) {
+        body.hotel = currentHotel;
+      }
       const response = await fetch("/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();

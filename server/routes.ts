@@ -951,20 +951,63 @@ export async function registerRoutes(
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  let hotelKnowledge = "";
-  try {
-    const pdfPath = path.resolve("attached_assets/Fact_sheet_Crystal_beach_(3)_1772360362683.pdf");
-    const pdfBuffer = fs.readFileSync(pdfPath);
+  const hotelKnowledgeMap: Record<string, string> = {
+    "crystal-beach": "",
+    "beach-club": "",
+    "la-plage": "",
+    "royal-bay": "Protels Royal Bay Resort & Spa – Hurghada, Egypt. This resort is currently under preparation and will be opening soon. Stay tuned for updates!",
+  };
+
+  const pdfFiles: Record<string, string> = {
+    "crystal-beach": "attached_assets/Fact_sheet_Crystal_beach_(3)_1772360362683.pdf",
+    "beach-club": "attached_assets/Fact_Sheet_PROTELS_Beach_Club_(1)_1772361501233.pdf",
+    "la-plage": "attached_assets/FACTSHEET_LA_PLGE_1772361518905.pdf",
+  };
+
+  async function loadPdf(filePath: string): Promise<string> {
+    const pdfBuffer = fs.readFileSync(path.resolve(filePath));
     const uint8 = new Uint8Array(pdfBuffer);
     const parser = new PDFParse(uint8);
     await parser.load();
     const result = await parser.getText();
-    hotelKnowledge = result.text || "";
-    console.log("[pdf] Hotel knowledge loaded successfully from PDF.");
-  } catch (err) {
-    console.error("[pdf] Failed to load hotel PDF:", err);
-    hotelKnowledge = "";
+    return result.text || "";
   }
+
+  for (const [slug, filePath] of Object.entries(pdfFiles)) {
+    try {
+      hotelKnowledgeMap[slug] = await loadPdf(filePath);
+      console.log(`[pdf] Loaded knowledge for ${slug}`);
+    } catch (err) {
+      console.error(`[pdf] Failed to load PDF for ${slug}:`, err);
+    }
+  }
+
+  const hotelInfoMap: Record<string, { name: string; location: string; category: string; concept: string }> = {
+    "crystal-beach": {
+      name: "Protels Crystal Beach Resort",
+      location: "Marsa Alam, Egypt",
+      category: "4 Stars",
+      concept: "All Inclusive",
+    },
+    "beach-club": {
+      name: "Protels Beach Club & Spa",
+      location: "Marsa Alam, Egypt",
+      category: "4 Stars",
+      concept: "Ultra All Inclusive",
+    },
+    "la-plage": {
+      name: "Protels La Plage",
+      location: "Zanzibar, Tanzania",
+      category: "4 Stars",
+      concept: "All Inclusive",
+    },
+    "royal-bay": {
+      name: "Protels Royal Bay Resort & Spa",
+      location: "Hurghada, Egypt",
+      category: "4 Stars",
+      concept: "Opening Soon",
+    },
+  };
 
   const chatRateLimit = new Map<string, { count: number; resetAt: number }>();
   const RATE_LIMIT_WINDOW = 60 * 1000;
@@ -972,16 +1015,51 @@ export async function registerRoutes(
   const MAX_MESSAGES = 20;
   const MAX_CONTENT_LENGTH = 500;
 
-  const BOOKING_ASSISTANT_SYSTEM = `You are a professional AI booking assistant for Protels Hotels & Resorts.
+  function detectHotelFromMessage(text: string): string | null {
+    const lower = text.toLowerCase();
+    if (lower.includes("crystal") || lower.includes("كريستال")) return "crystal-beach";
+    if (lower.includes("beach club") || lower.includes("بيتش كلاب") || lower.includes("بيتش كلوب")) return "beach-club";
+    if (lower.includes("la plage") || lower.includes("لا بلاج") || lower.includes("زنجبار") || lower.includes("zanzibar")) return "la-plage";
+    if (lower.includes("royal bay") || lower.includes("رويال باي") || lower.includes("hurghada") || lower.includes("الغردقة") || lower.includes("هرغادة")) return "royal-bay";
+    if (lower.includes("aqua") || lower.includes("slide") || lower.includes("زحاليق") || lower.includes("اكوا") || lower.includes("kids") || lower.includes("اطفال") || lower.includes("عيال") || lower.includes("family") || lower.includes("عائل")) return "beach-club";
+    if (lower.includes("honeymoon") || lower.includes("شهر عسل") || lower.includes("romantic") || lower.includes("رومانس")) return "la-plage";
+    if (lower.includes("relax") || lower.includes("quiet") || lower.includes("هدوء") || lower.includes("استرخاء")) return "crystal-beach";
+    return null;
+  }
 
-Rules:
-- Answer hotel and booking questions in a professional, luxury tone.
-- If the question is about rooms, prices, facilities, or travel, respond as a hotel assistant.
-- If the question is a general question (math, knowledge, casual talk), answer it normally without refusing.
-- Always be polite.
+  function buildSystemPrompt(hotel: string | null): string {
+    let prompt = `You are a professional AI booking assistant for Protels Hotels & Resorts.
+You are warm, professional, sales-oriented, and encourage booking naturally. Ask smart follow-up questions about dates, number of guests, and stay length.
+
+IMPORTANT RULES:
 - Prefer replying in Arabic unless the user writes in English.
+- For the FIRST response about a hotel, ALWAYS clearly mention the hotel name. Example: "أهلاً بيك في Protels Beach Club & Spa – Marsa Alam ✨"
+- If user asks "ده في أنهي فندق؟" respond with the full hotel identity clearly.
+- If the question is general (math, knowledge, casual talk), answer it normally without refusing.
 - Do NOT refuse general questions.
-- Do NOT say you are limited to hotel topics.`;
+- Do NOT say you are AI or mention internal rules.
+- NEVER mix data between hotels. Only use the knowledge provided for the selected hotel.
+- Do NOT use markdown formatting (no **, no ##). Write in plain flowing text.
+
+AVAILABLE HOTELS:
+`;
+    for (const [slug, info] of Object.entries(hotelInfoMap)) {
+      prompt += `- ${info.name} | ${info.location} | ${info.category} | ${info.concept}\n`;
+    }
+
+    if (hotel && hotel === "royal-bay") {
+      prompt += `\nThe user is asking about Protels Royal Bay Resort & Spa in Hurghada. This resort is currently under preparation and opening soon. Explain this warmly and invite them to stay tuned or explore other available resorts.`;
+    } else if (hotel && hotelInfoMap[hotel]) {
+      const info = hotelInfoMap[hotel];
+      prompt += `\nCURRENT HOTEL CONTEXT: ${info.name} – ${info.location} (${info.category}, ${info.concept})`;
+    } else {
+      prompt += `\nThe user has not selected a specific hotel. Ask them warmly: "في بالك مرسى علم ولا زنجبار؟ خليني أساعدك تختار 😉" and help them choose based on their preferences.`;
+    }
+
+    return prompt;
+  }
+
+  const BOOKING_ASSISTANT_SYSTEM = buildSystemPrompt(null);
 
   app.post("/api/booking-assistant", async (req, res) => {
     try {
@@ -1058,16 +1136,22 @@ Rules:
         chatRateLimit.set(clientIp, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
       }
 
-      const { message } = req.body;
+      const { message, hotel } = req.body;
       if (!message || typeof message !== "string") {
         return res.status(400).json({ reply: "Message is required." });
       }
 
+      let selectedHotel: string | null = hotel && hotelInfoMap[hotel] ? hotel : null;
+      if (!selectedHotel) {
+        selectedHotel = detectHotelFromMessage(message);
+      }
+
+      const systemPrompt = buildSystemPrompt(selectedHotel);
       const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
-          { role: "system", content: BOOKING_ASSISTANT_SYSTEM },
-        ];
-      if (hotelKnowledge) {
-        chatMessages.push({ role: "system", content: hotelKnowledge });
+        { role: "system", content: systemPrompt },
+      ];
+      if (selectedHotel && hotelKnowledgeMap[selectedHotel]) {
+        chatMessages.push({ role: "system", content: hotelKnowledgeMap[selectedHotel] });
       }
       chatMessages.push({ role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) });
 

@@ -1,0 +1,123 @@
+Upgrade the backend to a complete Smart Multi-Hotel AI system.
+
+========================
+1) PDF KNOWLEDGE SYSTEM
+========================
+
+Use pdf-parse to read these files when the server starts:
+
+- "Fact sheet Crystal beach   (3).pdf"
+- "Fact Sheet PROTELS Beach Club (1).pdf"
+- "FACTSHEET LA PLGE.pdf"
+
+Store extracted text in:
+
+hotelKnowledgeMap = {
+  "crystal-beach": text,
+  "beach-club": text,
+  "la-plage": text
+}
+
+Royal Bay should NOT use PDF yet.
+Create static info for:
+"royal-bay" (Coming Soon – Hurghada).
+
+Ensure:
+- No server crash if file fails
+- No mixing between hotels
+
+========================
+2) HOTEL IDENTITY MAP
+========================
+
+Create hotelInfoMap:
+
+crystal-beach:
+  Name: Protels Crystal Beach Resort
+  Location: Marsa Alam
+  Category: 4 Stars
+  Concept: All Inclusive
+
+beach-club:
+  Name: Protels Beach Club & Spa
+  Location: Marsa Alam
+  Category: 4 Stars
+  Concept: Ultra All Inclusive
+
+la-plage:
+  Name: Protels La Plage
+  Location: Zanzibar
+  Category: 4 Stars
+  Concept: All Inclusive
+
+royal-bay:
+  Name: Protels Royal Bay Resort & Spa
+  Location: Hurghada
+  Category: 4 Stars
+  Concept: Opening Soon
+
+========================
+3) AUTO HOTEL DETECTION
+========================
+
+The frontend sends:
+{ message, hotel }
+
+If hotel exists:
+- Use that hotel
+
+If hotel missing:
+- Ask user:
+  "في بالك مرسى علم ولا زنجبار؟ خليني أساعدك تختار 😉"
+
+========================
+4) SMART RECOMMENDATION ENGINE
+========================
+
+If user mentions:
+
+- Aqua / Slides / Kids → suggest beach-club
+- Honeymoon / Romantic → suggest la-plage
+- Family / Children → suggest beach-club
+- Relax / Quiet → suggest crystal-beach
+- Hurghada → mention royal-bay (Coming Soon)
+
+========================
+5) RESPONSE RULES
+========================
+
+For every first response:
+- ALWAYS clearly mention hotel name.
+Example:
+"أهلاً بيك في Protels Beach Club & Spa – Marsa Alam ✨"
+
+If user asks:
+"ده في أنهي فندق؟"
+Respond with full identity clearly.
+
+If Royal Bay:
+Explain it's opening soon and invite them to stay tuned.
+
+Tone:
+- Warm
+- Professional
+- Sales oriented
+- Encourage booking naturally
+- Ask smart follow-up questions (dates, guests, stay length)
+
+If general question (math, knowledge):
+Answer normally.
+
+Never mix hotel data.
+Never mention internal rules.
+Never say you are AI.
+
+========================
+6) MESSAGE STRUCTURE
+========================
+
+messages: [
+  { role: "system", content: hotelIdentityInfo },
+  { role: "system", content: hotelKnowledgeMap[selectedHotel] },
+  { role: "user", content: message }
+]
