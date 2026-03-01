@@ -115,6 +115,45 @@ export const pageContents = pgTable("page_contents", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const chatbotConfig = pgTable("chatbot_config", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const chatbotFaq = pgTable("chatbot_faq", {
+  id: serial("id").primaryKey(),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const chatbotOffers = pgTable("chatbot_offers", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  hotelSlug: text("hotel_slug"),
+  startDate: text("start_date"),
+  endDate: text("end_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const chatbotConversations = pgTable("chatbot_conversations", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  hotelSlug: text("hotel_slug"),
+  messages: jsonb("messages").notNull().$type<Array<{ role: string; content: string; timestamp: number }>>().default(sql`'[]'::jsonb`),
+  hasLead: boolean("has_lead").notNull().default(false),
+  leadName: text("lead_name"),
+  leadContact: text("lead_contact"),
+  startedAt: timestamp("started_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
@@ -126,6 +165,10 @@ export const chatConversations = pgTable("chat_conversations", {
 });
 
 export const insertChatConversationSchema = createInsertSchema(chatConversations).omit({ id: true, updatedAt: true });
+export const insertChatbotConfigSchema = createInsertSchema(chatbotConfig).omit({ id: true, updatedAt: true });
+export const insertChatbotFaqSchema = createInsertSchema(chatbotFaq).omit({ id: true, createdAt: true });
+export const insertChatbotOfferSchema = createInsertSchema(chatbotOffers).omit({ id: true, createdAt: true });
+export const insertChatbotConversationSchema = createInsertSchema(chatbotConversations).omit({ id: true, startedAt: true, updatedAt: true });
 
 export const insertPageVersionSchema = createInsertSchema(pageVersions).omit({ id: true, createdAt: true });
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true, updatedAt: true });
@@ -156,3 +199,11 @@ export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
 export type PageContent = typeof pageContents.$inferSelect;
 export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
 export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatbotConfig = z.infer<typeof insertChatbotConfigSchema>;
+export type ChatbotConfig = typeof chatbotConfig.$inferSelect;
+export type InsertChatbotFaq = z.infer<typeof insertChatbotFaqSchema>;
+export type ChatbotFaq = typeof chatbotFaq.$inferSelect;
+export type InsertChatbotOffer = z.infer<typeof insertChatbotOfferSchema>;
+export type ChatbotOffer = typeof chatbotOffers.$inferSelect;
+export type InsertChatbotConversation = z.infer<typeof insertChatbotConversationSchema>;
+export type ChatbotConversation = typeof chatbotConversations.$inferSelect;

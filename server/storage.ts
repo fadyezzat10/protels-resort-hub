@@ -4,6 +4,7 @@ import { desc } from "drizzle-orm";
 import { and } from "drizzle-orm";
 import {
   users, pages, hotels, media, globalSettings, seoSettings, blogPosts, pageVersions, pageContents, chatConversations,
+  chatbotConfig, chatbotFaq, chatbotOffers, chatbotConversations,
   type User, type InsertUser,
   type Page, type InsertPage,
   type Hotel, type InsertHotel,
@@ -14,6 +15,10 @@ import {
   type PageVersion, type InsertPageVersion,
   type PageContent, type InsertPageContent,
   type ChatConversation,
+  type ChatbotConfig, type InsertChatbotConfig,
+  type ChatbotFaq, type InsertChatbotFaq,
+  type ChatbotOffer, type InsertChatbotOffer,
+  type ChatbotConversation, type InsertChatbotConversation,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -81,6 +86,30 @@ export interface IStorage {
   getChatConversation(userId: number): Promise<ChatConversation | undefined>;
   saveChatConversation(userId: number, messages: any[]): Promise<ChatConversation>;
   clearChatConversation(userId: number): Promise<void>;
+
+  // Chatbot Config
+  getChatbotConfigs(): Promise<ChatbotConfig[]>;
+  upsertChatbotConfig(key: string, value: string): Promise<ChatbotConfig>;
+
+  // Chatbot FAQ
+  getChatbotFaqs(): Promise<ChatbotFaq[]>;
+  createChatbotFaq(faq: InsertChatbotFaq): Promise<ChatbotFaq>;
+  updateChatbotFaq(id: number, data: Partial<InsertChatbotFaq>): Promise<ChatbotFaq | undefined>;
+  deleteChatbotFaq(id: number): Promise<void>;
+
+  // Chatbot Offers
+  getChatbotOffers(): Promise<ChatbotOffer[]>;
+  createChatbotOffer(offer: InsertChatbotOffer): Promise<ChatbotOffer>;
+  updateChatbotOffer(id: number, data: Partial<InsertChatbotOffer>): Promise<ChatbotOffer | undefined>;
+  deleteChatbotOffer(id: number): Promise<void>;
+
+  // Chatbot Conversations
+  getChatbotConversations(): Promise<ChatbotConversation[]>;
+  getChatbotConversation(id: number): Promise<ChatbotConversation | undefined>;
+  getChatbotConversationBySession(sessionId: string): Promise<ChatbotConversation | undefined>;
+  saveChatbotConversation(data: InsertChatbotConversation): Promise<ChatbotConversation>;
+  updateChatbotConversation(id: number, data: Partial<InsertChatbotConversation>): Promise<ChatbotConversation | undefined>;
+  deleteChatbotConversation(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -298,6 +327,76 @@ export class DatabaseStorage implements IStorage {
   }
   async clearChatConversation(userId: number) {
     await db.delete(chatConversations).where(eq(chatConversations.userId, userId));
+  }
+
+  // Chatbot Config
+  async getChatbotConfigs() {
+    return db.select().from(chatbotConfig);
+  }
+  async upsertChatbotConfig(key: string, value: string) {
+    const [existing] = await db.select().from(chatbotConfig).where(eq(chatbotConfig.key, key));
+    if (existing) {
+      const [updated] = await db.update(chatbotConfig).set({ value, updatedAt: new Date() }).where(eq(chatbotConfig.id, existing.id)).returning();
+      return updated;
+    }
+    const [created] = await db.insert(chatbotConfig).values({ key, value }).returning();
+    return created;
+  }
+
+  // Chatbot FAQ
+  async getChatbotFaqs() {
+    return db.select().from(chatbotFaq);
+  }
+  async createChatbotFaq(faq: InsertChatbotFaq) {
+    const [created] = await db.insert(chatbotFaq).values(faq).returning();
+    return created;
+  }
+  async updateChatbotFaq(id: number, data: Partial<InsertChatbotFaq>) {
+    const [updated] = await db.update(chatbotFaq).set(data).where(eq(chatbotFaq.id, id)).returning();
+    return updated;
+  }
+  async deleteChatbotFaq(id: number) {
+    await db.delete(chatbotFaq).where(eq(chatbotFaq.id, id));
+  }
+
+  // Chatbot Offers
+  async getChatbotOffers() {
+    return db.select().from(chatbotOffers);
+  }
+  async createChatbotOffer(offer: InsertChatbotOffer) {
+    const [created] = await db.insert(chatbotOffers).values(offer).returning();
+    return created;
+  }
+  async updateChatbotOffer(id: number, data: Partial<InsertChatbotOffer>) {
+    const [updated] = await db.update(chatbotOffers).set(data).where(eq(chatbotOffers.id, id)).returning();
+    return updated;
+  }
+  async deleteChatbotOffer(id: number) {
+    await db.delete(chatbotOffers).where(eq(chatbotOffers.id, id));
+  }
+
+  // Chatbot Conversations
+  async getChatbotConversations() {
+    return db.select().from(chatbotConversations).orderBy(desc(chatbotConversations.updatedAt));
+  }
+  async getChatbotConversation(id: number) {
+    const [conv] = await db.select().from(chatbotConversations).where(eq(chatbotConversations.id, id));
+    return conv;
+  }
+  async getChatbotConversationBySession(sessionId: string) {
+    const [conv] = await db.select().from(chatbotConversations).where(eq(chatbotConversations.sessionId, sessionId));
+    return conv;
+  }
+  async saveChatbotConversation(data: InsertChatbotConversation) {
+    const [created] = await db.insert(chatbotConversations).values(data).returning();
+    return created;
+  }
+  async updateChatbotConversation(id: number, data: Partial<InsertChatbotConversation>) {
+    const [updated] = await db.update(chatbotConversations).set({ ...data, updatedAt: new Date() }).where(eq(chatbotConversations.id, id)).returning();
+    return updated;
+  }
+  async deleteChatbotConversation(id: number) {
+    await db.delete(chatbotConversations).where(eq(chatbotConversations.id, id));
   }
 }
 

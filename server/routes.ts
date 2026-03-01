@@ -1177,6 +1177,47 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     return signals;
   }
 
+  let cachedChatbotConfig: Record<string, string> = {};
+  let cachedFaqs: Array<{ question: string; answer: string }> = [];
+  let cachedOffers: Array<{ title: string; description: string; hotelSlug: string | null }> = [];
+  let chatbotCacheTime = 0;
+
+  async function loadChatbotCmsData() {
+    if (Date.now() - chatbotCacheTime < 60000) return;
+    try {
+      const configs = await storage.getChatbotConfigs();
+      cachedChatbotConfig = {};
+      for (const c of configs) cachedChatbotConfig[c.key] = c.value;
+
+      const faqs = await storage.getChatbotFaqs();
+      cachedFaqs = faqs.filter(f => f.isActive).map(f => ({ question: f.question, answer: f.answer }));
+
+      const offers = await storage.getChatbotOffers();
+      const now = new Date().toISOString().split("T")[0];
+      cachedOffers = offers.filter(o => {
+        if (!o.isActive) return false;
+        if (o.startDate && o.startDate > now) return false;
+        if (o.endDate && o.endDate < now) return false;
+        return true;
+      }).map(o => ({ title: o.title, description: o.description, hotelSlug: o.hotelSlug }));
+
+      chatbotCacheTime = Date.now();
+    } catch (e) {
+      console.error("[chatbot] Failed to load CMS data:", e);
+    }
+  }
+
+  function detectLeadInfo(text: string): { name?: string; contact?: string } {
+    const result: { name?: string; contact?: string } = {};
+    const phoneMatch = text.match(/(?:0[0-9]{10}|(?:\+|00)[0-9]{10,13})/);
+    if (phoneMatch) result.contact = phoneMatch[0];
+    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    if (emailMatch) result.contact = emailMatch[0];
+    const nameMatch = text.match(/(?:اسمي|اسمى|name is|my name)\s+([^\s,\.ورقم]{2,}(?:\s+[^\s,\.ورقم]{2,})?)/i);
+    if (nameMatch) result.name = nameMatch[1].trim();
+    return result;
+  }
+
   const conversations: Record<string, { messages: Array<{ role: "user" | "assistant"; content: string }>; hotel: string | null; lastActive: number; bookingSignals: Set<string>; bookingLinkSent: boolean }> = {};
 
   setInterval(() => {
@@ -1250,7 +1291,31 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
 
       const recentMessages = session.messages.slice(-MAX_MESSAGES);
 
-      const systemPrompt = buildSystemPrompt(selectedHotel);
+      await loadChatbotCmsData();
+
+      let systemPrompt = buildSystemPrompt(selectedHotel);
+
+      const cmsConfig = cachedChatbotConfig;
+      if (cmsConfig.tone) systemPrompt += `\nTONE OVERRIDE: Use a ${cmsConfig.tone} tone.`;
+      if (cmsConfig.responseLength) systemPrompt += `\nRESPONSE LENGTH: Keep responses ${cmsConfig.responseLength}.`;
+      if (cmsConfig.language) systemPrompt += `\nLANGUAGE PREFERENCE: ${cmsConfig.language}.`;
+      if (cmsConfig.customInstructions) systemPrompt += `\nADDITIONAL INSTRUCTIONS FROM MANAGEMENT:\n${cmsConfig.customInstructions}`;
+
+      if (cachedFaqs.length > 0) {
+        systemPrompt += `\n\nFREQUENTLY ASKED QUESTIONS — If the user asks something similar, use these answers:\n`;
+        for (const faq of cachedFaqs) {
+          systemPrompt += `Q: ${faq.question}\nA: ${faq.answer}\n\n`;
+        }
+      }
+
+      const relevantOffers = cachedOffers.filter(o => !o.hotelSlug || o.hotelSlug === selectedHotel);
+      if (relevantOffers.length > 0) {
+        systemPrompt += `\n\nCURRENT ACTIVE OFFERS — Mention these naturally when relevant:\n`;
+        for (const offer of relevantOffers) {
+          systemPrompt += `- ${offer.title}: ${offer.description}\n`;
+        }
+      }
+
       const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
         { role: "system", content: systemPrompt },
       ];
@@ -1276,11 +1341,104 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       }
 
       session.messages.push({ role: "assistant", content: reply });
+
+      // Save conversation to DB for CMS viewing
+      try {
+        const leadInfo = detectLeadInfo(message);
+        const msgEntry = { role: "assistant" as const, content: reply, timestamp: Date.now() };
+        const userMsgEntry = { role: "user" as const, content: message.slice(0, MAX_CONTENT_LENGTH), timestamp: Date.now() };
+
+        const existingConv = await storage.getChatbotConversationBySession(sid);
+        if (existingConv) {
+          const msgs = [...(existingConv.messages || []), userMsgEntry, msgEntry];
+          const updateData: any = { messages: msgs, hotelSlug: selectedHotel || existingConv.hotelSlug };
+          if (leadInfo.name) updateData.leadName = leadInfo.name;
+          if (leadInfo.contact) updateData.leadContact = leadInfo.contact;
+          if (leadInfo.name || leadInfo.contact) updateData.hasLead = true;
+          await storage.updateChatbotConversation(existingConv.id, updateData);
+        } else {
+          await storage.saveChatbotConversation({
+            sessionId: sid,
+            hotelSlug: selectedHotel,
+            messages: [userMsgEntry, msgEntry],
+            hasLead: !!(leadInfo.name || leadInfo.contact),
+            leadName: leadInfo.name || null,
+            leadContact: leadInfo.contact || null,
+          });
+        }
+      } catch (dbErr) {
+        console.error("[chatbot] DB save error:", dbErr);
+      }
+
       res.json({ reply });
     } catch (error: any) {
       console.error("Chat endpoint error:", error);
       res.status(500).json({ reply: "حدث خطأ، حاول مرة أخرى." });
     }
+  });
+
+  // ──────── CMS CHATBOT MANAGEMENT ────────
+  app.get("/api/cms/chatbot-config", requireAuth, async (_req, res) => {
+    const configs = await storage.getChatbotConfigs();
+    const result: Record<string, string> = {};
+    for (const c of configs) result[c.key] = c.value;
+    res.json(result);
+  });
+
+  app.put("/api/cms/chatbot-config", requireAuth, async (req, res) => {
+    const data = req.body as Record<string, string>;
+    for (const [key, value] of Object.entries(data)) {
+      await storage.upsertChatbotConfig(key, value);
+    }
+    res.json({ success: true });
+  });
+
+  app.get("/api/cms/chatbot-faq", requireAuth, async (_req, res) => {
+    const faqs = await storage.getChatbotFaqs();
+    res.json(faqs);
+  });
+  app.post("/api/cms/chatbot-faq", requireAuth, async (req, res) => {
+    const faq = await storage.createChatbotFaq(req.body);
+    res.json(faq);
+  });
+  app.put("/api/cms/chatbot-faq/:id", requireAuth, async (req, res) => {
+    const faq = await storage.updateChatbotFaq(Number(req.params.id), req.body);
+    res.json(faq);
+  });
+  app.delete("/api/cms/chatbot-faq/:id", requireAuth, async (req, res) => {
+    await storage.deleteChatbotFaq(Number(req.params.id));
+    res.json({ success: true });
+  });
+
+  app.get("/api/cms/chatbot-offers", requireAuth, async (_req, res) => {
+    const offers = await storage.getChatbotOffers();
+    res.json(offers);
+  });
+  app.post("/api/cms/chatbot-offers", requireAuth, async (req, res) => {
+    const offer = await storage.createChatbotOffer(req.body);
+    res.json(offer);
+  });
+  app.put("/api/cms/chatbot-offers/:id", requireAuth, async (req, res) => {
+    const offer = await storage.updateChatbotOffer(Number(req.params.id), req.body);
+    res.json(offer);
+  });
+  app.delete("/api/cms/chatbot-offers/:id", requireAuth, async (req, res) => {
+    await storage.deleteChatbotOffer(Number(req.params.id));
+    res.json({ success: true });
+  });
+
+  app.get("/api/cms/chatbot-conversations", requireAuth, async (_req, res) => {
+    const conversations_list = await storage.getChatbotConversations();
+    res.json(conversations_list);
+  });
+  app.get("/api/cms/chatbot-conversations/:id", requireAuth, async (req, res) => {
+    const conv = await storage.getChatbotConversation(Number(req.params.id));
+    if (!conv) return res.status(404).json({ error: "Not found" });
+    res.json(conv);
+  });
+  app.delete("/api/cms/chatbot-conversations/:id", requireAuth, async (req, res) => {
+    await storage.deleteChatbotConversation(Number(req.params.id));
+    res.json({ success: true });
   });
 
   // ──────── CMS AI ASSISTANT ────────

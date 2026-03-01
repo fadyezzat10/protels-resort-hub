@@ -94,6 +94,10 @@ Preferred communication style: Simple, everyday language.
 - `blogPosts` – Blog articles with multilingual title/content/excerpt (JSONB), SEO fields, hotel linking, featured image
 - `globalSettings` – Key-value settings store
 - `seoSettings` – Per-path SEO metadata (meta titles, descriptions, OG tags, robots, canonical URLs)
+- `chatbot_config` – Key-value chatbot settings (tone, responseLength, language, customInstructions)
+- `chatbot_faq` – Q&A pairs the chatbot uses to answer common questions
+- `chatbot_offers` – Active offers/promotions the chatbot mentions (general or per-hotel, with date ranges)
+- `chatbot_conversations` – Saved conversations with guests, lead detection (name, phone/email)
 
 ### Build System
 - **Development:** `tsx server/index.ts` runs the Express server with Vite middleware for HMR

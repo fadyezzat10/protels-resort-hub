@@ -100,6 +100,7 @@ import CMSHead from "@/components/CMSHead";
 import CMSTheme from "./pages/cms/CMSTheme";
 import CMSUsers from "./pages/cms/CMSUsers";
 import CMSAIAssistant from "./pages/cms/CMSAIAssistant";
+import CMSChatbot from "./pages/cms/CMSChatbot";
 import ThemeProvider from "@/components/ThemeProvider";
 import CMSAssistant from "@/components/CMSAssistant";
 
@@ -137,6 +138,7 @@ function Router() {
       <Route path="/controlpanal/builder/:slug" component={CMSBuilder} />
       <Route path="/controlpanal/users" component={CMSUsers} />
       <Route path="/controlpanal/visual-edit/:slug" component={VisualEditor} />
+      <Route path="/controlpanal/chatbot" component={CMSChatbot} />
       <Route path="/controlpanal/ai-assistant" component={CMSAIAssistant} />
       
       {/* Dynamic hotel page routing with sections */}
