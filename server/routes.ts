@@ -946,8 +946,7 @@ export async function registerRoutes(
 
   // ──────── BOOKING ASSISTANT CHATBOT ────────
   const openai = new OpenAI({
-    apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-    baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+    apiKey: process.env.OPENAI_API_KEY,
   });
 
   const chatRateLimit = new Map<string, { count: number; resetAt: number }>();
