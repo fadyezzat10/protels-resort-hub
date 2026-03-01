@@ -11,6 +11,9 @@ import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
 import { insertBlogPostSchema, pageVersions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
+import { createRequire } from "module";
+const _require = createRequire(import.meta.url);
+const { PDFParse } = _require("pdf-parse");
 import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
 
 declare module "express-session" {
@@ -948,6 +951,21 @@ export async function registerRoutes(
     apiKey: process.env.OPENAI_API_KEY,
   });
 
+  let hotelKnowledge = "";
+  try {
+    const pdfPath = path.resolve("attached_assets/Fact_sheet_Crystal_beach_(3)_1772360362683.pdf");
+    const pdfBuffer = fs.readFileSync(pdfPath);
+    const uint8 = new Uint8Array(pdfBuffer);
+    const parser = new PDFParse(uint8);
+    await parser.load();
+    const result = await parser.getText();
+    hotelKnowledge = result.text || "";
+    console.log("[pdf] Hotel knowledge loaded successfully from PDF.");
+  } catch (err) {
+    console.error("[pdf] Failed to load hotel PDF:", err);
+    hotelKnowledge = "";
+  }
+
   const chatRateLimit = new Map<string, { count: number; resetAt: number }>();
   const RATE_LIMIT_WINDOW = 60 * 1000;
   const RATE_LIMIT_MAX = 10;
@@ -1045,12 +1063,17 @@ Rules:
         return res.status(400).json({ reply: "Message is required." });
       }
 
+      const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
+          { role: "system", content: BOOKING_ASSISTANT_SYSTEM },
+        ];
+      if (hotelKnowledge) {
+        chatMessages.push({ role: "system", content: hotelKnowledge });
+      }
+      chatMessages.push({ role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) });
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: BOOKING_ASSISTANT_SYSTEM },
-          { role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) },
-        ],
+        messages: chatMessages,
         max_tokens: 300,
         temperature: 0.7,
       });
