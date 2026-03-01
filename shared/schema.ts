@@ -150,6 +150,7 @@ export const chatbotConversations = pgTable("chatbot_conversations", {
   hasLead: boolean("has_lead").notNull().default(false),
   leadName: text("lead_name"),
   leadContact: text("lead_contact"),
+  seen: boolean("seen").notNull().default(false),
   startedAt: timestamp("started_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

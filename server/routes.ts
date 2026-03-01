@@ -1441,6 +1441,17 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     res.json({ success: true });
   });
 
+  app.get("/api/cms/chatbot-unseen-leads", requireAuth, async (_req, res) => {
+    const all = await storage.getChatbotConversations();
+    const unseen = all.filter((c: any) => c.hasLead && !c.seen);
+    res.json({ count: unseen.length });
+  });
+
+  app.put("/api/cms/chatbot-conversations/:id/seen", requireAuth, async (req, res) => {
+    await storage.updateChatbotConversation(Number(req.params.id), { seen: true } as any);
+    res.json({ success: true });
+  });
+
   // ──────── CMS AI ASSISTANT ────────
   const CMS_ASSISTANT_SYSTEM = `You are the PROTELS CMS AI Assistant — an expert-level intelligent content management system for the PROTELS Hotels & Resorts website. You are extremely capable and proactive.
 

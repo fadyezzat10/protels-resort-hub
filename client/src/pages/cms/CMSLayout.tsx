@@ -52,6 +52,18 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
     retry: false,
   });
 
+  const { data: unseenData } = useQuery({
+    queryKey: ["/api/cms/chatbot-unseen-leads"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/chatbot-unseen-leads", { credentials: "include" });
+      if (!res.ok) return { count: 0 };
+      return res.json();
+    },
+    refetchInterval: 30000,
+    enabled: !!user,
+  });
+  const unseenLeads = unseenData?.count || 0;
+
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("POST", "/api/auth/logout");
@@ -112,20 +124,25 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
 
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <a
-                data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm",
-                  location === item.href
-                    ? "bg-brand-gold text-brand-blue font-semibold"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                )}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </a>
+            <Link
+              key={item.href}
+              href={item.href}
+              data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm",
+                location === item.href
+                  ? "bg-brand-gold text-brand-blue font-semibold"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
+              )}
+              onClick={() => setSidebarOpen(false)}
+            >
+              <item.icon className="w-5 h-5" />
+              {item.label}
+              {item.label === "Chatbot" && unseenLeads > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {unseenLeads}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

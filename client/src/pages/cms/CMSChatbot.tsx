@@ -444,8 +444,20 @@ function ConversationsTab() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/cms/chatbot-conversations/${id}`),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/cms/chatbot-conversations"] }); setSelectedId(null); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/cms/chatbot-conversations"] }); queryClient.invalidateQueries({ queryKey: ["/api/cms/chatbot-unseen-leads"] }); setSelectedId(null); },
   });
+
+  const markSeenMutation = useMutation({
+    mutationFn: (id: number) => apiRequest("PUT", `/api/cms/chatbot-conversations/${id}/seen`),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/cms/chatbot-conversations"] }); queryClient.invalidateQueries({ queryKey: ["/api/cms/chatbot-unseen-leads"] }); },
+  });
+
+  const handleSelectConvo = (conv: any) => {
+    setSelectedId(conv.id);
+    if (conv.hasLead && !conv.seen) {
+      markSeenMutation.mutate(conv.id);
+    }
+  };
 
   if (isLoading) return <div className="text-center py-8 text-gray-500">Loading...</div>;
 
@@ -531,13 +543,16 @@ function ConversationsTab() {
           <Card
             key={conv.id}
             data-testid={`card-conversation-${conv.id}`}
-            className="cursor-pointer hover:border-brand-blue/30 transition-colors"
-            onClick={() => setSelectedId(conv.id)}
+            className={`cursor-pointer hover:border-brand-blue/30 transition-colors ${conv.hasLead && !conv.seen ? "border-red-300 bg-red-50/30" : ""}`}
+            onClick={() => handleSelectConvo(conv)}
           >
             <CardContent className="pt-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
+                    {conv.hasLead && !conv.seen && (
+                      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">NEW</span>
+                    )}
                     {conv.hasLead && (
                       <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">Lead</span>
                     )}
@@ -585,6 +600,17 @@ function ConversationsTab() {
 export default function CMSChatbot() {
   const [activeTab, setActiveTab] = useState<TabId>("settings");
 
+  const { data: unseenData } = useQuery({
+    queryKey: ["/api/cms/chatbot-unseen-leads"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/chatbot-unseen-leads", { credentials: "include" });
+      if (!res.ok) return { count: 0 };
+      return res.json();
+    },
+    refetchInterval: 30000,
+  });
+  const unseenCount = unseenData?.count || 0;
+
   return (
     <CMSLayout>
       <div className="mb-6">
@@ -606,6 +632,11 @@ export default function CMSChatbot() {
           >
             <tab.icon className="w-4 h-4" />
             {tab.label}
+            {tab.id === "conversations" && unseenCount > 0 && (
+              <span className="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                {unseenCount}
+              </span>
+            )}
           </button>
         ))}
       </div>
