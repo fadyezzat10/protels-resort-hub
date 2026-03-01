@@ -1126,6 +1126,17 @@ AVAILABLE HOTELS:
     }
   });
 
+  const conversations: Record<string, { messages: Array<{ role: "user" | "assistant"; content: string }>; hotel: string | null; lastActive: number }> = {};
+
+  setInterval(() => {
+    const now = Date.now();
+    for (const id of Object.keys(conversations)) {
+      if (now - conversations[id].lastActive > 30 * 60 * 1000) {
+        delete conversations[id];
+      }
+    }
+  }, 5 * 60 * 1000);
+
   app.post("/chat", async (req, res) => {
     try {
       const clientIp = req.ip || req.socket.remoteAddress || "unknown";
@@ -1140,26 +1151,48 @@ AVAILABLE HOTELS:
         chatRateLimit.set(clientIp, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
       }
 
-      const { message, hotel } = req.body;
+      const { message, hotel, sessionId } = req.body;
       if (!message || typeof message !== "string") {
         return res.status(400).json({ reply: "Message is required." });
       }
 
-      let selectedHotel: string | null = hotel && hotelInfoMap[hotel] ? hotel : null;
+      const sid = sessionId && typeof sessionId === "string" ? sessionId : clientIp;
+
+      if (!conversations[sid]) {
+        conversations[sid] = { messages: [], hotel: null, lastActive: Date.now() };
+      }
+      const session = conversations[sid];
+      session.lastActive = Date.now();
+
+      let selectedHotel: string | null = session.hotel;
+
+      if (!selectedHotel && hotel && hotelInfoMap[hotel]) {
+        selectedHotel = hotel;
+      }
+
       const detected = detectHotelFromMessage(message);
 
       if (detected === "ask-marsa-alam" && !selectedHotel) {
-        return res.json({
-          reply: "عندنا في مرسى علم فندقين رائعين:\n\n" +
-            "1. Protels Crystal Beach Resort – منتجع هادي وفخم على البحر الأحمر، مثالي للاسترخاء والغطس.\n\n" +
-            "2. Protels Beach Club & Spa – منتجع Ultra All Inclusive فيه أكوا بارك و6 حمامات سباحة، مثالي للعائلات.\n\n" +
-            "أنهي واحد يناسبك أكتر؟ 😉"
-        });
+        const marsaReply = "عندنا في مرسى علم فندقين رائعين:\n\n" +
+          "1. Protels Crystal Beach Resort – منتجع هادي وفخم على البحر الأحمر، مثالي للاسترخاء والغطس.\n\n" +
+          "2. Protels Beach Club & Spa – منتجع Ultra All Inclusive فيه أكوا بارك و6 حمامات سباحة، مثالي للعائلات.\n\n" +
+          "أنهي واحد يناسبك أكتر؟ 😉";
+        session.messages.push({ role: "user", content: message });
+        session.messages.push({ role: "assistant", content: marsaReply });
+        return res.json({ reply: marsaReply });
       }
 
       if (!selectedHotel && detected && detected !== "ask-marsa-alam") {
         selectedHotel = detected;
       }
+
+      if (selectedHotel) {
+        session.hotel = selectedHotel;
+      }
+
+      session.messages.push({ role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) });
+
+      const recentMessages = session.messages.slice(-MAX_MESSAGES);
 
       const systemPrompt = buildSystemPrompt(selectedHotel);
       const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
@@ -1168,7 +1201,7 @@ AVAILABLE HOTELS:
       if (selectedHotel && hotelKnowledgeMap[selectedHotel]) {
         chatMessages.push({ role: "system", content: hotelKnowledgeMap[selectedHotel] });
       }
-      chatMessages.push({ role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) });
+      chatMessages.push(...recentMessages);
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -1178,6 +1211,7 @@ AVAILABLE HOTELS:
       });
 
       const reply = completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+      session.messages.push({ role: "assistant", content: reply });
       res.json({ reply });
     } catch (error: any) {
       console.error("Chat endpoint error:", error);

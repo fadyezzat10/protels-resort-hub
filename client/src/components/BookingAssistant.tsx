@@ -62,9 +62,21 @@ export default function BookingAssistant() {
     }
   }, [isOpen]);
 
+  function getSessionId(): string {
+    let id = localStorage.getItem("chatSessionId");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("chatSessionId", id);
+    }
+    return id;
+  }
+
   async function getBotResponse(message: string): Promise<string> {
     try {
-      const body: Record<string, string> = { message };
+      const body: Record<string, string> = {
+        message,
+        sessionId: getSessionId(),
+      };
       if (currentHotel) {
         body.hotel = currentHotel;
       }
