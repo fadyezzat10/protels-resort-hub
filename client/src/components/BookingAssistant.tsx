@@ -53,6 +53,23 @@ export default function BookingAssistant() {
     }
   }, [isOpen]);
 
+  async function getBotResponse(message: string): Promise<string> {
+    try {
+      const response = await fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      const data = await response.json();
+      return data.reply;
+    } catch (error) {
+      return "حدث خطأ، حاول مرة أخرى.";
+    }
+  }
+
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
@@ -63,80 +80,13 @@ export default function BookingAssistant() {
     }
 
     const userMessage: ChatMessage = { role: "user", content: trimmed };
-    const allMessages = [...messages, userMessage];
-    setMessages(allMessages);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
-    const apiMessages = allMessages
-      .filter((m) => !m.isGreeting)
-      .map((m) => ({ role: m.role, content: m.content }));
-
     try {
-      const response = await fetch("/api/booking-assistant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: apiMessages }),
-      });
-
-      if (!response.ok) throw new Error("Failed");
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = "";
-      let lineBuffer = "";
-
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          lineBuffer += decoder.decode(value, { stream: true });
-          const lines = lineBuffer.split("\n");
-          lineBuffer = lines.pop() || "";
-
-          for (const line of lines) {
-            const trimmedLine = line.trim();
-            if (trimmedLine.startsWith("data: ")) {
-              try {
-                const data = JSON.parse(trimmedLine.slice(6));
-                if (data.content) {
-                  assistantContent += data.content;
-                  const finalContent = assistantContent;
-                  setMessages((prev) => {
-                    const updated = [...prev];
-                    updated[updated.length - 1] = { role: "assistant", content: finalContent };
-                    return updated;
-                  });
-                }
-                if (data.error) {
-                  setMessages((prev) => {
-                    const updated = [...prev];
-                    updated[updated.length - 1] = { role: "assistant", content: data.error };
-                    return updated;
-                  });
-                }
-              } catch {}
-            }
-          }
-        }
-
-        if (lineBuffer.trim().startsWith("data: ")) {
-          try {
-            const data = JSON.parse(lineBuffer.trim().slice(6));
-            if (data.content) {
-              assistantContent += data.content;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: assistantContent };
-                return updated;
-              });
-            }
-          } catch {}
-        }
-      }
+      const reply = await getBotResponse(trimmed);
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch {
       setMessages((prev) => [
         ...prev,

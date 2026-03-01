@@ -11,7 +11,6 @@ import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
 import { insertBlogPostSchema, pageVersions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
-import { findRuleBasedResponse, detectArabicText } from "@shared/chatResponses";
 import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
 
 declare module "express-session" {
@@ -1081,22 +1080,6 @@ Help guests feel confident, informed, and ready to book by clicking "Book Now".`
         content: typeof m.content === "string" ? m.content.slice(0, MAX_CONTENT_LENGTH) : "",
       }));
 
-      const lastUserMsg = trimmedMessages.filter((m: any) => m.role === "user").pop();
-      const userText = lastUserMsg?.content || "";
-      const isArabic = detectArabicText(userText);
-
-      const ruleMatch = findRuleBasedResponse(userText);
-      if (ruleMatch) {
-        const reply = isArabic ? ruleMatch.ar : ruleMatch.en;
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
-        res.write(`data: ${JSON.stringify({ content: reply })}\n\n`);
-        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-        res.end();
-        return;
-      }
-
       const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
         { role: "system", content: BOOKING_ASSISTANT_SYSTEM },
         ...trimmedMessages,
@@ -1131,6 +1114,43 @@ Help guests feel confident, informed, and ready to book by clicking "Book Now".`
       } else {
         res.status(500).json({ error: "Failed to get response" });
       }
+    }
+  });
+
+  app.post("/chat", async (req, res) => {
+    try {
+      const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+      const now = Date.now();
+      const entry = chatRateLimit.get(clientIp);
+      if (entry && now < entry.resetAt) {
+        if (entry.count >= RATE_LIMIT_MAX) {
+          return res.status(429).json({ reply: "Too many requests. Please wait a moment." });
+        }
+        entry.count++;
+      } else {
+        chatRateLimit.set(clientIp, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+      }
+
+      const { message } = req.body;
+      if (!message || typeof message !== "string") {
+        return res.status(400).json({ reply: "Message is required." });
+      }
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: BOOKING_ASSISTANT_SYSTEM },
+          { role: "user", content: message.slice(0, MAX_CONTENT_LENGTH) },
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      });
+
+      const reply = completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+      res.json({ reply });
+    } catch (error: any) {
+      console.error("Chat endpoint error:", error);
+      res.status(500).json({ reply: "حدث خطأ، حاول مرة أخرى." });
     }
   });
 
