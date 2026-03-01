@@ -1089,7 +1089,7 @@ Your job: Tell them it's opening soon with excitement. Ask for their name and ph
     } else {
       prompt += `\nNo hotel selected yet. Welcome them briefly and present the 3 destinations in a concise, exciting way:
 مرسى علم: Crystal Beach (هدوء وغطس) أو Beach Club (عائلات وأكوا بارك)
-زنجبار: La Plage (بوتيك على شاطئ خاص)
+زنجبار: La Plage (منتجع على شاطئ خاص)
 الغردقة: Royal Bay (قريباً!)
 Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
