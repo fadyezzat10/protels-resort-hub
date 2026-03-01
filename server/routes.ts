@@ -1036,7 +1036,7 @@ export async function registerRoutes(
 You are warm, professional, sales-oriented, and encourage booking naturally. Ask smart follow-up questions about dates, number of guests, and stay length.
 
 IMPORTANT RULES:
-- Prefer replying in Arabic unless the user writes in English.
+- LANGUAGE STYLE: Mirror the user's language style. If they write in Egyptian dialect (عامية), reply in Egyptian dialect. If they write in formal Arabic (فصحى), reply in formal Arabic. If English, reply in English.
 - For the FIRST response about a hotel, ALWAYS clearly mention the hotel name. Example: "أهلاً بيك في Protels Beach Club & Spa – Marsa Alam ✨"
 - If user asks "ده في أنهي فندق؟" respond with the full hotel identity clearly.
 - If the question is general (math, knowledge, casual talk), answer it normally without refusing.
@@ -1052,12 +1052,23 @@ AVAILABLE HOTELS:
     }
 
     if (hotel && hotel === "royal-bay") {
-      prompt += `\nThe user is asking about Protels Royal Bay Resort & Spa in Hurghada. This resort is currently under preparation and opening soon. Explain this warmly and invite them to stay tuned or explore other available resorts.`;
+      prompt += `\nThe user is asking about Protels Royal Bay Resort & Spa in Hurghada. This resort is currently under preparation and opening soon. Do the following:
+1. Tell them warmly that Royal Bay is opening soon and it will be amazing.
+2. Ask them for their contact details (name, email or phone number) so we can notify them when bookings open.
+3. If they already provided contact details, thank them and confirm we will reach out when Royal Bay launches.`;
     } else if (hotel && hotelInfoMap[hotel]) {
       const info = hotelInfoMap[hotel];
       prompt += `\nCURRENT HOTEL CONTEXT: ${info.name} – ${info.location} (${info.category}, ${info.concept})`;
     } else {
-      prompt += `\nThe user has not selected a specific hotel. Ask them warmly: "في بالك مرسى علم ولا زنجبار ولا الغردقة؟ خليني أساعدك تختار 😉" and help them choose based on their preferences. Mention that Hurghada (Royal Bay) is opening soon.`;
+      prompt += `\nThe user has not selected a specific hotel yet. Welcome them warmly and present ALL 3 destinations with a brief exciting description for each:
+
+1. مرسى علم – Red Sea: عندنا فندقين:
+   - Protels Crystal Beach Resort: منتجع هادي وفخم على البحر، مثالي للاسترخاء والغطس والهدوء.
+   - Protels Beach Club & Spa: منتجع Ultra All Inclusive فيه أكوا بارك و6 حمامات سباحة، مثالي للعائلات.
+2. زنجبار – Tanzania: Protels La Plage – بوتيك ريزورت على شاطئ خاص في جزيرة زنجبار الساحرة.
+3. الغردقة – Red Sea: Protels Royal Bay Resort & Spa – قريباً! منتجع فخم قيد الافتتاح.
+
+Ask them which destination interests them to help them choose.`;
     }
 
     return prompt;
@@ -1236,7 +1247,7 @@ AVAILABLE HOTELS:
       let reply = completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
 
       if (selectedHotel === "royal-bay" && session.bookingSignals.size >= 2) {
-        reply = "Protels Royal Bay Resort & Spa – Hurghada قيد الافتتاح قريبًا ✨\nترقبوا الإعلان الرسمي لبدء الحجوزات قريبًا.";
+        reply = "Protels Royal Bay Resort & Spa – Hurghada قيد الافتتاح قريبًا ✨\nنقدر نسجل بياناتك (اسمك ورقم تليفونك أو الإيميل) عشان نبلغك أول ما الحجز يفتح!";
       } else if (selectedHotel && session.bookingSignals.size >= 2 && !session.bookingLinkSent && bookingLinkMap[selectedHotel]) {
         reply += "\n\n🔗 يمكنك إتمام الحجز مباشرة من خلال الرابط التالي:\n" + bookingLinkMap[selectedHotel];
         session.bookingLinkSent = true;
