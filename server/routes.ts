@@ -1015,15 +1015,19 @@ export async function registerRoutes(
   const MAX_MESSAGES = 20;
   const MAX_CONTENT_LENGTH = 500;
 
-  function detectHotelFromMessage(text: string): string | null {
+  function detectHotelFromMessage(text: string): string | "ask-marsa-alam" | null {
     const lower = text.toLowerCase();
     if (lower.includes("crystal") || lower.includes("كريستال")) return "crystal-beach";
     if (lower.includes("beach club") || lower.includes("بيتش كلاب") || lower.includes("بيتش كلوب")) return "beach-club";
-    if (lower.includes("la plage") || lower.includes("لا بلاج") || lower.includes("زنجبار") || lower.includes("zanzibar")) return "la-plage";
-    if (lower.includes("royal bay") || lower.includes("رويال باي") || lower.includes("hurghada") || lower.includes("الغردقة") || lower.includes("هرغادة")) return "royal-bay";
-    if (lower.includes("aqua") || lower.includes("slide") || lower.includes("زحاليق") || lower.includes("اكوا") || lower.includes("kids") || lower.includes("اطفال") || lower.includes("عيال") || lower.includes("family") || lower.includes("عائل")) return "beach-club";
-    if (lower.includes("honeymoon") || lower.includes("شهر عسل") || lower.includes("romantic") || lower.includes("رومانس")) return "la-plage";
-    if (lower.includes("relax") || lower.includes("quiet") || lower.includes("هدوء") || lower.includes("استرخاء")) return "crystal-beach";
+    if (lower.includes("la plage") || lower.includes("لا بلاج")) return "la-plage";
+    if (lower.includes("زنجبار") || lower.includes("zanzibar")) return "la-plage";
+    if (lower.includes("royal bay") || lower.includes("رويال باي")) return "royal-bay";
+    if (lower.includes("hurghada") || lower.includes("الغردقة") || lower.includes("الغردقه") || lower.includes("هرغادة") || lower.includes("هرغاده")) return "royal-bay";
+    if (lower.includes("aqua") || lower.includes("slide") || lower.includes("زحاليق") || lower.includes("زحليقه") || lower.includes("اكوا") || lower.includes("أكوا")) return "beach-club";
+    if (lower.includes("kids") || lower.includes("اطفال") || lower.includes("أطفال") || lower.includes("عيال") || lower.includes("family") || lower.includes("عائل") || lower.includes("عائلة") || lower.includes("أسرة")) return "beach-club";
+    if (lower.includes("honeymoon") || lower.includes("شهر عسل") || lower.includes("شهر العسل") || lower.includes("romantic") || lower.includes("رومانس") || lower.includes("رومانسي")) return "la-plage";
+    if (lower.includes("relax") || lower.includes("quiet") || lower.includes("هدوء") || lower.includes("استرخاء") || lower.includes("هادي") || lower.includes("هادئ")) return "crystal-beach";
+    if (lower.includes("مرسى علم") || lower.includes("marsa alam") || lower.includes("مرسي علم")) return "ask-marsa-alam";
     return null;
   }
 
@@ -1142,8 +1146,19 @@ AVAILABLE HOTELS:
       }
 
       let selectedHotel: string | null = hotel && hotelInfoMap[hotel] ? hotel : null;
-      if (!selectedHotel) {
-        selectedHotel = detectHotelFromMessage(message);
+      const detected = detectHotelFromMessage(message);
+
+      if (detected === "ask-marsa-alam" && !selectedHotel) {
+        return res.json({
+          reply: "عندنا في مرسى علم فندقين رائعين:\n\n" +
+            "1. Protels Crystal Beach Resort – منتجع هادي وفخم على البحر الأحمر، مثالي للاسترخاء والغطس.\n\n" +
+            "2. Protels Beach Club & Spa – منتجع Ultra All Inclusive فيه أكوا بارك و6 حمامات سباحة، مثالي للعائلات.\n\n" +
+            "أنهي واحد يناسبك أكتر؟ 😉"
+        });
+      }
+
+      if (!selectedHotel && detected && detected !== "ask-marsa-alam") {
+        selectedHotel = detected;
       }
 
       const systemPrompt = buildSystemPrompt(selectedHotel);
