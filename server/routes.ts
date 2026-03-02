@@ -1073,18 +1073,20 @@ NEVER DO:
 - Don't mix data between hotels
 - Don't give long paragraphs — be punchy and engaging
 
-AVAILABLE HOTELS:
+AVAILABLE HOTELS (each is a SEPARATE resort — NEVER mix their features):
 `;
-    for (const [slug, info] of Object.entries(hotelInfoMap)) {
-      prompt += `${info.name} | ${info.location} | ${info.category} | ${info.concept}\n`;
-    }
+    prompt += `1. Protels Crystal Beach Resort — Marsa Alam, Egypt | 4★ All Inclusive | Quiet adults & couples resort, stunning house reef for snorkeling/diving, peaceful beach, perfect for relaxation seekers\n`;
+    prompt += `2. Protels Beach Club & Spa — Marsa Alam, Egypt | 4★ Ultra All Inclusive | Family-friendly resort with Aqua Park (water slides), Kids Club, Spa, multiple restaurants, great for families with kids\n`;
+    prompt += `3. Protels La Plage — Zanzibar, Tanzania | 4★ All Inclusive | Boutique beach resort on private white sand beach, romantic and exotic, perfect for honeymoons, couples, and unique tropical getaways\n`;
+    prompt += `4. Protels Royal Bay Resort & Spa — Hurghada, Egypt | 4★ | OPENING SOON — not yet accepting bookings\n`;
 
     if (hotel && hotel === "royal-bay") {
       prompt += `\nHOTEL CONTEXT: Protels Royal Bay Resort & Spa – Hurghada. OPENING SOON — not yet accepting bookings.
 Your job: Tell them it's opening soon with excitement. Ask for their name and phone/email so we can notify them first when bookings open. If they already gave contact info, thank them warmly and confirm. If they want to travel now, suggest Crystal Beach or Beach Club in Marsa Alam or La Plage in Zanzibar as alternatives.`;
     } else if (hotel && hotelInfoMap[hotel]) {
       const info = hotelInfoMap[hotel];
-      prompt += `\nHOTEL CONTEXT: ${info.name} – ${info.location} (${info.category}, ${info.concept}). Focus ONLY on this hotel. Use the hotel knowledge provided to answer questions accurately.`;
+      prompt += `\nHOTEL CONTEXT: The guest is asking about ${info.name} – ${info.location} (${info.category}, ${info.concept}).
+CRITICAL: ONLY talk about THIS hotel's features, rooms, restaurants, and amenities. Do NOT mention features from other hotels. If the knowledge base below has specific details (room types, restaurant names, facilities), use those EXACT details. Be specific — mention actual room names, restaurant names, pool details etc.`;
     } else {
       prompt += `\nNo hotel selected yet. Welcome them briefly and present the 3 destinations in a concise, exciting way:
 مرسى علم: Crystal Beach (هدوء وغطس) أو Beach Club (عائلات وأكوا بارك)
@@ -1122,10 +1124,32 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         content: typeof m.content === "string" ? m.content.slice(0, MAX_CONTENT_LENGTH) : "",
       }));
 
+      let selectedHotel: string | null = null;
+      for (const msg of trimmedMessages) {
+        if (msg.role === "user") {
+          const detected = detectHotelFromMessage(msg.content);
+          if (detected && detected !== "ask-marsa-alam") {
+            selectedHotel = detected;
+          }
+        }
+      }
+
+      const systemPrompt = buildSystemPrompt(selectedHotel);
       const chatMessages: OpenAI.ChatCompletionMessageParam[] = [
-        { role: "system", content: BOOKING_ASSISTANT_SYSTEM },
-        ...trimmedMessages,
+        { role: "system", content: systemPrompt },
       ];
+
+      if (selectedHotel && hotelKnowledgeMap[selectedHotel]) {
+        const knowledge = hotelKnowledgeMap[selectedHotel];
+        if (knowledge.length > 0) {
+          chatMessages.push({
+            role: "system",
+            content: `HOTEL KNOWLEDGE BASE for ${hotelInfoMap[selectedHotel]?.name || selectedHotel}:\n${knowledge}\n\nUse this data to answer accurately. Do NOT mix information between hotels. If asked about a different hotel, only use that hotel's data.`,
+          });
+        }
+      }
+
+      chatMessages.push(...trimmedMessages);
 
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
@@ -1135,7 +1159,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         model: "gpt-4o-mini",
         messages: chatMessages,
         stream: true,
-        max_tokens: 300,
+        max_tokens: 400,
         temperature: 0.7,
       });
 
