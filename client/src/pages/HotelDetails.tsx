@@ -554,7 +554,7 @@ export default function HotelDetails() {
                     {/* Hero Image - Left Side on Desktop */}
                     <div className="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden group">
                       <img loading="lazy" 
-                        src="/images/italian-restaurant/hero.jpg" 
+                        src="/images/italian-restaurant/hero.webp" 
                         alt="Italian Restaurant" 
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
@@ -784,7 +784,7 @@ export default function HotelDetails() {
                                </div>
                                <div className="w-full md:w-5/12 order-1 md:order-2">
                                   <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md rotate-1 hover:rotate-0 transition-transform duration-500">
-                                    <img loading="lazy" src="/images/la-plage/lounge/lounge-1.png" alt="The Lounge Bar" className="w-full h-full object-cover" />
+                                    <img loading="lazy" src="/images/la-plage/lounge/lounge-1.webp" alt="The Lounge Bar" className="w-full h-full object-cover" />
                                   </div>
                                </div>
                             </div>
@@ -813,7 +813,7 @@ export default function HotelDetails() {
                             <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
                                <div className="w-full md:w-5/12 order-1">
                                   <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md -rotate-1 hover:rotate-0 transition-transform duration-500">
-                                    <img loading="lazy" src="/images/la-plage/blu-bar/blu-1.jpg" alt="Blu Pool Bar" className="w-full h-full object-cover" />
+                                    <img loading="lazy" src="/images/la-plage/blu-bar/blu-1.webp" alt="Blu Pool Bar" className="w-full h-full object-cover" />
                                   </div>
                                </div>
                                <div className="flex-1 order-2">
@@ -883,7 +883,7 @@ export default function HotelDetails() {
                                </div>
                                <div className="w-full md:w-5/12 order-1 md:order-2">
                                   <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md rotate-1 hover:rotate-0 transition-transform duration-500">
-                                    <img loading="lazy" src="/images/la-plage/jazz-bar/jazz-1.jpg" alt="Jazz Lobby Bar" className="w-full h-full object-cover" />
+                                    <img loading="lazy" src="/images/la-plage/jazz-bar/jazz-1.webp" alt="Jazz Lobby Bar" className="w-full h-full object-cover" />
                                   </div>
                                </div>
                             </div>

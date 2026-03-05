@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
+import fs from "fs";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -15,6 +16,21 @@ declare module "http" {
 }
 
 app.use(compression());
+
+app.use("/images", (req, res, next) => {
+  const ext = path.extname(req.path);
+  if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
+    const relPath = req.path.startsWith("/") ? req.path.slice(1) : req.path;
+    const originalPath = path.resolve("client/public/images", relPath);
+    const webpPath = path.resolve("client/public/images", relPath.replace(/\.(png|jpe?g)$/i, ".webp"));
+    if (!fs.existsSync(originalPath) && fs.existsSync(webpPath)) {
+      res.setHeader("Content-Type", "image/webp");
+      res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+      return res.sendFile(webpPath);
+    }
+  }
+  next();
+});
 
 app.use("/images", express.static(path.resolve("client/public/images"), {
   maxAge: "30d",
