@@ -5,7 +5,17 @@ import Footer from "@/components/Footer";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Calendar, Building2, ArrowLeft, ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+function fixContentLinks(html: string): string {
+  return html.replace(/href="https?:\/\/[^"]*protels[^"]*\/(hotels\/[^"]*|gallery|about|contact|careers|blog[^"]*)"/gi, (match) => {
+    const pathMatch = match.match(/protels[^"]*\/(hotels\/[^"]*|gallery|about|contact|careers|blog[^"]*)/i);
+    if (pathMatch) {
+      return `href="/${pathMatch[1]}"`;
+    }
+    return match;
+  });
+}
 
 const hotelNames: Record<string, string> = {
   "crystal-beach": "Crystal Beach Resort",
@@ -18,6 +28,8 @@ export default function BlogArticle() {
   const { slug } = useParams<{ slug: string }>();
   const { language } = useI18n();
   const isAr = language === "ar";
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const { data: post, isLoading, error } = useQuery<any>({
     queryKey: ["/api/public/blog", slug],
@@ -53,6 +65,17 @@ export default function BlogArticle() {
 
       const twDesc = document.querySelector('meta[name="twitter:description"]');
       if (twDesc) twDesc.setAttribute("content", post.metaDescription || (post.excerpt?.[language] || post.excerpt?.en || ""));
+    }
+
+    if (contentRef.current) {
+      const links = contentRef.current.querySelectorAll("a[href]");
+      links.forEach((link) => {
+        const href = link.getAttribute("href") || "";
+        if (href.startsWith("http://") || href.startsWith("https://")) {
+          link.setAttribute("target", "_blank");
+          link.setAttribute("rel", "noopener noreferrer");
+        }
+      });
     }
 
     return () => {
@@ -186,6 +209,7 @@ export default function BlogArticle() {
 
           <div
             data-testid="text-blog-article-content"
+            ref={contentRef}
             className="prose prose-lg max-w-none text-gray-700 font-light leading-relaxed
               prose-headings:font-serif prose-headings:text-brand-blue prose-headings:font-normal
               prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
@@ -196,7 +220,7 @@ export default function BlogArticle() {
               prose-blockquote:border-brand-gold prose-blockquote:text-gray-600 prose-blockquote:italic
               prose-strong:text-brand-blue prose-strong:font-semibold
               prose-ul:list-disc prose-ol:list-decimal"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: fixContentLinks(content) }}
           />
 
           {post.hotelSlug && (
