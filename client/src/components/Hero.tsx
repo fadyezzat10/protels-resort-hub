@@ -112,6 +112,8 @@ export default function Hero({
               src={getImgSrc(idx)}
               alt={`Resort ${idx + 1}`}
               className="absolute inset-0 w-full h-full object-cover"
+              loading={idx === 0 ? "eager" : "lazy"}
+              {...(idx === 0 ? { fetchPriority: "high" as any } : {})}
               style={{
                 opacity: idx === currentIndex ? 1 : 0,
                 transition: "opacity 1.5s ease-in-out",

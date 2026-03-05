@@ -39,6 +39,17 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/framer-motion")) return "framer-motion";
+          if (id.includes("node_modules/@radix-ui")) return "radix-ui";
+          if (id.includes("node_modules/openai") || id.includes("node_modules/@emailjs")) return "vendor-services";
+          if (id.includes("/pages/cms/") || id.includes("/components/CMS")) return "cms";
+          if (id.includes("/pages/admin/")) return "admin";
+        },
+      },
+    },
   },
   server: {
     host: "0.0.0.0",

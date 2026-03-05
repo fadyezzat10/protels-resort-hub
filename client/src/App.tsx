@@ -1,14 +1,11 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, Component, type ReactNode, type ErrorInfo } from "react";
+import { useEffect, Component, type ReactNode, type ErrorInfo, lazy, Suspense } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { EditModeProvider } from "@/lib/editMode";
-import AdminToolbar from "@/components/AdminToolbar";
-import FloatingEditToolbar from "@/components/FloatingEditToolbar";
-import BookingAssistant from "@/components/BookingAssistant";
 import NotFound from "@/pages/not-found";
 
 class GlobalErrorBoundary extends Component<
@@ -70,85 +67,101 @@ class GlobalErrorBoundary extends Component<
     return this.props.children;
   }
 }
+
 import Home from "@/pages/Home";
 import Hotels from "@/pages/Hotels";
 import HotelDetails from "@/pages/HotelDetails";
-import Gallery from "@/pages/Gallery";
-import Contact from "@/pages/Contact";
-import Careers from "@/pages/Careers";
-import About from "@/pages/About";
-import Dashboard from "@/pages/admin/Dashboard";
-import UsersPage from "@/pages/admin/Users";
-import NewsletterPage from "@/pages/admin/Newsletter";
-import Login from "@/pages/admin/Login";
-import CMSLogin from "@/pages/cms/CMSLogin";
-import CMSDashboard from "@/pages/cms/CMSDashboard";
-import CMSPages from "@/pages/cms/CMSPages";
-import CMSHotels from "@/pages/cms/CMSHotels";
-import CMSMedia from "@/pages/cms/CMSMedia";
-import CMSSeo from "@/pages/cms/CMSSeo";
-import CMSSettings from "@/pages/cms/CMSSettings";
-import CMSBlog from "@/pages/cms/CMSBlog";
-import CMSCompanyProfile from "@/pages/cms/CMSCompanyProfile";
-import CMSBuilder from "@/pages/cms/CMSBuilder";
-import VisualEditor from "@/pages/cms/VisualEditor";
-import CompanyProfile from "@/pages/CompanyProfile";
-import BuilderPage from "@/pages/BuilderPage";
-import Blog from "@/pages/Blog";
-import BlogArticle from "@/pages/BlogArticle";
 import CMSHead from "@/components/CMSHead";
-import CMSTheme from "./pages/cms/CMSTheme";
-import CMSUsers from "./pages/cms/CMSUsers";
-import CMSAIAssistant from "./pages/cms/CMSAIAssistant";
-import CMSChatbot from "./pages/cms/CMSChatbot";
 import ThemeProvider from "@/components/ThemeProvider";
-import CMSAssistant from "@/components/CMSAssistant";
+
+const Gallery = lazy(() => import("@/pages/Gallery"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const Careers = lazy(() => import("@/pages/Careers"));
+const About = lazy(() => import("@/pages/About"));
+const Blog = lazy(() => import("@/pages/Blog"));
+const BlogArticle = lazy(() => import("@/pages/BlogArticle"));
+const CompanyProfile = lazy(() => import("@/pages/CompanyProfile"));
+const BuilderPage = lazy(() => import("@/pages/BuilderPage"));
+
+const Dashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const UsersPage = lazy(() => import("@/pages/admin/Users"));
+const NewsletterPage = lazy(() => import("@/pages/admin/Newsletter"));
+const Login = lazy(() => import("@/pages/admin/Login"));
+
+const CMSLogin = lazy(() => import("@/pages/cms/CMSLogin"));
+const CMSDashboard = lazy(() => import("@/pages/cms/CMSDashboard"));
+const CMSPages = lazy(() => import("@/pages/cms/CMSPages"));
+const CMSHotels = lazy(() => import("@/pages/cms/CMSHotels"));
+const CMSMedia = lazy(() => import("@/pages/cms/CMSMedia"));
+const CMSSeo = lazy(() => import("@/pages/cms/CMSSeo"));
+const CMSSettings = lazy(() => import("@/pages/cms/CMSSettings"));
+const CMSBlog = lazy(() => import("@/pages/cms/CMSBlog"));
+const CMSCompanyProfile = lazy(() => import("@/pages/cms/CMSCompanyProfile"));
+const CMSBuilder = lazy(() => import("@/pages/cms/CMSBuilder"));
+const VisualEditor = lazy(() => import("@/pages/cms/VisualEditor"));
+const CMSTheme = lazy(() => import("./pages/cms/CMSTheme"));
+const CMSUsers = lazy(() => import("./pages/cms/CMSUsers"));
+const CMSAIAssistant = lazy(() => import("./pages/cms/CMSAIAssistant"));
+const CMSChatbot = lazy(() => import("./pages/cms/CMSChatbot"));
+
+const AdminToolbar = lazy(() => import("@/components/AdminToolbar"));
+const FloatingEditToolbar = lazy(() => import("@/components/FloatingEditToolbar"));
+const BookingAssistant = lazy(() => import("@/components/BookingAssistant"));
+const CMSAssistant = lazy(() => import("@/components/CMSAssistant"));
+
+function LazyFallback() {
+  return (
+    <div style={{ minHeight: "50vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: "32px", height: "32px", border: "3px solid #e5e7eb", borderTop: "3px solid #c9a96e", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/hotels" component={Hotels} />
-      <Route path="/gallery" component={Gallery} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/careers" component={Careers} />
-      <Route path="/about" component={About} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:slug" component={BlogArticle} />
-      <Route path="/company-profile" component={CompanyProfile} />
-      <Route path="/page/:slug" component={BuilderPage} />
+    <Suspense fallback={<LazyFallback />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/hotels" component={Hotels} />
+        <Route path="/gallery" component={Gallery} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/careers" component={Careers} />
+        <Route path="/about" component={About} />
+        <Route path="/blog" component={Blog} />
+        <Route path="/blog/:slug" component={BlogArticle} />
+        <Route path="/company-profile" component={CompanyProfile} />
+        <Route path="/page/:slug" component={BuilderPage} />
 
-      {/* Admin Routes */}
-      <Route path="/admin" component={Login} />
-      <Route path="/admin/dashboard" component={Dashboard} />
-      <Route path="/admin/users" component={UsersPage} />
-      <Route path="/admin/newsletter" component={NewsletterPage} />
+        <Route path="/admin" component={Login} />
+        <Route path="/admin/dashboard" component={Dashboard} />
+        <Route path="/admin/users" component={UsersPage} />
+        <Route path="/admin/newsletter" component={NewsletterPage} />
 
-      {/* CMS Routes */}
-      <Route path="/controlpanal" component={CMSLogin} />
-      <Route path="/controlpanal/dashboard" component={CMSDashboard} />
-      <Route path="/controlpanal/pages" component={CMSPages} />
-      <Route path="/controlpanal/hotels" component={CMSHotels} />
-      <Route path="/controlpanal/media" component={CMSMedia} />
-      <Route path="/controlpanal/seo" component={CMSSeo} />
-      <Route path="/controlpanal/settings" component={CMSSettings} />
-      <Route path="/controlpanal/theme" component={CMSTheme} />
-      <Route path="/controlpanal/blog" component={CMSBlog} />
-      <Route path="/controlpanal/company-profile" component={CMSCompanyProfile} />
-      <Route path="/controlpanal/builder/:slug" component={CMSBuilder} />
-      <Route path="/controlpanal/users" component={CMSUsers} />
-      <Route path="/controlpanal/visual-edit/:slug" component={VisualEditor} />
-      <Route path="/controlpanal/chatbot" component={CMSChatbot} />
-      <Route path="/controlpanal/ai-assistant" component={CMSAIAssistant} />
-      
-      {/* Dynamic hotel page routing with sections */}
-      <Route path="/hotels/:hotelId" component={HotelDetails} />
-      <Route path="/hotels/:hotelId/:section" component={HotelDetails} />
-      <Route path="/:hotelId" component={HotelDetails} />
-      <Route path="/:hotelId/:section" component={HotelDetails} />
-      
-      <Route component={NotFound} />
-    </Switch>
+        <Route path="/controlpanal" component={CMSLogin} />
+        <Route path="/controlpanal/dashboard" component={CMSDashboard} />
+        <Route path="/controlpanal/pages" component={CMSPages} />
+        <Route path="/controlpanal/hotels" component={CMSHotels} />
+        <Route path="/controlpanal/media" component={CMSMedia} />
+        <Route path="/controlpanal/seo" component={CMSSeo} />
+        <Route path="/controlpanal/settings" component={CMSSettings} />
+        <Route path="/controlpanal/theme" component={CMSTheme} />
+        <Route path="/controlpanal/blog" component={CMSBlog} />
+        <Route path="/controlpanal/company-profile" component={CMSCompanyProfile} />
+        <Route path="/controlpanal/builder/:slug" component={CMSBuilder} />
+        <Route path="/controlpanal/users" component={CMSUsers} />
+        <Route path="/controlpanal/visual-edit/:slug" component={VisualEditor} />
+        <Route path="/controlpanal/chatbot" component={CMSChatbot} />
+        <Route path="/controlpanal/ai-assistant" component={CMSAIAssistant} />
+        
+        <Route path="/hotels/:hotelId" component={HotelDetails} />
+        <Route path="/hotels/:hotelId/:section" component={HotelDetails} />
+        <Route path="/:hotelId" component={HotelDetails} />
+        <Route path="/:hotelId/:section" component={HotelDetails} />
+        
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
@@ -164,14 +177,22 @@ function ChatbotWrapper() {
   const [location] = useLocation();
   const isAdminOrCMS = location.startsWith("/admin") || location.startsWith("/controlpanal");
   if (isAdminOrCMS) return null;
-  return <BookingAssistant />;
+  return (
+    <Suspense fallback={null}>
+      <BookingAssistant />
+    </Suspense>
+  );
 }
 
 function CMSAssistantWrapper() {
   const [location] = useLocation();
   const isCMS = location.startsWith("/controlpanal") && location !== "/controlpanal" && !location.includes("/ai-assistant");
   if (!isCMS) return null;
-  return <CMSAssistant mode="floating" />;
+  return (
+    <Suspense fallback={null}>
+      <CMSAssistant mode="floating" />
+    </Suspense>
+  );
 }
 
 function App() {
@@ -186,8 +207,10 @@ function App() {
               <Toaster />
               <ScrollToTop />
               <Router />
-              <AdminToolbar />
-              <FloatingEditToolbar />
+              <Suspense fallback={null}>
+                <AdminToolbar />
+                <FloatingEditToolbar />
+              </Suspense>
               <ChatbotWrapper />
               <CMSAssistantWrapper />
               </ThemeProvider>
