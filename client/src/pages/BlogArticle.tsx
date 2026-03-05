@@ -154,7 +154,7 @@ export default function BlogArticle() {
       {post.featuredImage && (
         <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-          <img
+          <img loading="lazy"
             src={post.featuredImage}
             alt={title}
             className="absolute inset-0 w-full h-full object-cover"

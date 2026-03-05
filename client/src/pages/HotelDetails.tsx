@@ -439,7 +439,7 @@ export default function HotelDetails() {
                     {hotel.roomDetails?.map((room, idx) => (
                       <div key={idx} className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
                         <div className="relative h-48 overflow-hidden">
-                          <img 
+                          <img loading="lazy" 
                             src={room.images?.[0] || hotel.image} 
                             alt={room.name}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -507,7 +507,7 @@ export default function HotelDetails() {
                 <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg">
                   {/* Hero Image */}
                   <div className="h-[400px] relative">
-                    <img 
+                    <img loading="lazy" 
                       src="/images/el-dokka/hero.jpg" 
                       alt="El Dokka Restaurant" 
                       className="w-full h-full object-cover"
@@ -537,7 +537,7 @@ export default function HotelDetails() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {[1, 2, 3].map((num) => (
                         <div key={num} className="aspect-[4/3] overflow-hidden rounded-lg group cursor-pointer">
-                          <img 
+                          <img loading="lazy" 
                             src={`/images/el-dokka/gallery-${num}.jpg`}
                             alt={`El Dokka Detail ${num}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -553,7 +553,7 @@ export default function HotelDetails() {
                   <div className="flex flex-col lg:flex-row">
                     {/* Hero Image - Left Side on Desktop */}
                     <div className="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden group">
-                      <img 
+                      <img loading="lazy" 
                         src="/images/italian-restaurant/hero.jpg" 
                         alt="Italian Restaurant" 
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -601,7 +601,7 @@ export default function HotelDetails() {
                     <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
                       {[1, 2, 3, 4, 5, 6].map((num) => (
                         <div key={num} className="snap-center shrink-0 w-[280px] md:w-[320px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                          <img 
+                          <img loading="lazy" 
                             src={`/images/italian-restaurant/gallery-${num}.jpg`}
                             alt={`Italian Dish ${num}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -618,7 +618,7 @@ export default function HotelDetails() {
                   <div className="flex flex-col lg:flex-row">
                     {/* Hero Image - Left Side on Desktop */}
                     <div className="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden group">
-                      <img 
+                      <img loading="lazy" 
                         src="/images/mongolian-restaurant/hero.jpg" 
                         alt="Mongolian Restaurant" 
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -654,7 +654,7 @@ export default function HotelDetails() {
                     <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
                       {[1, 2, 3].map((num) => (
                         <div key={num} className="snap-center shrink-0 w-[280px] md:w-[320px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                          <img 
+                          <img loading="lazy" 
                             src={`/images/mongolian-restaurant/gallery-${num}.jpg`}
                             alt={`Mongolian Detail ${num}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -678,7 +678,7 @@ export default function HotelDetails() {
                       )}>
                         <div className="md:w-2/5 h-64 md:h-auto relative">
                            {/* Using specific image for La Plage main restaurant if available, otherwise general hotel image */}
-                           <img 
+                           <img loading="lazy" 
                             src={isLaPlage ? "/images/la-plage/dining/dining-1.jpg" : hotel.image} 
                             alt={hotel.dining.main.name} 
                             className="w-full h-full object-cover"
@@ -744,7 +744,7 @@ export default function HotelDetails() {
                                   "dining-18.jpg", "dining-19.jpg", "dining-20.jpg"
                                 ].map((img, i) => (
                                   <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                                    <img 
+                                    <img loading="lazy" 
                                       src={`/images/la-plage/dining/${img}`}
                                       alt={`La Plage Dining ${i + 1}`}
                                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -784,7 +784,7 @@ export default function HotelDetails() {
                                </div>
                                <div className="w-full md:w-5/12 order-1 md:order-2">
                                   <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md rotate-1 hover:rotate-0 transition-transform duration-500">
-                                    <img src="/images/la-plage/lounge/lounge-1.png" alt="The Lounge Bar" className="w-full h-full object-cover" />
+                                    <img loading="lazy" src="/images/la-plage/lounge/lounge-1.png" alt="The Lounge Bar" className="w-full h-full object-cover" />
                                   </div>
                                </div>
                             </div>
@@ -793,7 +793,7 @@ export default function HotelDetails() {
                             <div className="grid grid-cols-3 gap-4">
                               {["lounge-2.png", "lounge-3.png", "lounge-4.png"].map((img, i) => (
                                 <div key={i} className="aspect-square rounded-lg overflow-hidden relative group cursor-pointer shadow-sm">
-                                  <img 
+                                  <img loading="lazy" 
                                     src={`/images/la-plage/lounge/${img}`}
                                     alt={`The Lounge Detail ${i + 1}`}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -813,7 +813,7 @@ export default function HotelDetails() {
                             <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
                                <div className="w-full md:w-5/12 order-1">
                                   <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md -rotate-1 hover:rotate-0 transition-transform duration-500">
-                                    <img src="/images/la-plage/blu-bar/blu-1.jpg" alt="Blu Pool Bar" className="w-full h-full object-cover" />
+                                    <img loading="lazy" src="/images/la-plage/blu-bar/blu-1.jpg" alt="Blu Pool Bar" className="w-full h-full object-cover" />
                                   </div>
                                </div>
                                <div className="flex-1 order-2">
@@ -844,7 +844,7 @@ export default function HotelDetails() {
                                 "blu-6.png", "blu-7.png", "blu-8.png", "blu-9.png"
                               ].map((img, i) => (
                                 <div key={i} className="snap-center shrink-0 w-[240px] md:w-[280px] aspect-square rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                                  <img 
+                                  <img loading="lazy" 
                                     src={`/images/la-plage/blu-bar/${img}`}
                                     alt={`Blu Bar Detail ${i + 1}`}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -883,7 +883,7 @@ export default function HotelDetails() {
                                </div>
                                <div className="w-full md:w-5/12 order-1 md:order-2">
                                   <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md rotate-1 hover:rotate-0 transition-transform duration-500">
-                                    <img src="/images/la-plage/jazz-bar/jazz-1.jpg" alt="Jazz Lobby Bar" className="w-full h-full object-cover" />
+                                    <img loading="lazy" src="/images/la-plage/jazz-bar/jazz-1.jpg" alt="Jazz Lobby Bar" className="w-full h-full object-cover" />
                                   </div>
                                </div>
                             </div>
@@ -895,7 +895,7 @@ export default function HotelDetails() {
                                 "jazz-6.jpg", "jazz-7.jpg", "jazz-8.jpg"
                               ].map((img, i) => (
                                 <div key={i} className="snap-center shrink-0 w-[240px] md:w-[280px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                                  <img 
+                                  <img loading="lazy" 
                                     src={`/images/la-plage/jazz-bar/${img}`}
                                     alt={`Jazz Bar Detail ${i + 1}`}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -1006,7 +1006,7 @@ export default function HotelDetails() {
                         {/* Hero Image first, then gallery images */}
                         {["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"].map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                            <img 
+                            <img loading="lazy" 
                               src={`/images/fitness-center/${img}.jpg`}
                               alt={`Fitness Center ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -1059,7 +1059,7 @@ export default function HotelDetails() {
                         {/* Hero Image first, then gallery images */}
                         {["hero", "gallery-1", "gallery-2", "gallery-3"].map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                            <img 
+                            <img loading="lazy" 
                               src={`/images/spa-wellness/${img}.jpg`}
                               alt={`Spa & Wellness ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -1114,7 +1114,7 @@ export default function HotelDetails() {
                           : ["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"]
                         ).map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                            <img 
+                            <img loading="lazy" 
                               src={hotel.id === "beach-club" 
                                 ? `/images/beach-club/facilities/beach/${img}.jpg` 
                                 : `/images/private-beach/${img}.jpg`
@@ -1170,7 +1170,7 @@ export default function HotelDetails() {
                         {/* Hero Image first, then gallery images */}
                         {["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"].map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                            <img 
+                            <img loading="lazy" 
                               src={`/images/pools-aquapark/${img}.jpg`}
                               alt={`Pools & Aquapark ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -1226,7 +1226,7 @@ export default function HotelDetails() {
                           "pool-palm-1.png", "pool-palm-2.png"
                         ].map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                            <img 
+                            <img loading="lazy" 
                               src={`/images/la-plage/facilities/${img}`}
                               alt={`La Plage Beach ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -1282,7 +1282,7 @@ export default function HotelDetails() {
                           "pool-8.png", "pool-9.png", "pool-10.png", "pool-11.png", "pool-12.png"
                         ].map((img, i) => (
                           <div key={i} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
-                            <img 
+                            <img loading="lazy" 
                               src={`/images/la-plage/facilities/pools/${img}`}
                               alt={`La Plage Pool ${i + 1}`}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

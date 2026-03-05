@@ -63,7 +63,7 @@ function RoyalBayVideoSection({ videoUrl, title, description }: { videoUrl: stri
               />
             ) : (
               <>
-                <img
+                <img loading="lazy"
                   src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
                   alt={title}
                   className="w-full h-full object-cover"

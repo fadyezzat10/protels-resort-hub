@@ -120,7 +120,7 @@ export default function Blog() {
                     >
                       {post.featuredImage ? (
                         <div className="aspect-[16/10] overflow-hidden">
-                          <img
+                          <img loading="lazy"
                             src={post.featuredImage}
                             alt={post.title?.[language] || post.title?.en || ""}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -257,7 +257,7 @@ export default function HotelGallery({ hotel }: HotelGalleryProps) {
               className="w-full h-[300px] md:h-[450px] rounded-lg overflow-hidden mb-6 group cursor-pointer relative"
               onClick={() => openLightbox(0)}
             >
-              <img
+              <img loading="lazy"
                 src={allImages[0].src}
                 alt={allImages[0].alt}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -277,7 +277,7 @@ export default function HotelGallery({ hotel }: HotelGalleryProps) {
                   className="aspect-[4/3] rounded-lg overflow-hidden cursor-pointer relative group"
                   onClick={() => openLightbox(index + 1)}
                 >
-                  <img
+                  <img loading="lazy"
                     src={img.src}
                     alt={img.alt}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

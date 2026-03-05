@@ -67,7 +67,7 @@ export default function Gallery() {
                data-testid={`gallery-image-${i}`}
                onClick={() => openLightbox(i)}
              >
-               <img 
+               <img loading="lazy" 
                  src={img.src} 
                  alt={img.title}
                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -83,7 +83,7 @@ export default function Gallery() {
                className="aspect-square relative group overflow-hidden cursor-pointer"
                onClick={() => openLightbox(i)}
              >
-               <img 
+               <img loading="lazy" 
                  src={img.src} 
                  alt={img.title}
                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

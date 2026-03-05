@@ -1,7 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import path from "path";
 
 const app = express();
 const httpServer = createServer(app);
@@ -11,6 +13,20 @@ declare module "http" {
     rawBody: unknown;
   }
 }
+
+app.use(compression());
+
+app.use("/images", express.static(path.resolve("client/public/images"), {
+  maxAge: "30d",
+  immutable: true,
+  etag: true,
+  lastModified: true,
+}));
+
+app.use("/uploads", express.static(path.resolve("uploads"), {
+  maxAge: "7d",
+  etag: true,
+}));
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "ok" });

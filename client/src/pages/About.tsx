@@ -125,7 +125,7 @@ export default function About() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 2.5, ease: "easeOut" }}
         >
-          <img
+          <img loading="lazy"
             src={heroSrc}
             alt="Protels Luxury Aerial View"
             className="w-full h-full object-cover"
@@ -269,7 +269,7 @@ export default function About() {
               >
                 <div className="w-full lg:w-1/2 overflow-hidden shadow-xl rounded-sm">
                   <div className="aspect-[4/3] relative group overflow-hidden">
-                    <img 
+                    <img loading="lazy" 
                       src={resort.image} 
                       alt={resort.name} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

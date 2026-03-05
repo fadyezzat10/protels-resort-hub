@@ -10,7 +10,20 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  app.use(express.static(distPath, {
+    maxAge: "7d",
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith(".html")) {
+        res.setHeader("Cache-Control", "no-cache");
+      } else if (filePath.match(/\.(js|css)$/)) {
+        res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+      } else if (filePath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/)) {
+        res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+      }
+    },
+  }));
 
   app.use((_req, res, _next) => {
     res.sendFile(path.resolve(distPath, "index.html"));

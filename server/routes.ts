@@ -815,6 +815,19 @@ export async function registerRoutes(
     }
   });
 
+  const publicApiCache = new Map<string, { data: any; time: number }>();
+  const PUBLIC_CACHE_TTL = 60 * 1000;
+
+  function getCached(key: string) {
+    const entry = publicApiCache.get(key);
+    if (entry && Date.now() - entry.time < PUBLIC_CACHE_TTL) return entry.data;
+    return null;
+  }
+
+  function setCache(key: string, data: any) {
+    publicApiCache.set(key, { data, time: Date.now() });
+  }
+
   // Public page content API (for website rendering)
   app.get("/api/public/page-content/:pagePath", async (req, res) => {
     try {
@@ -849,14 +862,45 @@ export async function registerRoutes(
     res.json(page);
   });
 
-  app.get("/api/public/hotels", async (_req, res) => {
+  app.get("/api/public/hotels", async (req, res) => {
+    const cacheKey = req.query.full === "true" ? "hotels-full" : "hotels-light";
+    const cached = getCached(cacheKey);
+    if (cached) return res.json(cached);
+
     const all = await storage.getHotels();
-    res.json(all.filter(h => h.status === "published"));
+    const published = all.filter(h => h.status === "published");
+    if (req.query.full === "true") {
+      setCache(cacheKey, published);
+      res.json(published);
+    } else {
+      const light = published.map(h => ({
+        id: h.id,
+        slug: h.slug,
+        name: h.name,
+        location: h.location,
+        image: h.image,
+        description: h.description,
+        features: h.features,
+        rooms: h.rooms,
+        discount: h.discount,
+        sortOrder: h.sortOrder,
+        bookingLink: h.bookingLink,
+        heroVideo: h.heroVideo,
+        theme: h.theme,
+      }));
+      setCache(cacheKey, light);
+      res.json(light);
+    }
   });
 
   app.get("/api/public/hotels/:slug", async (req, res) => {
+    const cacheKey = `hotel-${req.params.slug}`;
+    const cached = getCached(cacheKey);
+    if (cached) return res.json(cached);
+
     const hotel = await storage.getHotelBySlug(req.params.slug);
     if (!hotel || hotel.status !== "published") return res.status(404).json({ message: "Not found" });
+    setCache(cacheKey, hotel);
     res.json(hotel);
   });
 

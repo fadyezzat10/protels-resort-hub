@@ -360,7 +360,7 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           {coverImage && (
-            <img src={coverImage} alt="Cover" className="w-64 h-auto rounded-lg shadow-xl mb-4 object-contain" />
+            <img loading="lazy" src={coverImage} alt="Cover" className="w-64 h-auto rounded-lg shadow-xl mb-4 object-contain" />
           )}
           <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
           <p className="text-gray-500 text-sm">Loading document... {loadingProgress}%</p>

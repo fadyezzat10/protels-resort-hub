@@ -50,7 +50,7 @@ export default function RoomModal({ room, isOpen, onClose }: RoomModalProps) {
           {/* Left Side: Image Gallery */}
           <div className="relative h-64 lg:h-auto bg-gray-100 flex flex-col">
             <div className="relative flex-1 overflow-hidden group min-h-[300px] lg:min-h-full">
-              <img 
+              <img loading="lazy" 
                 src={images[currentImageIndex]} 
                 alt={`${room.name} view ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover transition-opacity duration-500 ease-in-out absolute inset-0"
@@ -82,7 +82,7 @@ export default function RoomModal({ room, isOpen, onClose }: RoomModalProps) {
                     currentImageIndex === idx ? "border-brand-gold opacity-100 scale-105" : "border-transparent opacity-60 hover:opacity-100"
                   )}
                 >
-                  <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
+                  <img loading="lazy" src={img} alt="thumbnail" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
