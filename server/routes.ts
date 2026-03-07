@@ -1622,44 +1622,113 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       const { url, quality = 80, maxWidth = 1920 } = req.body;
       if (!url) return res.status(400).json({ message: "URL required" });
 
-      let filePath = "";
-      if (url.startsWith("/images/")) {
-        filePath = path.join(process.cwd(), "client/public", url);
-      } else if (url.startsWith("/uploads/")) {
-        filePath = path.join(process.cwd(), url.replace(/^\//, ""));
-      }
+      const resolved = await resolveImageToBuffer(url);
+      const originalSize = resolved.size;
 
-      if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).json({ message: "File not found on disk" });
-      }
-
-      const originalStat = fs.statSync(filePath);
-      const originalSize = originalStat.size;
-
-      const webpPath = filePath.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, ".webp");
-
-      await sharp(filePath)
+      const processedBuffer = await sharp(resolved.buffer)
         .resize({ width: maxWidth, withoutEnlargement: true })
         .webp({ quality })
-        .toFile(webpPath);
-
-      const newStat = fs.statSync(webpPath);
-      const newSize = newStat.size;
+        .toBuffer();
 
       const newUrl = url.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, ".webp");
+
+      if (resolved.isRemote) {
+        const objService = new ObjectStorageService();
+        const publicPaths = objService.getPublicObjectSearchPaths();
+        if (publicPaths.length > 0) {
+          const outFileName = newUrl.replace(/^.*\//, "");
+          const bucketPath = publicPaths[0];
+          const fullPath = `${bucketPath}/${outFileName}`;
+          const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+          const pathParts = p.split("/");
+          const bucketName = pathParts[1];
+          const objectName = pathParts.slice(2).join("/");
+          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+          const bucket = objectStorageClient.bucket(bucketName);
+          const objFile = bucket.file(objectName);
+          await objFile.save(processedBuffer, { metadata: { contentType: "image/webp" } });
+
+          const localUploadsDir = path.join(process.cwd(), "uploads");
+          if (!fs.existsSync(localUploadsDir)) fs.mkdirSync(localUploadsDir, { recursive: true });
+          fs.writeFileSync(path.join(localUploadsDir, outFileName), processedBuffer);
+        }
+      } else {
+        const webpPath = resolved.localPath.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, ".webp");
+        fs.writeFileSync(webpPath, processedBuffer);
+      }
+
+      await updateImageReferencesInDb(url, newUrl);
 
       res.json({
         originalUrl: url,
         newUrl,
         originalSize: Math.round(originalSize / 1024),
-        newSize: Math.round(newSize / 1024),
-        savings: Math.round(((originalSize - newSize) / originalSize) * 100),
+        newSize: Math.round(processedBuffer.length / 1024),
+        savings: Math.round(((originalSize - processedBuffer.length) / originalSize) * 100),
       });
     } catch (err: any) {
       console.error("Image optimization error:", err);
       res.status(500).json({ message: err.message });
     }
   });
+
+  async function updateImageReferencesInDb(oldUrl: string, newUrl: string) {
+    if (oldUrl === newUrl) return;
+    try {
+      const allHotels = await storage.getHotels();
+      for (const h of allHotels) {
+        let changed = false;
+        const updates: any = {};
+        if (h.image === oldUrl) { updates.image = newUrl; changed = true; }
+        if (Array.isArray(h.gallery)) {
+          const newGallery = h.gallery.map((g: string) => g === oldUrl ? newUrl : g);
+          if (JSON.stringify(newGallery) !== JSON.stringify(h.gallery)) { updates.gallery = newGallery; changed = true; }
+        }
+        if (h.room_details && Array.isArray(h.room_details)) {
+          const newRooms = (h.room_details as any[]).map((room: any) => {
+            if (room.images && Array.isArray(room.images)) {
+              const newImgs = room.images.map((img: string) => img === oldUrl ? newUrl : img);
+              if (JSON.stringify(newImgs) !== JSON.stringify(room.images)) { changed = true; return { ...room, images: newImgs }; }
+            }
+            return room;
+          });
+          if (changed && !updates.gallery) updates.room_details = newRooms;
+          else if (JSON.stringify(newRooms) !== JSON.stringify(h.room_details)) { updates.room_details = newRooms; changed = true; }
+        }
+        if (changed) await storage.updateHotel(h.id, updates);
+      }
+
+      const blogPosts = await storage.getBlogPosts();
+      for (const p of blogPosts) {
+        if (p.featuredImage === oldUrl) {
+          await storage.updateBlogPost(p.id, { featuredImage: newUrl });
+        }
+      }
+
+      const settings = await storage.getSettings();
+      const heroSetting = settings.find((s: any) => s.key === "hero_images");
+      if (heroSetting?.value) {
+        try {
+          const heroArr = typeof heroSetting.value === "string" ? JSON.parse(heroSetting.value) : heroSetting.value;
+          if (Array.isArray(heroArr)) {
+            const newArr = heroArr.map((img: string) => img === oldUrl ? newUrl : img);
+            if (JSON.stringify(newArr) !== JSON.stringify(heroArr)) {
+              await storage.upsertSetting("hero_images", newArr);
+            }
+          }
+        } catch {}
+      }
+
+      const mediaFiles = await storage.getMediaFiles();
+      for (const m of mediaFiles) {
+        if (m.url === oldUrl) {
+          await storage.updateMedia(m.id, { url: newUrl } as any);
+        }
+      }
+    } catch (err) {
+      console.error("Error updating image references:", err);
+    }
+  }
 
   // ──────── IMAGE EDITOR API ────────
   async function resolveImageToBuffer(url: string): Promise<{ buffer: Buffer; size: number; isRemote: boolean; localPath: string }> {
@@ -1669,6 +1738,18 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     } else if (url.startsWith("/uploads/")) {
       const fp = path.join(process.cwd(), url.replace(/^\//, ""));
       if (fs.existsSync(fp)) return { buffer: fs.readFileSync(fp), size: fs.statSync(fp).size, isRemote: false, localPath: fp };
+      try {
+        const objService = new ObjectStorageService();
+        const fileName = url.replace(/^\/uploads\//, "");
+        const file = await objService.searchPublicObject(fileName);
+        if (file) {
+          const chunks: Buffer[] = [];
+          const stream = await (file as any).createReadStream();
+          for await (const chunk of stream) { chunks.push(Buffer.from(chunk)); }
+          const buf = Buffer.concat(chunks);
+          return { buffer: buf, size: buf.length, isRemote: true, localPath: "" };
+        }
+      } catch {}
     }
     if (url.startsWith("https://")) {
       const ctrl = new AbortController();
@@ -1828,7 +1909,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       if (resolved.isRemote) {
         const processedBuffer = await pipeline.toBuffer();
         const origFilename = url.split("/").pop() || "image";
-        const origBase = origFilename.replace(/\.[^.]+$/, "");
+        const origBase = origFilename.replace(/\.[^.]+$/, "").replace(/-edited$/, "");
         const outFileName = `${origBase}-edited.${outputFormat}`;
 
         const objService = new ObjectStorageService();
@@ -1849,6 +1930,11 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         }
 
         const newUrl = `/uploads/${outFileName}`;
+        const localUploadsDir = path.join(process.cwd(), "uploads");
+        if (!fs.existsSync(localUploadsDir)) fs.mkdirSync(localUploadsDir, { recursive: true });
+        fs.writeFileSync(path.join(localUploadsDir, outFileName), processedBuffer);
+
+        await updateImageReferencesInDb(url, newUrl);
         const previewPipeline2 = sharp(processedBuffer).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
         const previewBuffer = await previewPipeline2.toBuffer();
 
@@ -1862,7 +1948,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         });
       } else {
         const ext = path.extname(resolved.localPath);
-        const baseName = path.basename(resolved.localPath, ext);
+        const baseName = path.basename(resolved.localPath, ext).replace(/-edited$/, "");
         const dir = path.dirname(resolved.localPath);
         const outFileName = `${baseName}-edited.${outputFormat}`;
         const outPath = path.join(dir, outFileName);
@@ -1871,6 +1957,8 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
 
         const newSize = fs.statSync(outPath).size;
         const newUrl = url.replace(/[^/]+$/, outFileName);
+
+        await updateImageReferencesInDb(url, newUrl);
 
         const previewPipeline2 = sharp(outPath).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
         const previewBuffer = await previewPipeline2.toBuffer();
@@ -2036,6 +2124,11 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         fs.unlinkSync(req.file.path);
 
         const newUrl = `/uploads/${newFilename}`;
+        const localUploadsDir2 = path.join(process.cwd(), "uploads");
+        if (!fs.existsSync(localUploadsDir2)) fs.mkdirSync(localUploadsDir2, { recursive: true });
+        fs.writeFileSync(path.join(localUploadsDir2, newFilename), processedBuffer);
+
+        await updateImageReferencesInDb(targetUrl, newUrl);
 
         res.json({
           message: "Image replaced in Object Storage",
@@ -2092,6 +2185,8 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
 
       const newSize = fs.statSync(newPath).size;
       const newUrl = targetUrl.replace(path.basename(targetUrl), baseName + newExt);
+
+      await updateImageReferencesInDb(targetUrl, newUrl);
 
       res.json({
         message: "Image replaced successfully",
@@ -2215,6 +2310,26 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
             height = meta.height || null;
             if (meta.format) format = meta.format;
           } catch {}
+        } else if (img.url.startsWith("/uploads/")) {
+          try {
+            const objService = new ObjectStorageService();
+            const fileName = img.url.replace(/^\/uploads\//, "");
+            const file = await objService.searchPublicObject(fileName);
+            if (file) {
+              exists = true;
+              const chunks: Buffer[] = [];
+              const stream = await (file as any).createReadStream();
+              for await (const chunk of stream) { chunks.push(Buffer.from(chunk)); }
+              const buf = Buffer.concat(chunks);
+              fileSize = buf.length;
+              try {
+                const meta = await sharp(buf).metadata();
+                width = meta.width || null;
+                height = meta.height || null;
+                if (meta.format) format = meta.format;
+              } catch {}
+            }
+          } catch {}
         } else if (img.url.startsWith("http")) {
           try {
             const ctrl = new AbortController();
@@ -2287,7 +2402,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
           impactReason = "Well optimized";
         }
 
-        const canOptimize = exists && !isWebp && fileSize > 0 && !!filePath;
+        const canOptimize = exists && !isWebp && fileSize > 0;
 
         imageResults.push({
           type: "image",
