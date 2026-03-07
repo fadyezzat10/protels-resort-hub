@@ -52,7 +52,7 @@ Preferred communication style: Simple, everyday language.
 - `/blog/:slug` – Individual blog article page
 - `/admin` – Legacy admin login
 - `/controlpanal` – CMS login and management routes (pages, hotels, blog, media, SEO, settings)
-- `/controlpanal/performance` – Performance Impact Analyzer (LCP detection, image impact analysis)
+- `/controlpanal/performance` – Website Performance Analyzer (image + JS analysis, LCP detection, optimize button)
 - `/controlpanal/image-optimization` – Image Optimization (scan/compress/convert to WebP)
 
 **SEO:**

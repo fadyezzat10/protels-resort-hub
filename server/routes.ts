@@ -1661,7 +1661,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
   });
 
-  // ──────── PERFORMANCE IMPACT ANALYZER ────────
+  // ──────── WEBSITE PERFORMANCE ANALYZER ────────
   app.get("/api/cms/performance-analysis", requireAuth, async (_req, res) => {
     try {
       const sharp = (await import("sharp")).default;
@@ -1725,6 +1725,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       }
 
       interface AnalyzedImage {
+        type: "image";
         url: string;
         page: string;
         renderPosition: string;
@@ -1740,9 +1741,10 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         impactReason: string;
         recommendations: string[];
         recommendedRes: string;
+        canOptimize: boolean;
       }
 
-      const results: AnalyzedImage[] = [];
+      const imageResults: AnalyzedImage[] = [];
 
       for (const img of pageImages) {
         let filePath = "";
@@ -1840,7 +1842,10 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
           impactReason = "Well optimized";
         }
 
-        results.push({
+        const canOptimize = exists && !isWebp && fileSize > 0 && !!filePath;
+
+        imageResults.push({
+          type: "image",
           url: img.url,
           page: img.page,
           renderPosition: img.renderPosition,
@@ -1856,31 +1861,126 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
           impactReason,
           recommendations,
           recommendedRes: `${recWidth}x${recHeight}`,
+          canOptimize,
         });
       }
 
-      results.sort((a, b) => {
+      imageResults.sort((a, b) => {
         const order = { High: 0, Medium: 1, Low: 2 };
         if (order[a.impactLevel] !== order[b.impactLevel]) return order[a.impactLevel] - order[b.impactLevel];
         return b.fileSizeBytes - a.fileSizeBytes;
       });
 
-      const totalImages = results.length;
-      const highCount = results.filter(r => r.impactLevel === "High").length;
-      const mediumCount = results.filter(r => r.impactLevel === "Medium").length;
-      const lcpCount = results.filter(r => r.isLCP).length;
-      const totalSizeKB = results.reduce((s, r) => s + r.fileSize, 0);
-      const affectingPerformance = results.filter(r => r.recommendations.length > 0).length;
+      interface ScriptEntry {
+        type: "script";
+        fileName: string;
+        filePath: string;
+        fileSize: number;
+        fileSizeBytes: number;
+        gzipSize: number | null;
+        chunkType: "entry" | "vendor" | "page" | "component";
+        impactLevel: "High" | "Medium" | "Low";
+        impactReason: string;
+        recommendations: string[];
+      }
+
+      const scriptResults: ScriptEntry[] = [];
+      const distDir = path.join(process.cwd(), "dist/public/assets");
+      if (fs.existsSync(distDir)) {
+        const jsFiles = fs.readdirSync(distDir).filter(f => f.endsWith(".js"));
+        for (const jsFile of jsFiles) {
+          const jsPath = path.join(distDir, jsFile);
+          const stat = fs.statSync(jsPath);
+          const sizeBytes = stat.size;
+          const sizeKB = Math.round(sizeBytes / 1024);
+
+          let gzipSize: number | null = null;
+          try {
+            const zlib = await import("zlib");
+            const buf = fs.readFileSync(jsPath);
+            const gzipped = zlib.gzipSync(buf);
+            gzipSize = Math.round(gzipped.length / 1024);
+          } catch {}
+
+          const nameBase = jsFile.replace(/[-_][A-Za-z0-9]+\.js$/, "").toLowerCase();
+          let chunkType: ScriptEntry["chunkType"] = "component";
+          if (nameBase.includes("index") || nameBase.includes("vendor") || nameBase.includes("chunk")) {
+            chunkType = "vendor";
+          } else if (["home", "hotels", "about", "contact", "gallery", "careers", "blog", "blogarticle", "hoteldetails", "companyprofile"].some(p => nameBase.includes(p))) {
+            chunkType = "page";
+          } else if (nameBase.includes("cms") || nameBase.includes("admin")) {
+            chunkType = "vendor";
+          }
+
+          const jsRecs: string[] = [];
+          let jsImpact: ScriptEntry["impactLevel"] = "Low";
+          let jsReason = "Script size is acceptable";
+
+          if (sizeBytes > 500 * 1024) {
+            jsImpact = "High";
+            jsReason = "Very large bundle — blocks rendering";
+            jsRecs.push("Split into smaller chunks using code splitting");
+            jsRecs.push("Use dynamic import() for non-critical modules");
+          } else if (sizeBytes > 200 * 1024) {
+            jsImpact = "Medium";
+            jsReason = "Large bundle — may delay interactivity";
+            jsRecs.push("Consider code splitting to reduce initial load");
+          } else if (sizeBytes > 100 * 1024) {
+            jsReason = "Moderate bundle size";
+            jsRecs.push("Monitor size — consider lazy loading if it grows");
+          }
+
+          if (gzipSize && gzipSize > 100) {
+            jsRecs.push(`Enable gzip compression (${sizeKB} KB → ~${gzipSize} KB gzipped)`);
+          }
+
+          if (jsRecs.length === 0) jsReason = "Well optimized";
+
+          scriptResults.push({
+            type: "script",
+            fileName: jsFile,
+            filePath: `/assets/${jsFile}`,
+            fileSize: sizeKB,
+            fileSizeBytes: sizeBytes,
+            gzipSize,
+            chunkType,
+            impactLevel: jsImpact,
+            impactReason: jsReason,
+            recommendations: jsRecs,
+          });
+        }
+      }
+
+      scriptResults.sort((a, b) => b.fileSizeBytes - a.fileSizeBytes);
+
+      const imgHighCount = imageResults.filter(r => r.impactLevel === "High").length;
+      const imgMediumCount = imageResults.filter(r => r.impactLevel === "Medium").length;
+      const lcpCount = imageResults.filter(r => r.isLCP).length;
+      const imgAffecting = imageResults.filter(r => r.recommendations.length > 0).length;
+      const imgTotalKB = imageResults.reduce((s, r) => s + r.fileSize, 0);
+
+      const jsHighCount = scriptResults.filter(r => r.impactLevel === "High").length;
+      const jsMediumCount = scriptResults.filter(r => r.impactLevel === "Medium").length;
+      const jsAffecting = scriptResults.filter(r => r.recommendations.length > 0).length;
+      const jsTotalKB = scriptResults.reduce((s, r) => s + r.fileSize, 0);
 
       res.json({
-        images: results,
+        images: imageResults,
+        scripts: scriptResults,
         summary: {
-          totalImages,
-          highCount,
-          mediumCount,
+          totalImages: imageResults.length,
+          totalScripts: scriptResults.length,
+          imgHighCount,
+          imgMediumCount,
           lcpCount,
-          affectingPerformance,
-          totalSizeMB: Math.round(totalSizeKB / 1024),
+          imgAffecting,
+          imgTotalSizeMB: Math.round(imgTotalKB / 1024),
+          jsHighCount,
+          jsMediumCount,
+          jsAffecting,
+          jsTotalSizeKB: jsTotalKB,
+          overallHighCount: imgHighCount + jsHighCount,
+          overallAffecting: imgAffecting + jsAffecting,
         },
       });
     } catch (err: any) {
