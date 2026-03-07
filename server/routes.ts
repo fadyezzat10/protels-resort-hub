@@ -1661,6 +1661,265 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
   });
 
+  // ──────── IMAGE EDITOR API ────────
+  app.post("/api/cms/image-edit", requireAuth, async (req, res) => {
+    try {
+      const sharp = (await import("sharp")).default;
+      const { url, operations } = req.body;
+      if (!url || !operations) return res.status(400).json({ message: "URL and operations required" });
+
+      let filePath = "";
+      if (url.startsWith("/images/")) {
+        filePath = path.join(process.cwd(), "client/public", url);
+      } else if (url.startsWith("/uploads/")) {
+        filePath = path.join(process.cwd(), url.replace(/^\//, ""));
+      }
+      if (!filePath || !fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "File not found on disk" });
+      }
+
+      const originalSize = fs.statSync(filePath).size;
+      let pipeline = sharp(filePath);
+
+      for (const op of operations) {
+        switch (op.type) {
+          case "resize":
+            pipeline = pipeline.resize({
+              width: op.width || undefined,
+              height: op.height || undefined,
+              fit: op.fit || "inside",
+              withoutEnlargement: true,
+            });
+            break;
+          case "crop":
+            pipeline = pipeline.extract({
+              left: Math.round(op.left),
+              top: Math.round(op.top),
+              width: Math.round(op.width),
+              height: Math.round(op.height),
+            });
+            break;
+          case "rotate":
+            pipeline = pipeline.rotate(op.angle || 90);
+            break;
+          case "flip":
+            pipeline = pipeline.flip();
+            break;
+          case "flop":
+            pipeline = pipeline.flop();
+            break;
+          case "brightness":
+            pipeline = pipeline.modulate({ brightness: op.value ?? 1 });
+            break;
+          case "contrast": {
+            const c = op.value ?? 1;
+            pipeline = pipeline.linear(c, -(128 * (c - 1)));
+            break;
+          }
+          case "saturation":
+            pipeline = pipeline.modulate({ saturation: op.value ?? 1 });
+            break;
+          case "blur":
+            if (op.sigma && op.sigma > 0.3) pipeline = pipeline.blur(op.sigma);
+            break;
+          case "sharpen":
+            pipeline = pipeline.sharpen({ sigma: op.sigma || 1 });
+            break;
+          case "grayscale":
+            pipeline = pipeline.grayscale();
+            break;
+          case "sepia":
+            pipeline = pipeline.recomb([
+              [0.393, 0.769, 0.189],
+              [0.349, 0.686, 0.168],
+              [0.272, 0.534, 0.131],
+            ]);
+            break;
+          case "vintage":
+            pipeline = pipeline.modulate({ brightness: 0.95, saturation: 0.7 })
+              .recomb([
+                [0.45, 0.65, 0.15],
+                [0.35, 0.65, 0.15],
+                [0.25, 0.50, 0.15],
+              ]);
+            break;
+          case "warm":
+            pipeline = pipeline.modulate({ brightness: 1.05, saturation: 1.2 })
+              .tint({ r: 255, g: 220, b: 180 });
+            break;
+          case "cool":
+            pipeline = pipeline.modulate({ brightness: 1.0, saturation: 0.9 })
+              .tint({ r: 180, g: 200, b: 255 });
+            break;
+          case "text": {
+            const meta = await pipeline.metadata();
+            const imgW = meta.width || 800;
+            const imgH = meta.height || 600;
+            const fontSize = op.fontSize || 48;
+            const fontColor = op.color || "#ffffff";
+            const bgColor = op.bgColor || "rgba(0,0,0,0.5)";
+            const text = op.text || "";
+            const posX = op.x ?? "center";
+            const posY = op.y ?? "center";
+            let tx = 0, ty = 0;
+            if (posX === "center") tx = imgW / 2;
+            else if (posX === "right") tx = imgW - 20;
+            else tx = typeof posX === "number" ? posX : 20;
+            if (posY === "center") ty = imgH / 2;
+            else if (posY === "bottom") ty = imgH - 40;
+            else ty = typeof posY === "number" ? posY : 40;
+            const anchor = posX === "center" ? "middle" : posX === "right" ? "end" : "start";
+            const escapedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const svgText = Buffer.from(`<svg width="${imgW}" height="${imgH}">
+              <style>text { font-family: 'Arial', sans-serif; font-weight: bold; }</style>
+              <text x="${tx}" y="${ty}" font-size="${fontSize}" fill="${fontColor}" text-anchor="${anchor}" dominant-baseline="middle"
+                paint-order="stroke" stroke="${bgColor}" stroke-width="${Math.round(fontSize / 8)}">${escapedText}</text>
+            </svg>`);
+            pipeline = pipeline.composite([{ input: svgText, gravity: "northwest" }]);
+            break;
+          }
+          case "watermark": {
+            const wMeta = await pipeline.metadata();
+            const wW = wMeta.width || 800;
+            const wH = wMeta.height || 600;
+            const wText = op.text || "PROTELS";
+            const wSize = op.fontSize || 24;
+            const wColor = op.color || "rgba(255,255,255,0.3)";
+            const wEsc = wText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const svgWm = Buffer.from(`<svg width="${wW}" height="${wH}">
+              <text x="${wW - 15}" y="${wH - 15}" font-size="${wSize}" fill="${wColor}" text-anchor="end" font-family="Arial" font-weight="bold">${wEsc}</text>
+            </svg>`);
+            pipeline = pipeline.composite([{ input: svgWm, gravity: "northwest" }]);
+            break;
+          }
+          case "drawOverlay": {
+            if (op.svgData) {
+              const svgBuf = Buffer.from(op.svgData);
+              pipeline = pipeline.composite([{ input: svgBuf, gravity: "northwest" }]);
+            }
+            break;
+          }
+        }
+      }
+
+      const outputFormat = req.body.outputFormat || "webp";
+      const quality = req.body.quality || 85;
+      const ext = path.extname(filePath);
+      const baseName = path.basename(filePath, ext);
+      const dir = path.dirname(filePath);
+      const outFileName = `${baseName}-edited.${outputFormat}`;
+      const outPath = path.join(dir, outFileName);
+
+      if (outputFormat === "webp") {
+        pipeline = pipeline.webp({ quality });
+      } else if (outputFormat === "jpeg" || outputFormat === "jpg") {
+        pipeline = pipeline.jpeg({ quality });
+      } else if (outputFormat === "png") {
+        pipeline = pipeline.png({ quality });
+      }
+
+      await pipeline.toFile(outPath);
+
+      const newSize = fs.statSync(outPath).size;
+      const newUrl = url.replace(/[^/]+$/, outFileName);
+
+      const previewPipeline = sharp(outPath).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
+      const previewBuffer = await previewPipeline.toBuffer();
+      const previewDataUrl = `data:image/webp;base64,${previewBuffer.toString("base64")}`;
+
+      res.json({
+        originalUrl: url,
+        newUrl,
+        originalSize: Math.round(originalSize / 1024),
+        newSize: Math.round(newSize / 1024),
+        savings: Math.round(((originalSize - newSize) / originalSize) * 100),
+        previewDataUrl,
+      });
+    } catch (err: any) {
+      console.error("Image edit error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  app.post("/api/cms/image-edit-preview", requireAuth, async (req, res) => {
+    try {
+      const sharp = (await import("sharp")).default;
+      const { url, operations } = req.body;
+      if (!url) return res.status(400).json({ message: "URL required" });
+
+      let filePath = "";
+      if (url.startsWith("/images/")) {
+        filePath = path.join(process.cwd(), "client/public", url);
+      } else if (url.startsWith("/uploads/")) {
+        filePath = path.join(process.cwd(), url.replace(/^\//, ""));
+      }
+      if (!filePath || !fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "File not found" });
+      }
+
+      let pipeline = sharp(filePath);
+
+      if (operations) {
+        for (const op of operations) {
+          switch (op.type) {
+            case "resize":
+              pipeline = pipeline.resize({ width: op.width, height: op.height, fit: op.fit || "inside", withoutEnlargement: true });
+              break;
+            case "crop":
+              pipeline = pipeline.extract({ left: Math.round(op.left), top: Math.round(op.top), width: Math.round(op.width), height: Math.round(op.height) });
+              break;
+            case "rotate":
+              pipeline = pipeline.rotate(op.angle || 90);
+              break;
+            case "flip":
+              pipeline = pipeline.flip();
+              break;
+            case "flop":
+              pipeline = pipeline.flop();
+              break;
+            case "brightness":
+              pipeline = pipeline.modulate({ brightness: op.value ?? 1 });
+              break;
+            case "contrast": {
+              const c = op.value ?? 1;
+              pipeline = pipeline.linear(c, -(128 * (c - 1)));
+              break;
+            }
+            case "saturation":
+              pipeline = pipeline.modulate({ saturation: op.value ?? 1 });
+              break;
+            case "blur":
+              if (op.sigma && op.sigma > 0.3) pipeline = pipeline.blur(op.sigma);
+              break;
+            case "sharpen":
+              pipeline = pipeline.sharpen({ sigma: op.sigma || 1 });
+              break;
+            case "grayscale":
+              pipeline = pipeline.grayscale();
+              break;
+            case "sepia":
+              pipeline = pipeline.recomb([[0.393, 0.769, 0.189], [0.349, 0.686, 0.168], [0.272, 0.534, 0.131]]);
+              break;
+            case "vintage":
+              pipeline = pipeline.modulate({ brightness: 0.95, saturation: 0.7 }).recomb([[0.45, 0.65, 0.15], [0.35, 0.65, 0.15], [0.25, 0.50, 0.15]]);
+              break;
+            case "warm":
+              pipeline = pipeline.modulate({ brightness: 1.05, saturation: 1.2 }).tint({ r: 255, g: 220, b: 180 });
+              break;
+            case "cool":
+              pipeline = pipeline.modulate({ brightness: 1.0, saturation: 0.9 }).tint({ r: 180, g: 200, b: 255 });
+              break;
+          }
+        }
+      }
+
+      const buf = await pipeline.resize({ width: 500, withoutEnlargement: true }).webp({ quality: 65 }).toBuffer();
+      res.json({ previewDataUrl: `data:image/webp;base64,${buf.toString("base64")}` });
+    } catch (err: any) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // ──────── WEBSITE PERFORMANCE ANALYZER ────────
   app.get("/api/cms/performance-analysis", requireAuth, async (_req, res) => {
     try {

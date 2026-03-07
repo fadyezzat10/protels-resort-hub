@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
@@ -26,8 +26,11 @@ import {
   Package,
   HardDrive,
   Filter,
+  Pencil,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const InlineImageEditor = lazy(() => import("@/components/InlineImageEditor"));
 
 interface AnalyzedImage {
   type: "image";
@@ -144,6 +147,7 @@ function ImageRow({ img, index, onOptimize, optimizing }: {
   optimizing: string | null;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [editing, setEditing] = useState(false);
   const hasRecs = img.recommendations.length > 0;
 
   return (
@@ -152,12 +156,13 @@ function ImageRow({ img, index, onOptimize, optimizing }: {
         data-testid={`row-image-${index}`}
         className={cn(
           "border-b transition-colors",
-          hasRecs && "cursor-pointer",
+          (hasRecs || img.exists) && "cursor-pointer",
           img.impactLevel === "High" && "bg-red-50/60 hover:bg-red-50",
           img.impactLevel === "Medium" && "bg-amber-50/40 hover:bg-amber-50/60",
           img.impactLevel === "Low" && "hover:bg-gray-50",
+          editing && "border-b-0 bg-blue-50/30",
         )}
-        onClick={() => hasRecs && setExpanded(!expanded)}
+        onClick={() => { if (!editing) { hasRecs && setExpanded(!expanded); } }}
       >
         <td className="px-4 py-3">
           <div className="w-11 h-11 rounded-lg overflow-hidden bg-gray-100 border flex-shrink-0">
@@ -195,8 +200,8 @@ function ImageRow({ img, index, onOptimize, optimizing }: {
         <td className="px-4 py-3"><PositionBadge position={img.renderPosition} /></td>
         <td className="px-4 py-3"><ImpactBadge level={img.impactLevel} isLCP={img.isLCP} /></td>
         <td className="px-4 py-3">
-          <div className="flex items-center gap-2">
-            {img.canOptimize && (
+          <div className="flex items-center gap-1.5">
+            {img.exists && img.canOptimize && (
               <Button
                 data-testid={`button-optimize-${index}`}
                 size="sm"
@@ -209,14 +214,41 @@ function ImageRow({ img, index, onOptimize, optimizing }: {
                 Optimize
               </Button>
             )}
-            {!img.canOptimize && img.isWebp && img.exists && (
+            {img.exists && (
+              <Button
+                data-testid={`button-edit-${index}`}
+                size="sm"
+                variant={editing ? "default" : "outline"}
+                className={cn("text-xs h-7", editing ? "bg-brand-blue hover:bg-brand-blue/90 text-white" : "border-blue-300 text-blue-600 hover:bg-blue-50")}
+                onClick={(e) => { e.stopPropagation(); setEditing(!editing); setExpanded(false); }}
+              >
+                <Pencil className="w-3 h-3 mr-1" />
+                {editing ? "Close" : "Edit"}
+              </Button>
+            )}
+            {!img.canOptimize && !editing && img.isWebp && img.exists && (
               <span className="text-[10px] text-green-500 font-medium">Optimized</span>
             )}
-            {hasRecs && (expanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />)}
+            {hasRecs && !editing && (expanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />)}
           </div>
         </td>
       </tr>
-      {expanded && hasRecs && (
+      {editing && img.exists && (
+        <tr>
+          <td colSpan={7} className="p-0">
+            <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-brand-gold" /></div>}>
+              <InlineImageEditor
+                url={img.url}
+                width={img.width}
+                height={img.height}
+                format={img.format}
+                onClose={() => setEditing(false)}
+              />
+            </Suspense>
+          </td>
+        </tr>
+      )}
+      {expanded && hasRecs && !editing && (
         <tr className={cn(img.impactLevel === "High" && "bg-red-50/30", img.impactLevel === "Medium" && "bg-amber-50/20")}>
           <td colSpan={7} className="px-4 py-3 border-b">
             <div className="ml-16 space-y-2">
