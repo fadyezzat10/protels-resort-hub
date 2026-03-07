@@ -1517,6 +1517,150 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
   });
 
+  // ──────── IMAGE OPTIMIZATION ANALYZER ────────
+  app.get("/api/cms/image-analysis", requireAuth, async (_req, res) => {
+    try {
+      const images: any[] = [];
+      const seen = new Set<string>();
+
+      const addImage = (url: string, page: string, category: string) => {
+        if (!url || seen.has(url)) return;
+        seen.add(url);
+        images.push({ url, page, category });
+      };
+
+      const allHotels = await storage.getHotels();
+      for (const h of allHotels) {
+        if (h.image) addImage(h.image, `/hotels/${h.slug}`, "hero");
+        if (Array.isArray(h.gallery)) {
+          for (const g of h.gallery) addImage(g, `/hotels/${h.slug}/gallery`, "gallery");
+        }
+        if (h.room_details && Array.isArray(h.room_details)) {
+          for (const room of h.room_details as any[]) {
+            if (room.images && Array.isArray(room.images)) {
+              for (const img of room.images) addImage(img, `/hotels/${h.slug}/accommodation`, "room");
+            }
+          }
+        }
+      }
+
+      const blogPosts = await storage.getBlogPosts();
+      for (const post of blogPosts) {
+        if (post.featuredImage) addImage(post.featuredImage, `/blog/${post.slug}`, "blog");
+      }
+
+      const mediaFiles = await storage.getMediaFiles();
+      for (const m of mediaFiles) {
+        if (m.mimeType?.startsWith("image/") && m.url) {
+          addImage(m.url, "/media-library", "media");
+        }
+      }
+
+      const results: any[] = [];
+      for (const img of images) {
+        let fileSize = 0;
+        let exists = false;
+        let filePath = "";
+
+        if (img.url.startsWith("/images/")) {
+          filePath = path.join(process.cwd(), "client/public", img.url);
+        } else if (img.url.startsWith("/uploads/")) {
+          filePath = path.join(process.cwd(), img.url.replace(/^\//, ""));
+        }
+
+        if (filePath && fs.existsSync(filePath)) {
+          const stat = fs.statSync(filePath);
+          fileSize = stat.size;
+          exists = true;
+        }
+
+        const ext = path.extname(img.url).toLowerCase();
+        const isWebp = ext === ".webp";
+        const sizeKB = Math.round(fileSize / 1024);
+        const status = fileSize > 300 * 1024 ? "heavy" : "ok";
+
+        let recommendedRes = "800x600";
+        if (img.category === "hero") recommendedRes = "1920x1080";
+        else if (img.category === "gallery") recommendedRes = "1200x800";
+        else if (img.category === "room") recommendedRes = "1000x667";
+        else if (img.category === "blog") recommendedRes = "1200x630";
+
+        results.push({
+          url: img.url,
+          page: img.page,
+          category: img.category,
+          fileSize: sizeKB,
+          fileSizeBytes: fileSize,
+          status,
+          isWebp,
+          exists,
+          recommendedRes,
+          canOptimize: exists && !isWebp && fileSize > 0,
+        });
+      }
+
+      results.sort((a, b) => b.fileSizeBytes - a.fileSizeBytes);
+
+      const totalImages = results.length;
+      const heavyCount = results.filter(r => r.status === "heavy").length;
+      const nonWebpCount = results.filter(r => !r.isWebp && r.exists).length;
+      const totalSizeKB = results.reduce((sum, r) => sum + r.fileSize, 0);
+
+      res.json({
+        images: results,
+        summary: { totalImages, heavyCount, nonWebpCount, totalSizeMB: Math.round(totalSizeKB / 1024) },
+      });
+    } catch (err: any) {
+      console.error("Image analysis error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  app.post("/api/cms/optimize-image", requireAuth, async (req, res) => {
+    try {
+      const sharp = (await import("sharp")).default;
+      const { url, quality = 80, maxWidth = 1920 } = req.body;
+      if (!url) return res.status(400).json({ message: "URL required" });
+
+      let filePath = "";
+      if (url.startsWith("/images/")) {
+        filePath = path.join(process.cwd(), "client/public", url);
+      } else if (url.startsWith("/uploads/")) {
+        filePath = path.join(process.cwd(), url.replace(/^\//, ""));
+      }
+
+      if (!filePath || !fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "File not found on disk" });
+      }
+
+      const originalStat = fs.statSync(filePath);
+      const originalSize = originalStat.size;
+
+      const webpPath = filePath.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, ".webp");
+
+      await sharp(filePath)
+        .resize({ width: maxWidth, withoutEnlargement: true })
+        .webp({ quality })
+        .toFile(webpPath);
+
+      const newStat = fs.statSync(webpPath);
+      const newSize = newStat.size;
+
+      const newUrl = url.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, ".webp");
+
+      res.json({
+        originalUrl: url,
+        newUrl,
+        originalSize: Math.round(originalSize / 1024),
+        newSize: Math.round(newSize / 1024),
+        savings: Math.round(((originalSize - newSize) / originalSize) * 100),
+      });
+    } catch (err: any) {
+      console.error("Image optimization error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // ──────── CMS CHATBOT MANAGEMENT ────────
   app.get("/api/cms/chatbot-config", requireAuth, async (_req, res) => {
     const configs = await storage.getChatbotConfigs();

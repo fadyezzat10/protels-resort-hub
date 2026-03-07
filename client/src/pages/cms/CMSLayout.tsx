@@ -19,6 +19,7 @@ import {
   Users,
   Bot,
   MessageCircle,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/controlpanal/theme", label: "Theme", icon: Palette },
   { href: "/controlpanal/users", label: "Users", icon: Users },
   { href: "/controlpanal/chatbot", label: "Chatbot", icon: MessageCircle },
+  { href: "/controlpanal/image-optimization", label: "Image Optimization", icon: Zap },
   { href: "/controlpanal/ai-assistant", label: "AI Assistant", icon: Bot },
 ];
 
