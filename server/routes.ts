@@ -1984,11 +1984,11 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       const qualityVal = parseInt(req.body.quality) || 80;
       const requestedFormat = req.body.outputFormat;
 
-      const isObjectStorage = targetUrl.startsWith("https://storage.googleapis.com/");
+      const isRemoteUrl = targetUrl.startsWith("https://");
       const isLocalImages = targetUrl.startsWith("/images/");
       const isLocalUploads = targetUrl.startsWith("/uploads/");
 
-      if (!isObjectStorage && !isLocalImages && !isLocalUploads) {
+      if (!isRemoteUrl && !isLocalImages && !isLocalUploads) {
         fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: "Invalid target URL" });
       }
@@ -1998,7 +1998,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         return res.status(400).json({ message: "Invalid path" });
       }
 
-      if (isObjectStorage) {
+      if (isRemoteUrl) {
         const objService = new ObjectStorageService();
         const publicPaths = objService.getPublicObjectSearchPaths();
         if (!publicPaths.length) {
