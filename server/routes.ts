@@ -1920,6 +1920,91 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
   });
 
+  app.post("/api/cms/image-replace", requireAuth, upload.single("file"), async (req, res) => {
+    try {
+      const targetUrl = req.body.targetUrl;
+      if (!targetUrl || !req.file) {
+        return res.status(400).json({ message: "Target URL and file are required" });
+      }
+
+      if (/\.\./.test(targetUrl)) {
+        return res.status(400).json({ message: "Invalid path" });
+      }
+
+      const allowedImagesDir = path.resolve(process.cwd(), "client/public/images");
+      const allowedUploadsDir = path.resolve(process.cwd(), "uploads");
+
+      let targetPath = "";
+      if (targetUrl.startsWith("/images/")) {
+        targetPath = path.resolve(process.cwd(), "client/public", targetUrl.slice(1));
+      } else if (targetUrl.startsWith("/uploads/")) {
+        targetPath = path.resolve(process.cwd(), targetUrl.slice(1));
+      }
+
+      if (!targetPath || (!targetPath.startsWith(allowedImagesDir) && !targetPath.startsWith(allowedUploadsDir))) {
+        return res.status(400).json({ message: "Invalid target URL" });
+      }
+
+      if (!req.file.mimetype.startsWith("image/")) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: "Only image files are allowed" });
+      }
+
+      const targetDir = path.dirname(targetPath);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
+      const sharp = (await import("sharp")).default;
+
+      try {
+        await sharp(req.file.path).metadata();
+      } catch {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: "Invalid image file" });
+      }
+
+      const ext = path.extname(targetPath).toLowerCase();
+      const format = req.body.outputFormat || (ext === ".webp" ? "webp" : ext === ".png" ? "png" : "jpeg");
+
+      let pipeline = sharp(req.file.path);
+
+      if (format === "webp") {
+        pipeline = pipeline.webp({ quality: parseInt(req.body.quality) || 80 });
+      } else if (format === "png") {
+        pipeline = pipeline.png({ compressionLevel: 8 });
+      } else {
+        pipeline = pipeline.jpeg({ quality: parseInt(req.body.quality) || 80, mozjpeg: true });
+      }
+
+      const newExt = format === "webp" ? ".webp" : format === "png" ? ".png" : ".jpeg";
+      const baseName = path.basename(targetPath, path.extname(targetPath));
+      const newPath = path.join(targetDir, baseName + newExt);
+
+      await pipeline.toFile(newPath);
+
+      if (newPath !== targetPath && fs.existsSync(targetPath)) {
+        fs.unlinkSync(targetPath);
+      }
+
+      fs.unlinkSync(req.file.path);
+
+      const newSize = fs.statSync(newPath).size;
+      const newUrl = targetUrl.replace(path.basename(targetUrl), baseName + newExt);
+
+      res.json({
+        message: "Image replaced successfully",
+        newUrl,
+        newSize: Math.round(newSize / 1024),
+      });
+    } catch (err: any) {
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // ──────── WEBSITE PERFORMANCE ANALYZER ────────
   app.get("/api/cms/performance-analysis", requireAuth, async (_req, res) => {
     try {

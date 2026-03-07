@@ -25,6 +25,8 @@ import {
   Undo2,
   Palette,
   Download,
+  Replace,
+  Upload,
 } from "lucide-react";
 
 interface Operation {
@@ -85,6 +87,9 @@ export default function InlineImageEditor({ url, width, height, format, onClose 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef<{ paths: { x: number; y: number }[][] }>({ paths: [] });
   const currentPathRef = useRef<{ x: number; y: number }[]>([]);
+
+  const [isReplacing, setIsReplacing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
 
@@ -300,6 +305,39 @@ export default function InlineImageEditor({ url, width, height, format, onClose 
     },
   });
 
+  const handleReplaceImage = async (file: File) => {
+    setIsReplacing(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("targetUrl", url);
+      formData.append("outputFormat", outputFormat);
+      formData.append("quality", quality.toString());
+
+      const res = await fetch("/api/cms/image-replace", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+
+      const result = await res.json();
+      toast({
+        title: "Image replaced!",
+        description: `New size: ${result.newSize} KB`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/cms/performance-analysis"] });
+      onClose();
+    } catch (err: any) {
+      toast({ title: "Replace failed", description: err.message, variant: "destructive" });
+    }
+    setIsReplacing(false);
+  };
+
   const tools: { key: ToolSection; label: string; icon: React.ReactNode }[] = [
     { key: "transform", label: "Transform", icon: <Maximize2 className="w-3.5 h-3.5" /> },
     { key: "adjust", label: "Adjust", icon: <Sun className="w-3.5 h-3.5" /> },
@@ -318,6 +356,28 @@ export default function InlineImageEditor({ url, width, height, format, onClose 
           <span className="text-xs text-gray-400 font-mono">{url.split("/").pop()}</span>
         </div>
         <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleReplaceImage(file);
+              e.target.value = "";
+            }}
+          />
+          <Button
+            data-testid="button-replace-image"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isReplacing}
+            className="text-xs h-7 border-blue-300 text-blue-600 hover:bg-blue-50"
+          >
+            {isReplacing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Replace className="w-3 h-3 mr-1" />}
+            Replace Image
+          </Button>
           <Button variant="ghost" size="sm" onClick={resetAll} className="text-xs h-7">
             <Undo2 className="w-3 h-3 mr-1" /> Reset
           </Button>
@@ -338,10 +398,25 @@ export default function InlineImageEditor({ url, width, height, format, onClose 
       </div>
 
       <div className="flex gap-4">
-        <div className="relative w-[320px] h-[220px] bg-gray-100 rounded-lg overflow-hidden border flex-shrink-0 flex items-center justify-center">
+        <div
+          className="relative w-[320px] h-[220px] bg-gray-100 rounded-lg overflow-hidden border flex-shrink-0 flex items-center justify-center group"
+          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const file = e.dataTransfer.files?.[0];
+            if (file && file.type.startsWith("image/")) handleReplaceImage(file);
+          }}
+        >
           {isLoadingPreview && (
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10">
               <Loader2 className="w-6 h-6 animate-spin text-white" />
+            </div>
+          )}
+          {isReplacing && (
+            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center z-20">
+              <Loader2 className="w-6 h-6 animate-spin text-white mb-2" />
+              <span className="text-xs text-white font-medium">Replacing...</span>
             </div>
           )}
           <img
@@ -357,6 +432,11 @@ export default function InlineImageEditor({ url, width, height, format, onClose 
               onMouseDown={handleCanvasMouseDown}
               style={{ touchAction: "none" }}
             />
+          )}
+          {!isDrawing && !isReplacing && (
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 pointer-events-none">
+              <span className="text-[10px] text-white bg-black/50 px-2 py-1 rounded">Drop image to replace</span>
+            </div>
           )}
         </div>
 
