@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
+import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -156,6 +157,17 @@ export default function Careers() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+      <SEOHead
+        title="Careers | Protels Hotels & Resorts – Join Our Team"
+        description="Join the Protels Hotels & Resorts team. Explore career opportunities at our luxury beach resorts in Egypt and Zanzibar. Apply now for hospitality positions."
+        keywords="Protels careers, hotel jobs Egypt, hospitality careers Zanzibar, resort jobs Marsa Alam, Hurghada hotel employment"
+        ogTitle="Careers at Protels Hotels & Resorts"
+        ogDescription="Explore exciting career opportunities at our luxury beach resorts in Egypt and Zanzibar."
+        jsonLd={getBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Careers", path: "/careers" },
+        ])}
+      />
       <Navbar />
       
       {/* Hero Section */}

@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
+import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useMergedHotels, useCMSMedia, usePageHeroImage } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { useState, useCallback, useEffect } from "react";
@@ -48,6 +49,17 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen bg-brand-white">
+      <SEOHead
+        title="Photo Gallery | Protels Hotels & Resorts – Resort Images"
+        description="Browse stunning photos of Protels luxury beach resorts in Egypt and Zanzibar. See our rooms, pools, beaches, dining venues, and facilities."
+        keywords="Protels resort photos, Marsa Alam hotel gallery, Red Sea resort images, Zanzibar beach resort pictures"
+        ogTitle="Protels Hotels & Resorts Gallery"
+        ogDescription="Explore beautiful images from our luxury beach resorts."
+        jsonLd={getBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Gallery", path: "/gallery" },
+        ])}
+      />
       <Navbar />
       <Hero 
         image={heroImg}

@@ -3,10 +3,10 @@ import { Link } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
+import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Building2 } from "lucide-react";
-import { useEffect } from "react";
 
 const hotelNames: Record<string, string> = {
   "crystal-beach": "Crystal Beach Resort",
@@ -28,29 +28,25 @@ export default function Blog() {
     },
   });
 
-  useEffect(() => {
-    document.title = isAr
-      ? "مدونة بروتيلز | أخبار ومقالات السفر والفنادق"
-      : "Blog | Protels Hotels & Resorts – Travel Tips & News";
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute("content", isAr
-        ? "اكتشف أحدث الأخبار والنصائح حول وجهاتنا ومنتجعاتنا الفاخرة في مصر وزنجبار"
-        : "Discover the latest news, travel tips, and stories from Protels luxury beach resorts in Egypt and Zanzibar."
-      );
-    }
-    return () => {
-      document.title = "Protels Hotels & Resorts – Luxury Beach Resorts in Egypt & Zanzibar";
-      if (metaDesc) metaDesc.setAttribute("content", "Discover luxury beachfront resorts with diving, family packages and exclusive offers at Protels Hotels & Resorts. Book your perfect vacation now.");
-    };
-  }, [isAr]);
-
   const sortedPosts = [...posts].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   return (
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
+      <SEOHead
+        title={isAr ? "مدونة بروتيلز | أخبار ومقالات السفر والفنادق" : "Blog | Protels Hotels & Resorts – Travel Tips & News"}
+        description={isAr
+          ? "اكتشف أحدث الأخبار والنصائح حول وجهاتنا ومنتجعاتنا الفاخرة في مصر وزنجبار"
+          : "Discover the latest news, travel tips, and stories from Protels luxury beach resorts in Egypt and Zanzibar."}
+        keywords="Protels blog, Marsa Alam travel tips, Red Sea diving blog, Zanzibar travel guide, Egypt resort news"
+        ogTitle={isAr ? "مدونة بروتيلز" : "Protels Hotels & Resorts Blog"}
+        ogDescription="Travel tips, resort news, and destination guides from Protels Hotels & Resorts."
+        jsonLd={getBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Blog", path: "/blog" },
+        ])}
+      />
       <Navbar />
 
       <section className="relative bg-brand-blue py-32 px-6">

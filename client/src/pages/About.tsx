@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
+import SEOHead, { getOrganizationJsonLd, getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useI18n } from "@/lib/i18n";
 import { useEditMode } from "@/lib/editMode";
 import { useCMSPage, usePageHeroImage } from "@/lib/cms";
@@ -56,6 +57,14 @@ export default function About() {
     transition: { duration: 0.8 },
     viewport: { once: true }
   };
+
+  const aboutJsonLd = [
+    getOrganizationJsonLd(),
+    getBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "About Us", path: "/about" },
+    ]),
+  ];
 
   const resorts = [
     {
@@ -112,6 +121,14 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-brand-white font-sans selection:bg-brand-gold/30">
+      <SEOHead
+        title="About Us | Protels Hotels & Resorts – Our Story & Vision"
+        description="Learn about Protels Hotels & Resorts, a luxury hospitality brand operating premium beach resorts in Egypt and Zanzibar. Discover our story, values, and commitment to excellence."
+        keywords="Protels resorts about, luxury hotel brand Egypt, Red Sea hospitality, Zanzibar resort company"
+        ogTitle="About Protels Hotels & Resorts"
+        ogDescription="Discover the story behind Protels Hotels & Resorts – luxury beach destinations in Egypt and Zanzibar."
+        jsonLd={aboutJsonLd}
+      />
       <Navbar />
       
       {/* Hero Section */}

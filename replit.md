@@ -53,6 +53,16 @@ Preferred communication style: Simple, everyday language.
 - `/admin` – Legacy admin login
 - `/controlpanal` – CMS login and management routes (pages, hotels, blog, media, SEO, settings)
 
+**SEO:**
+- `robots.txt` – Server-side route in `server/routes.ts`, blocks /admin, /controlpanal, /api
+- `sitemap.xml` – Dynamic server-side route with all public pages, hotel sub-pages, and blog posts
+- `client/src/components/SEOHead.tsx` – Reusable SEO component (title, description, OG, Twitter, JSON-LD, canonical)
+- `client/src/components/CMSHead.tsx` – CMS-driven SEO overrides (GTM, favicon, hreflang)
+- Schema.org structured data: Organization, Hotel, BreadcrumbList, BlogPosting, WebSite
+- Target keywords: "Marsa Alam hotels", "Red Sea resorts", "Protels resorts", "Egypt beach resorts"
+- All pages have unique meta titles, descriptions, and keywords
+- Blog articles have article-type OG tags and BlogPosting JSON-LD
+
 **Key Frontend Files:**
 - `client/src/App.tsx` – Main router and providers
 - `client/src/lib/data.ts` – Static hotel data, room details, images
@@ -61,6 +71,7 @@ Preferred communication style: Simple, everyday language.
 - `client/src/components/Navbar.tsx` – Main navigation with language switcher
 - `client/src/components/Footer.tsx` – Site footer
 - `client/src/components/Hero.tsx` – Hero section with image carousel
+- `client/src/components/SEOHead.tsx` – Per-page SEO meta tags and structured data
 - `client/src/index.css` – Tailwind config and CSS custom properties
 
 ### Backend Architecture

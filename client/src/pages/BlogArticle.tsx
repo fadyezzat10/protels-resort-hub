@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Calendar, Building2, ArrowLeft, ArrowRight } from "lucide-react";
@@ -41,32 +42,32 @@ export default function BlogArticle() {
     enabled: !!slug,
   });
 
+  const defaultDesc = "Discover luxury beachfront resorts in Marsa Alam, Hurghada & Zanzibar at Protels Hotels & Resorts.";
+  const articleTitle = post ? (post.metaTitle || ((post.title?.[language] || post.title?.en || "Blog") + " | Protels Hotels & Resorts")) : "Blog | Protels Hotels & Resorts";
+  const articleDesc = post ? (post.metaDescription || post.excerpt?.[language] || post.excerpt?.en || defaultDesc) : defaultDesc;
+  const encodedSlug = slug ? encodeURIComponent(slug) : "";
+
+  const blogArticleJsonLd = post ? [
+    getBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Blog", path: "/blog" },
+      { name: post.title?.[language] || post.title?.en || "Article", path: `/blog/${slug}` },
+    ]),
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": post.title?.[language] || post.title?.en || "",
+      "description": articleDesc,
+      "image": post.featuredImage || undefined,
+      "datePublished": post.createdAt,
+      "dateModified": post.updatedAt || post.createdAt,
+      "author": { "@type": "Organization", "name": "Protels Hotels & Resorts" },
+      "publisher": { "@type": "Organization", "name": "Protels Hotels & Resorts" },
+      "mainEntityOfPage": `https://protels.com/blog/${encodedSlug}`,
+    },
+  ] : undefined;
+
   useEffect(() => {
-    const defaultTitle = "Protels Hotels & Resorts – Luxury Beach Resorts in Egypt & Zanzibar";
-    const defaultDesc = "Discover luxury beachfront resorts with diving, family packages and exclusive offers at Protels Hotels & Resorts. Book your perfect vacation now.";
-
-    if (post) {
-      const articleTitle = post.metaTitle || ((post.title?.[language] || post.title?.en || "Blog") + " | Protels Hotels & Resorts");
-      document.title = articleTitle;
-
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute("content", post.metaDescription || (post.excerpt?.[language] || post.excerpt?.en || defaultDesc));
-      }
-
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute("content", articleTitle);
-
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute("content", post.metaDescription || (post.excerpt?.[language] || post.excerpt?.en || ""));
-
-      const twTitle = document.querySelector('meta[name="twitter:title"]');
-      if (twTitle) twTitle.setAttribute("content", articleTitle);
-
-      const twDesc = document.querySelector('meta[name="twitter:description"]');
-      if (twDesc) twDesc.setAttribute("content", post.metaDescription || (post.excerpt?.[language] || post.excerpt?.en || ""));
-    }
-
     if (contentRef.current) {
       const links = contentRef.current.querySelectorAll("a[href]");
       links.forEach((link) => {
@@ -77,20 +78,6 @@ export default function BlogArticle() {
         }
       });
     }
-
-    return () => {
-      document.title = defaultTitle;
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute("content", defaultDesc);
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute("content", "PROTELS Hotels & Resorts");
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute("content", "Experience luxury at our premier beach resorts in Egypt and Zanzibar.");
-      const twTitle = document.querySelector('meta[name="twitter:title"]');
-      if (twTitle) twTitle.setAttribute("content", "PROTELS Hotels & Resorts");
-      const twDesc = document.querySelector('meta[name="twitter:description"]');
-      if (twDesc) twDesc.setAttribute("content", "Experience luxury at our premier beach resorts in Egypt and Zanzibar.");
-    };
   }, [post, language]);
 
   if (isLoading) {
@@ -149,6 +136,16 @@ export default function BlogArticle() {
 
   return (
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
+      <SEOHead
+        title={articleTitle}
+        description={articleDesc}
+        ogTitle={post.title?.[language] || post.title?.en || ""}
+        ogDescription={articleDesc}
+        ogImage={post.featuredImage || undefined}
+        ogType="article"
+        canonical={`https://protels.com/blog/${encodedSlug}`}
+        jsonLd={blogArticleJsonLd}
+      />
       <Navbar />
 
       {post.featuredImage && (

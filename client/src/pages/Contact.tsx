@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
+import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useI18n } from "@/lib/i18n";
 import { usePageHeroImage } from "@/lib/cms";
 import { Mail, Phone, MapPin, Smartphone, Globe } from "lucide-react";
@@ -70,6 +71,17 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-brand-white">
+      <SEOHead
+        title="Contact Us | Protels Hotels & Resorts – Get in Touch"
+        description="Contact Protels Hotels & Resorts for reservations, inquiries, and support. Find phone numbers, email addresses, and locations for all our resorts in Marsa Alam, Hurghada, and Zanzibar."
+        keywords="Protels contact, Marsa Alam hotel phone, Red Sea resort reservations, Zanzibar hotel contact"
+        ogTitle="Contact Protels Hotels & Resorts"
+        ogDescription="Get in touch with Protels Hotels & Resorts for bookings and inquiries."
+        jsonLd={getBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" },
+        ])}
+      />
       <Navbar />
       <Hero 
         image={heroImg}

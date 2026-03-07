@@ -98,23 +98,47 @@ export async function registerRoutes(
     res.json({ status: "ok" });
   });
 
+  app.get("/robots.txt", (_req, res) => {
+    res.set("Content-Type", "text/plain");
+    res.send(`User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /controlpanal
+Disallow: /controlpanal/*
+Disallow: /api/
+
+Sitemap: https://protels.com/sitemap.xml
+`);
+  });
+
   app.get("/sitemap.xml", async (_req, res) => {
     const baseUrl = "https://protels.com";
-    const staticPages = [
-      { path: "/", priority: "1.0", changefreq: "weekly" },
-      { path: "/hotels", priority: "0.9", changefreq: "weekly" },
-      { path: "/about", priority: "0.7", changefreq: "monthly" },
-      { path: "/contact", priority: "0.7", changefreq: "monthly" },
-      { path: "/careers", priority: "0.6", changefreq: "monthly" },
-      { path: "/gallery", priority: "0.6", changefreq: "monthly" },
-      { path: "/blog", priority: "0.8", changefreq: "weekly" },
-      { path: "/company-profile", priority: "0.6", changefreq: "monthly" },
-    ];
-    const hotelSlugs = ["crystal-beach", "beach-club", "la-plage", "royal-bay"];
     const today = new Date().toISOString().split("T")[0];
 
+    const staticPages = [
+      { path: "/", priority: "1.0", changefreq: "daily" },
+      { path: "/hotels", priority: "0.9", changefreq: "weekly" },
+      { path: "/about", priority: "0.7", changefreq: "monthly" },
+      { path: "/contact", priority: "0.8", changefreq: "monthly" },
+      { path: "/careers", priority: "0.6", changefreq: "monthly" },
+      { path: "/gallery", priority: "0.7", changefreq: "weekly" },
+      { path: "/blog", priority: "0.8", changefreq: "daily" },
+      { path: "/company-profile", priority: "0.5", changefreq: "monthly" },
+    ];
+
+    const hotelData = [
+      { slug: "crystal-beach", sections: ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] },
+      { slug: "beach-club", sections: ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] },
+      { slug: "la-plage", sections: ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] },
+      { slug: "royal-bay", sections: ["overview"] },
+    ];
+
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+    xml += `        xmlns:xhtml="http://www.w3.org/1999/xhtml"\n`;
+    xml += `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 
     for (const page of staticPages) {
       xml += `  <url>\n`;
@@ -125,28 +149,44 @@ export async function registerRoutes(
       xml += `  </url>\n`;
     }
 
-    for (const slug of hotelSlugs) {
+    for (const hotel of hotelData) {
       xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/hotels/${slug}</loc>\n`;
+      xml += `    <loc>${baseUrl}/hotels/${hotel.slug}</loc>\n`;
       xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
-      xml += `    <priority>0.8</priority>\n`;
+      xml += `    <priority>0.9</priority>\n`;
       xml += `  </url>\n`;
+
+      for (const section of hotel.sections) {
+        if (section === "overview") continue;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/hotels/${hotel.slug}/${section}</loc>\n`;
+        xml += `    <lastmod>${today}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.7</priority>\n`;
+        xml += `  </url>\n`;
+      }
     }
 
-    const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
-    for (const post of publishedPosts) {
-      xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
-      xml += `    <lastmod>${post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today}</lastmod>\n`;
-      xml += `    <changefreq>weekly</changefreq>\n`;
-      xml += `    <priority>0.7</priority>\n`;
-      xml += `  </url>\n`;
+    try {
+      const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
+      for (const post of publishedPosts) {
+        const encodedSlug = encodeURIComponent(post.slug);
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/blog/${encodedSlug}</loc>\n`;
+        xml += `    <lastmod>${post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.7</priority>\n`;
+        xml += `  </url>\n`;
+      }
+    } catch (e) {
+      console.error("Sitemap: error loading blog posts", e);
     }
 
     xml += `</urlset>`;
 
     res.set("Content-Type", "application/xml");
+    res.set("Cache-Control", "public, max-age=3600");
     res.send(xml);
   });
 

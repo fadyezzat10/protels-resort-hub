@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
+import SEOHead, { getHotelJsonLd, getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { MapPin, Utensils, Waves, Sun, Phone, Mail, Clock, Wifi, Coffee, Wine, Maximize2, Bed, Mountain, Dumbbell, Sparkles, Umbrella, GlassWater } from "lucide-react";
 import NotFound from "@/pages/not-found";
@@ -79,8 +80,35 @@ export default function HotelDetails() {
   const hotelTheme = hotel.theme;
   const hasCustomTheme = hotelTheme && (hotelTheme.primaryColor || hotelTheme.secondaryColor || hotelTheme.accentColor);
 
+  const hotelSeoKeywords: Record<string, string> = {
+    "crystal-beach": "Crystal Beach Resort Marsa Alam, Marsa Alam hotels, Red Sea resorts, all-inclusive Marsa Alam, diving resort Egypt, Egypt beach resorts",
+    "beach-club": "Beach Club Marsa Alam, Protels Beach Club & Spa, Marsa Alam hotels, aquapark resort Egypt, family resort Red Sea, Egypt beach resorts",
+    "la-plage": "La Plage Zanzibar, Zanzibar resorts, Kiwengwa beach hotel, all-inclusive Zanzibar, Zanzibar boutique resort, Tanzania beach resort",
+    "royal-bay": "Royal Bay Hurghada, Hurghada hotels, Hurghada resorts, Red Sea resorts, Egypt beach resorts, Hurghada all-inclusive",
+  };
+
+  const hotelJsonLd = [
+    getHotelJsonLd(hotel as any),
+    getBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Hotels", path: "/hotels" },
+      { name: hotel.name, path: `/hotels/${hotel.id}` },
+    ]),
+  ];
+
   return (
     <div className={cn("min-h-screen bg-brand-white transition-colors duration-500", (isLaPlage || hasCustomTheme) && "bg-[var(--hotel-bg,#F9F6F0)]")}>
+      <SEOHead
+        title={`${hotel.name} | Protels Hotels & Resorts – ${hotel.location}`}
+        description={hotel.description?.en || `Experience luxury at ${hotel.name} in ${hotel.location}. All-inclusive packages, private beach, spa, and world-class dining.`}
+        keywords={hotelSeoKeywords[hotel.id] || `${hotel.name}, Protels resorts, luxury hotel`}
+        ogTitle={hotel.name}
+        ogDescription={hotel.description?.en?.substring(0, 200) || `Luxury resort in ${hotel.location}`}
+        ogImage={hotel.image?.startsWith("http") ? hotel.image : undefined}
+        ogType="hotel"
+        canonical={`https://protels.com/hotels/${hotel.id}`}
+        jsonLd={hotelJsonLd}
+      />
       {(isLaPlage || hasCustomTheme) && (
         <style>{`
           .hotel-custom-theme {

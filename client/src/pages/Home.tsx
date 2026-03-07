@@ -4,6 +4,7 @@ import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
+import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
@@ -118,8 +119,23 @@ export default function Home() {
 
   const finalHeroImages = heroImages.length > 0 ? heroImages : staticSliderImages;
 
+  const homeJsonLd = [
+    getOrganizationJsonLd(),
+    getBreadcrumbJsonLd([{ name: "Home", path: "/" }]),
+    ...hotels.map((h) => getHotelJsonLd(h as any)),
+  ];
+
   return (
     <div className="min-h-screen bg-brand-white">
+      <SEOHead
+        title="Protels Hotels & Resorts – Luxury Beach Resorts in Egypt & Zanzibar"
+        description="Discover luxury beachfront resorts in Marsa Alam, Hurghada & Zanzibar. All-inclusive packages, diving, spa, family activities. Book your Red Sea vacation at Protels."
+        keywords="Marsa Alam hotels, Red Sea resorts, Protels resorts, Egypt beach resorts, Hurghada hotels, Zanzibar resorts, luxury beach resort Egypt, all-inclusive Red Sea, diving resort Egypt"
+        ogTitle="Protels Hotels & Resorts – Luxury Beach Resorts"
+        ogDescription="Experience luxury at our premier beach resorts in Marsa Alam, Hurghada, and Zanzibar. All-inclusive vacation packages with diving, spa & family fun."
+        canonical="https://protels.com/"
+        jsonLd={homeJsonLd}
+      />
       <Navbar />
       
       <Hero 
