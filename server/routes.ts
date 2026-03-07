@@ -1662,24 +1662,36 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
   });
 
   // ──────── IMAGE EDITOR API ────────
+  async function resolveImageToBuffer(url: string): Promise<{ buffer: Buffer; size: number; isRemote: boolean; localPath: string }> {
+    if (url.startsWith("/images/")) {
+      const fp = path.join(process.cwd(), "client/public", url);
+      if (fs.existsSync(fp)) return { buffer: fs.readFileSync(fp), size: fs.statSync(fp).size, isRemote: false, localPath: fp };
+    } else if (url.startsWith("/uploads/")) {
+      const fp = path.join(process.cwd(), url.replace(/^\//, ""));
+      if (fs.existsSync(fp)) return { buffer: fs.readFileSync(fp), size: fs.statSync(fp).size, isRemote: false, localPath: fp };
+    }
+    if (url.startsWith("https://")) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 15000);
+      const resp = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(timer);
+      if (!resp.ok) throw new Error("Failed to download remote image");
+      const arrBuf = await resp.arrayBuffer();
+      const buf = Buffer.from(arrBuf);
+      return { buffer: buf, size: buf.length, isRemote: true, localPath: "" };
+    }
+    throw new Error("File not found");
+  }
+
   app.post("/api/cms/image-edit", requireAuth, async (req, res) => {
     try {
       const sharp = (await import("sharp")).default;
       const { url, operations } = req.body;
       if (!url || !operations) return res.status(400).json({ message: "URL and operations required" });
 
-      let filePath = "";
-      if (url.startsWith("/images/")) {
-        filePath = path.join(process.cwd(), "client/public", url);
-      } else if (url.startsWith("/uploads/")) {
-        filePath = path.join(process.cwd(), url.replace(/^\//, ""));
-      }
-      if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).json({ message: "File not found on disk" });
-      }
-
-      const originalSize = fs.statSync(filePath).size;
-      let pipeline = sharp(filePath);
+      const resolved = await resolveImageToBuffer(url);
+      const originalSize = resolved.size;
+      let pipeline = sharp(resolved.buffer);
 
       for (const op of operations) {
         switch (op.type) {
@@ -1804,11 +1816,6 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
 
       const outputFormat = req.body.outputFormat || "webp";
       const quality = req.body.quality || 85;
-      const ext = path.extname(filePath);
-      const baseName = path.basename(filePath, ext);
-      const dir = path.dirname(filePath);
-      const outFileName = `${baseName}-edited.${outputFormat}`;
-      const outPath = path.join(dir, outFileName);
 
       if (outputFormat === "webp") {
         pipeline = pipeline.webp({ quality });
@@ -1818,23 +1825,65 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         pipeline = pipeline.png({ quality });
       }
 
-      await pipeline.toFile(outPath);
+      if (resolved.isRemote) {
+        const processedBuffer = await pipeline.toBuffer();
+        const origFilename = url.split("/").pop() || "image";
+        const origBase = origFilename.replace(/\.[^.]+$/, "");
+        const outFileName = `${origBase}-edited.${outputFormat}`;
 
-      const newSize = fs.statSync(outPath).size;
-      const newUrl = url.replace(/[^/]+$/, outFileName);
+        const objService = new ObjectStorageService();
+        const publicPaths = objService.getPublicObjectSearchPaths();
+        if (publicPaths.length > 0) {
+          const bucketPath = publicPaths[0];
+          const fullPath = `${bucketPath}/${outFileName}`;
+          const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+          const parts = p.split("/");
+          const bucketName = parts[1];
+          const objectName = parts.slice(2).join("/");
 
-      const previewPipeline = sharp(outPath).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
-      const previewBuffer = await previewPipeline.toBuffer();
-      const previewDataUrl = `data:image/webp;base64,${previewBuffer.toString("base64")}`;
+          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+          const bucket = objectStorageClient.bucket(bucketName);
+          const objFile = bucket.file(objectName);
+          const mimeType = outputFormat === "webp" ? "image/webp" : outputFormat === "png" ? "image/png" : "image/jpeg";
+          await objFile.save(processedBuffer, { metadata: { contentType: mimeType } });
+        }
 
-      res.json({
-        originalUrl: url,
-        newUrl,
-        originalSize: Math.round(originalSize / 1024),
-        newSize: Math.round(newSize / 1024),
-        savings: Math.round(((originalSize - newSize) / originalSize) * 100),
-        previewDataUrl,
-      });
+        const newUrl = `/uploads/${outFileName}`;
+        const previewPipeline2 = sharp(processedBuffer).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
+        const previewBuffer = await previewPipeline2.toBuffer();
+
+        res.json({
+          originalUrl: url,
+          newUrl,
+          originalSize: Math.round(originalSize / 1024),
+          newSize: Math.round(processedBuffer.length / 1024),
+          savings: Math.round(((originalSize - processedBuffer.length) / originalSize) * 100),
+          previewDataUrl: `data:image/webp;base64,${previewBuffer.toString("base64")}`,
+        });
+      } else {
+        const ext = path.extname(resolved.localPath);
+        const baseName = path.basename(resolved.localPath, ext);
+        const dir = path.dirname(resolved.localPath);
+        const outFileName = `${baseName}-edited.${outputFormat}`;
+        const outPath = path.join(dir, outFileName);
+
+        await pipeline.toFile(outPath);
+
+        const newSize = fs.statSync(outPath).size;
+        const newUrl = url.replace(/[^/]+$/, outFileName);
+
+        const previewPipeline2 = sharp(outPath).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
+        const previewBuffer = await previewPipeline2.toBuffer();
+
+        res.json({
+          originalUrl: url,
+          newUrl,
+          originalSize: Math.round(originalSize / 1024),
+          newSize: Math.round(newSize / 1024),
+          savings: Math.round(((originalSize - newSize) / originalSize) * 100),
+          previewDataUrl: `data:image/webp;base64,${previewBuffer.toString("base64")}`,
+        });
+      }
     } catch (err: any) {
       console.error("Image edit error:", err);
       res.status(500).json({ message: err.message });
@@ -1847,17 +1896,8 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       const { url, operations } = req.body;
       if (!url) return res.status(400).json({ message: "URL required" });
 
-      let filePath = "";
-      if (url.startsWith("/images/")) {
-        filePath = path.join(process.cwd(), "client/public", url);
-      } else if (url.startsWith("/uploads/")) {
-        filePath = path.join(process.cwd(), url.replace(/^\//, ""));
-      }
-      if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).json({ message: "File not found" });
-      }
-
-      let pipeline = sharp(filePath);
+      const resolved = await resolveImageToBuffer(url);
+      let pipeline = sharp(resolved.buffer);
 
       if (operations) {
         for (const op of operations) {
@@ -1927,32 +1967,9 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         return res.status(400).json({ message: "Target URL and file are required" });
       }
 
-      if (/\.\./.test(targetUrl)) {
-        return res.status(400).json({ message: "Invalid path" });
-      }
-
-      const allowedImagesDir = path.resolve(process.cwd(), "client/public/images");
-      const allowedUploadsDir = path.resolve(process.cwd(), "uploads");
-
-      let targetPath = "";
-      if (targetUrl.startsWith("/images/")) {
-        targetPath = path.resolve(process.cwd(), "client/public", targetUrl.slice(1));
-      } else if (targetUrl.startsWith("/uploads/")) {
-        targetPath = path.resolve(process.cwd(), targetUrl.slice(1));
-      }
-
-      if (!targetPath || (!targetPath.startsWith(allowedImagesDir) && !targetPath.startsWith(allowedUploadsDir))) {
-        return res.status(400).json({ message: "Invalid target URL" });
-      }
-
       if (!req.file.mimetype.startsWith("image/")) {
         fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: "Only image files are allowed" });
-      }
-
-      const targetDir = path.dirname(targetPath);
-      if (!fs.existsSync(targetDir)) {
-        fs.mkdirSync(targetDir, { recursive: true });
       }
 
       const sharp = (await import("sharp")).default;
@@ -1964,17 +1981,101 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         return res.status(400).json({ message: "Invalid image file" });
       }
 
+      const qualityVal = parseInt(req.body.quality) || 80;
+      const requestedFormat = req.body.outputFormat;
+
+      const isObjectStorage = targetUrl.startsWith("https://storage.googleapis.com/");
+      const isLocalImages = targetUrl.startsWith("/images/");
+      const isLocalUploads = targetUrl.startsWith("/uploads/");
+
+      if (!isObjectStorage && !isLocalImages && !isLocalUploads) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: "Invalid target URL" });
+      }
+
+      if ((isLocalImages || isLocalUploads) && /\.\./.test(targetUrl)) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: "Invalid path" });
+      }
+
+      if (isObjectStorage) {
+        const objService = new ObjectStorageService();
+        const publicPaths = objService.getPublicObjectSearchPaths();
+        if (!publicPaths.length) {
+          fs.unlinkSync(req.file.path);
+          return res.status(500).json({ message: "Object Storage not configured" });
+        }
+
+        const origFilename = targetUrl.split("/").pop() || "replaced.webp";
+        const origBase = origFilename.replace(/\.[^.]+$/, "");
+        const format = requestedFormat || "webp";
+        const newExt = format === "webp" ? ".webp" : format === "png" ? ".png" : ".jpeg";
+        const newFilename = `${origBase}${newExt}`;
+
+        let pipeline = sharp(req.file.path);
+        if (format === "webp") pipeline = pipeline.webp({ quality: qualityVal });
+        else if (format === "png") pipeline = pipeline.png({ compressionLevel: 8 });
+        else pipeline = pipeline.jpeg({ quality: qualityVal, mozjpeg: true });
+
+        const processedBuffer = await pipeline.toBuffer();
+
+        const bucketPath = publicPaths[0];
+        const fullPath = `${bucketPath}/${newFilename}`;
+        const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+        const parts = p.split("/");
+        const bucketName = parts[1];
+        const objectName = parts.slice(2).join("/");
+
+        const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+        const bucket = objectStorageClient.bucket(bucketName);
+        const objFile = bucket.file(objectName);
+
+        const mimeType = format === "webp" ? "image/webp" : format === "png" ? "image/png" : "image/jpeg";
+        await objFile.save(processedBuffer, { metadata: { contentType: mimeType } });
+
+        fs.unlinkSync(req.file.path);
+
+        const newUrl = `/uploads/${newFilename}`;
+
+        res.json({
+          message: "Image replaced in Object Storage",
+          newUrl,
+          newSize: Math.round(processedBuffer.length / 1024),
+        });
+        return;
+      }
+
+      const allowedImagesDir = path.resolve(process.cwd(), "client/public/images");
+      const allowedUploadsDir = path.resolve(process.cwd(), "uploads");
+
+      let targetPath = "";
+      if (isLocalImages) {
+        targetPath = path.resolve(process.cwd(), "client/public", targetUrl.slice(1));
+      } else if (isLocalUploads) {
+        targetPath = path.resolve(process.cwd(), targetUrl.slice(1));
+      }
+
+      if (!targetPath || (!targetPath.startsWith(allowedImagesDir) && !targetPath.startsWith(allowedUploadsDir))) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: "Invalid target URL" });
+      }
+
+      const targetDir = path.dirname(targetPath);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
       const ext = path.extname(targetPath).toLowerCase();
-      const format = req.body.outputFormat || (ext === ".webp" ? "webp" : ext === ".png" ? "png" : "jpeg");
+      const format = requestedFormat || (ext === ".webp" ? "webp" : ext === ".png" ? "png" : "jpeg");
 
       let pipeline = sharp(req.file.path);
 
       if (format === "webp") {
-        pipeline = pipeline.webp({ quality: parseInt(req.body.quality) || 80 });
+        pipeline = pipeline.webp({ quality: qualityVal });
       } else if (format === "png") {
         pipeline = pipeline.png({ compressionLevel: 8 });
       } else {
-        pipeline = pipeline.jpeg({ quality: parseInt(req.body.quality) || 80, mozjpeg: true });
+        pipeline = pipeline.jpeg({ quality: qualityVal, mozjpeg: true });
       }
 
       const newExt = format === "webp" ? ".webp" : format === "png" ? ".png" : ".jpeg";
