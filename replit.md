@@ -52,6 +52,8 @@ Preferred communication style: Simple, everyday language.
 - `/blog/:slug` – Individual blog article page
 - `/admin` – Legacy admin login
 - `/controlpanal` – CMS login and management routes (pages, hotels, blog, media, SEO, settings)
+- `/controlpanal/performance` – Performance Impact Analyzer (LCP detection, image impact analysis)
+- `/controlpanal/image-optimization` – Image Optimization (scan/compress/convert to WebP)
 
 **SEO:**
 - `robots.txt` – Server-side route in `server/routes.ts`, blocks /admin, /controlpanal, /api

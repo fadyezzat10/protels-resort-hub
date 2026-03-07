@@ -1661,6 +1661,234 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
   });
 
+  // ──────── PERFORMANCE IMPACT ANALYZER ────────
+  app.get("/api/cms/performance-analysis", requireAuth, async (_req, res) => {
+    try {
+      const sharp = (await import("sharp")).default;
+
+      interface PageImage {
+        url: string;
+        page: string;
+        renderPosition: "Hero" | "Section" | "Gallery";
+        isFirstOnPage: boolean;
+      }
+
+      const pageImages: PageImage[] = [];
+      const seen = new Set<string>();
+      const pageFirstTracker = new Map<string, boolean>();
+
+      const addImg = (url: string, page: string, renderPosition: PageImage["renderPosition"]) => {
+        if (!url || seen.has(url + page)) return;
+        seen.add(url + page);
+        const isFirst = !pageFirstTracker.has(page);
+        if (isFirst) pageFirstTracker.set(page, true);
+        pageImages.push({ url, page, renderPosition, isFirstOnPage: isFirst });
+      };
+
+      const allHotels = await storage.getHotels();
+      for (const h of allHotels) {
+        const hotelPage = `/hotels/${h.slug}`;
+        if (h.image) addImg(h.image, hotelPage, "Hero");
+        if (Array.isArray(h.gallery)) {
+          for (const g of h.gallery) addImg(g, hotelPage, "Gallery");
+        }
+        if (h.room_details && Array.isArray(h.room_details)) {
+          for (const room of h.room_details as any[]) {
+            if (room.images && Array.isArray(room.images)) {
+              for (const img of room.images) addImg(img, hotelPage, "Section");
+            }
+          }
+        }
+      }
+
+      const settings = await storage.getSettings();
+      const heroImagesRaw = settings.find((s: any) => s.key === "hero_images");
+      if (heroImagesRaw?.value) {
+        try {
+          const heroArr = typeof heroImagesRaw.value === "string" ? JSON.parse(heroImagesRaw.value) : heroImagesRaw.value;
+          if (Array.isArray(heroArr)) {
+            for (const img of heroArr) addImg(img, "/", "Hero");
+          }
+        } catch {}
+      }
+
+      const blogPosts = await storage.getBlogPosts();
+      for (const post of blogPosts) {
+        if (post.featuredImage) addImg(post.featuredImage, `/blog/${post.slug}`, "Hero");
+      }
+
+      const mediaFiles = await storage.getMediaFiles();
+      for (const m of mediaFiles) {
+        if (m.mimeType?.startsWith("image/") && m.url) {
+          addImg(m.url, "/media-library", "Section");
+        }
+      }
+
+      interface AnalyzedImage {
+        url: string;
+        page: string;
+        renderPosition: string;
+        fileSize: number;
+        fileSizeBytes: number;
+        width: number | null;
+        height: number | null;
+        format: string;
+        isWebp: boolean;
+        exists: boolean;
+        isLCP: boolean;
+        impactLevel: "High" | "Medium" | "Low";
+        impactReason: string;
+        recommendations: string[];
+        recommendedRes: string;
+      }
+
+      const results: AnalyzedImage[] = [];
+
+      for (const img of pageImages) {
+        let filePath = "";
+        if (img.url.startsWith("/images/")) {
+          filePath = path.join(process.cwd(), "client/public", img.url);
+        } else if (img.url.startsWith("/uploads/")) {
+          filePath = path.join(process.cwd(), img.url.replace(/^\//, ""));
+        }
+
+        let fileSize = 0;
+        let exists = false;
+        let width: number | null = null;
+        let height: number | null = null;
+        let format = path.extname(img.url).replace(".", "").toLowerCase();
+
+        if (filePath && fs.existsSync(filePath)) {
+          const stat = fs.statSync(filePath);
+          fileSize = stat.size;
+          exists = true;
+          try {
+            const meta = await sharp(filePath).metadata();
+            width = meta.width || null;
+            height = meta.height || null;
+            if (meta.format) format = meta.format;
+          } catch {}
+        } else if (img.url.startsWith("http")) {
+          try {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 5000);
+            const headRes = await fetch(img.url, { method: "HEAD", signal: ctrl.signal });
+            clearTimeout(timer);
+            if (headRes.ok) {
+              exists = true;
+              const cl = headRes.headers.get("content-length");
+              if (cl) fileSize = parseInt(cl, 10);
+              const ct = headRes.headers.get("content-type");
+              if (ct?.includes("webp")) format = "webp";
+              else if (ct?.includes("png")) format = "png";
+              else if (ct?.includes("jpeg") || ct?.includes("jpg")) format = "jpeg";
+            }
+          } catch {}
+        }
+
+        const sizeKB = Math.round(fileSize / 1024);
+        const isWebp = format === "webp";
+        const isLCP = img.isFirstOnPage && img.renderPosition === "Hero";
+
+        let recWidth = 800;
+        let recHeight = 600;
+        if (img.renderPosition === "Hero") { recWidth = 1920; recHeight = 1080; }
+        else if (img.renderPosition === "Gallery") { recWidth = 1200; recHeight = 800; }
+        else if (img.renderPosition === "Section") { recWidth = 1000; recHeight = 667; }
+
+        const recommendations: string[] = [];
+        let impactLevel: "High" | "Medium" | "Low" = "Low";
+        let impactReason = "Image is within acceptable parameters";
+
+        if (!isWebp && exists && format !== "svg") {
+          recommendations.push("Convert to WebP for 25-80% smaller file size");
+        }
+
+        if (fileSize > 500 * 1024) {
+          recommendations.push(`Compress image (currently ${sizeKB} KB, target < 200 KB)`);
+        } else if (fileSize > 200 * 1024) {
+          recommendations.push(`Consider compressing (currently ${sizeKB} KB, target < 200 KB)`);
+        }
+
+        if (width && height) {
+          if (width > recWidth * 1.5 || height > recHeight * 1.5) {
+            recommendations.push(`Resize to ${recWidth}x${recHeight} (currently ${width}x${height})`);
+          }
+        }
+
+        if (isLCP && fileSize > 200 * 1024) {
+          impactLevel = "High";
+          impactReason = "LCP image — slowing the page";
+        } else if (isLCP && !isWebp) {
+          impactLevel = "High";
+          impactReason = "LCP image — not in WebP format";
+        } else if (isLCP) {
+          impactLevel = "Medium";
+          impactReason = "LCP image — monitor for performance";
+        } else if (fileSize > 500 * 1024) {
+          impactLevel = "High";
+          impactReason = "Very large file size slowing the page";
+        } else if (fileSize > 300 * 1024) {
+          impactLevel = "Medium";
+          impactReason = "Large file size may affect load time";
+        } else if (!isWebp && exists && fileSize > 100 * 1024) {
+          impactLevel = "Medium";
+          impactReason = "Not using WebP — larger than necessary";
+        }
+
+        if (recommendations.length === 0 && exists) {
+          impactReason = "Well optimized";
+        }
+
+        results.push({
+          url: img.url,
+          page: img.page,
+          renderPosition: img.renderPosition,
+          fileSize: sizeKB,
+          fileSizeBytes: fileSize,
+          width,
+          height,
+          format,
+          isWebp,
+          exists,
+          isLCP,
+          impactLevel,
+          impactReason,
+          recommendations,
+          recommendedRes: `${recWidth}x${recHeight}`,
+        });
+      }
+
+      results.sort((a, b) => {
+        const order = { High: 0, Medium: 1, Low: 2 };
+        if (order[a.impactLevel] !== order[b.impactLevel]) return order[a.impactLevel] - order[b.impactLevel];
+        return b.fileSizeBytes - a.fileSizeBytes;
+      });
+
+      const totalImages = results.length;
+      const highCount = results.filter(r => r.impactLevel === "High").length;
+      const mediumCount = results.filter(r => r.impactLevel === "Medium").length;
+      const lcpCount = results.filter(r => r.isLCP).length;
+      const totalSizeKB = results.reduce((s, r) => s + r.fileSize, 0);
+      const affectingPerformance = results.filter(r => r.recommendations.length > 0).length;
+
+      res.json({
+        images: results,
+        summary: {
+          totalImages,
+          highCount,
+          mediumCount,
+          lcpCount,
+          affectingPerformance,
+          totalSizeMB: Math.round(totalSizeKB / 1024),
+        },
+      });
+    } catch (err: any) {
+      console.error("Performance analysis error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // ──────── CMS CHATBOT MANAGEMENT ────────
   app.get("/api/cms/chatbot-config", requireAuth, async (_req, res) => {
     const configs = await storage.getChatbotConfigs();
