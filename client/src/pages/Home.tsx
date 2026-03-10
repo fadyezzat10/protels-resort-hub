@@ -4,7 +4,7 @@ import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
-import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd } from "@/components/SEOHead";
+import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd, getFAQJsonLd } from "@/components/SEOHead";
 import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
@@ -119,9 +119,18 @@ export default function Home() {
 
   const finalHeroImages = heroImages.length > 0 ? heroImages : staticSliderImages;
 
+  const hotelFAQs = [
+    { question: "What resorts does Protels Hotels & Resorts operate?", answer: "Protels operates four luxury resorts: Crystal Beach Resort and Beach Club & Spa in Marsa Alam (Egypt), Royal Bay Resort & Spa in Hurghada (Egypt), and La Plage in Zanzibar (Tanzania)." },
+    { question: "Are Protels resorts all-inclusive?", answer: "Yes, all Protels resorts offer comprehensive all-inclusive packages including meals, drinks, activities, and entertainment." },
+    { question: "Does Protels offer diving and water sports?", answer: "Yes, our Red Sea resorts feature PADI-certified diving centers with access to world-class coral reefs and a variety of water sports activities." },
+    { question: "Are Protels resorts family-friendly?", answer: "Absolutely! Our resorts offer kids clubs, family rooms, aqua parks, pools, and supervised activities for children of all ages." },
+    { question: "How can I book a stay at a Protels resort?", answer: "You can book directly through our website using the 'Book Now' button on any resort page, or contact our reservations team via email at info@protels.com." },
+  ];
+
   const homeJsonLd = [
     getOrganizationJsonLd(),
     getBreadcrumbJsonLd([{ name: "Home", path: "/" }]),
+    getFAQJsonLd(hotelFAQs),
     ...hotels.map((h) => getHotelJsonLd(h as any)),
   ];
 

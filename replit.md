@@ -60,10 +60,13 @@ Preferred communication style: Simple, everyday language.
 - `sitemap.xml` – Dynamic server-side route with all public pages, hotel sub-pages, and blog posts
 - `client/src/components/SEOHead.tsx` – Reusable SEO component (title, description, OG, Twitter, JSON-LD, canonical)
 - `client/src/components/CMSHead.tsx` – CMS-driven SEO overrides (GTM, favicon, hreflang)
-- Schema.org structured data: Organization, Hotel, BreadcrumbList, BlogPosting, WebSite
+- Schema.org structured data: Organization (with sameAs, brand, contactPoints), Hotel (with aggregateRating, ReserveAction, images), BreadcrumbList, BlogPosting, WebSite, FAQPage
 - Target keywords: "Marsa Alam hotels", "Red Sea resorts", "Protels resorts", "Egypt beach resorts"
 - All pages have unique meta titles, descriptions, and keywords
 - Blog articles have article-type OG tags and BlogPosting JSON-LD
+- Sitemap includes hreflang tags (8 languages + x-default) on all URLs, image tags for hotels and blog posts
+- Security headers: X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy
+- Robots.txt with Crawl-delay and blocking unoptimized upload formats (.png, .jpg, .jpeg)
 
 **Key Frontend Files:**
 - `client/src/App.tsx` – Main router and providers

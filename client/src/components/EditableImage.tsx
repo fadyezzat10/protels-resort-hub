@@ -71,7 +71,7 @@ export default function EditableImage({
   const isSelected = selectedKey === imgKey;
 
   if (!isEditMode) {
-    return <img src={currentSrc} alt={alt} className={className} style={sizeStyle} {...rest} />;
+    return <img src={currentSrc} alt={alt} className={className} style={sizeStyle} loading="lazy" {...rest} />;
   }
 
   return (

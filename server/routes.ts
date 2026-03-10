@@ -100,14 +100,19 @@ export async function registerRoutes(
 
   app.get("/robots.txt", (_req, res) => {
     res.set("Content-Type", "text/plain");
+    res.set("Cache-Control", "public, max-age=86400");
     res.send(`User-agent: *
 Allow: /
+Crawl-delay: 1
 
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /controlpanal
 Disallow: /controlpanal/*
 Disallow: /api/
+Disallow: /uploads/*.png$
+Disallow: /uploads/*.jpg$
+Disallow: /uploads/*.jpeg$
 
 Sitemap: https://protels.com/sitemap.xml
 `);
@@ -135,6 +140,17 @@ Sitemap: https://protels.com/sitemap.xml
       { slug: "royal-bay", sections: ["overview"] },
     ];
 
+    const supportedLangs = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
+
+    const addHreflangTags = (path: string) => {
+      let tags = "";
+      for (const lang of supportedLangs) {
+        tags += `    <xhtml:link rel="alternate" hreflang="${lang}" href="${baseUrl}${path}" />\n`;
+      }
+      tags += `    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${path}" />\n`;
+      return tags;
+    };
+
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
     xml += `        xmlns:xhtml="http://www.w3.org/1999/xhtml"\n`;
@@ -146,8 +162,16 @@ Sitemap: https://protels.com/sitemap.xml
       xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
       xml += `    <priority>${page.priority}</priority>\n`;
+      xml += addHreflangTags(page.path);
       xml += `  </url>\n`;
     }
+
+    const hotelImages: Record<string, string> = {
+      "crystal-beach": "/images/hotel-crystal-beach-hero.webp",
+      "beach-club": "/images/hotel-beach-club-hero.webp",
+      "la-plage": "/images/hotel-la-plage-hero.webp",
+      "royal-bay": "/images/hotel-royal-bay-hero.webp",
+    };
 
     for (const hotel of hotelData) {
       xml += `  <url>\n`;
@@ -155,6 +179,13 @@ Sitemap: https://protels.com/sitemap.xml
       xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.9</priority>\n`;
+      xml += addHreflangTags(`/hotels/${hotel.slug}`);
+      if (hotelImages[hotel.slug]) {
+        xml += `    <image:image>\n`;
+        xml += `      <image:loc>${baseUrl}${hotelImages[hotel.slug]}</image:loc>\n`;
+        xml += `      <image:title>${hotel.slug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())} Resort</image:title>\n`;
+        xml += `    </image:image>\n`;
+      }
       xml += `  </url>\n`;
 
       for (const section of hotel.sections) {
@@ -164,6 +195,7 @@ Sitemap: https://protels.com/sitemap.xml
         xml += `    <lastmod>${today}</lastmod>\n`;
         xml += `    <changefreq>weekly</changefreq>\n`;
         xml += `    <priority>0.7</priority>\n`;
+        xml += addHreflangTags(`/hotels/${hotel.slug}/${section}`);
         xml += `  </url>\n`;
       }
     }
@@ -177,6 +209,12 @@ Sitemap: https://protels.com/sitemap.xml
         xml += `    <lastmod>${post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today}</lastmod>\n`;
         xml += `    <changefreq>weekly</changefreq>\n`;
         xml += `    <priority>0.7</priority>\n`;
+        xml += addHreflangTags(`/blog/${encodedSlug}`);
+        if ((post as any).featuredImage) {
+          xml += `    <image:image>\n`;
+          xml += `      <image:loc>${baseUrl}${(post as any).featuredImage}</image:loc>\n`;
+          xml += `    </image:image>\n`;
+        }
         xml += `  </url>\n`;
       }
     } catch (e) {
