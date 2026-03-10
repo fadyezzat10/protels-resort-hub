@@ -1048,13 +1048,13 @@ Sitemap: https://protels.com/sitemap.xml
 
   app.get("/api/public/settings/:key", async (req, res) => {
     const setting = await storage.getSetting(req.params.key);
-    if (!setting) return res.status(404).json({ message: "Not found" });
+    if (!setting) return res.json(null);
     res.json(setting);
   });
 
   app.get("/api/public/seo/:path", async (req, res) => {
     const seo = await storage.getSeoByPath(req.params.path);
-    if (!seo) return res.status(404).json({ message: "Not found" });
+    if (!seo) return res.json(null);
     res.json(seo);
   });
 
