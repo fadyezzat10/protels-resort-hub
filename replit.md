@@ -102,7 +102,7 @@ Preferred communication style: Simple, everyday language.
 **Database Tables:**
 - `users` – Admin/CMS users (id, username, password, role)
 - `pages` – CMS-managed pages with multilingual content (title/content stored as JSONB `Record<string, string>`)
-- `hotels` – Hotel entries with descriptions (JSONB), features, rooms, gallery, dining details, map links
+- `hotels` – Hotel entries with descriptions (JSONB), features, rooms, gallery, dining details, map links, ratings (JSONB array of platform ratings)
 - `media` – Uploaded media file metadata
 - `blogPosts` – Blog articles with multilingual title/content/excerpt (JSONB), SEO fields, hotel linking, featured image
 - `globalSettings` – Key-value settings store

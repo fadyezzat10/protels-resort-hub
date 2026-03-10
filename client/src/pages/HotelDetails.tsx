@@ -184,180 +184,94 @@ export default function HotelDetails() {
                   {hotel.description[language] || hotel.description.en}
                 </p>
                 
-                {/* Review Links */}
-                {hotel.id === "crystal-beach" && (
-                  <div className="mt-8 pt-8 border-t border-gray-100">
-                    <h3 className="text-xl font-serif text-brand-blue mb-6">{t("hotel.reviews")}</h3>
-                    <div className="flex flex-wrap gap-4">
-                      {/* Google Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-brand-gold text-brand-blue hover:bg-brand-gold hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm group"
-                      >
-                        <a href="https://www.google.com/travel/hotels/entity/CgoI4MiL4MqIv7s9EAE/reviews" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" className="group-hover:fill-white"/>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" className="group-hover:fill-white"/>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" className="group-hover:fill-white"/>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" className="group-hover:fill-white"/>
-                          </svg>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">{t("hotel.googleReviews")}</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-
-                      {/* TripAdvisor Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-brand-gold text-brand-blue hover:bg-brand-gold hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm group"
-                      >
-                        <a href="https://www.tripadvisor.com/Hotel_Review-g311425-d25806577-Reviews-Protels_Crystal_Beach_Resort-Marsa_Alam_Red_Sea_and_Sinai.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" className="text-[#00AF87] group-hover:text-white"/>
-                            <circle cx="8.5" cy="12" r="2.5" className="text-[#00AF87] group-hover:text-white"/>
-                            <circle cx="15.5" cy="12" r="2.5" className="text-[#00AF87] group-hover:text-white"/>
-                            <path d="M12 14.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-                          </svg>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">TripAdvisor</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-
-                      {/* HolidayCheck Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-brand-gold text-brand-blue hover:bg-brand-gold hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm group"
-                      >
-                        <a href="https://www.holidaycheck.de/hi/protels-crystal-beach-resort/2ec35bc0-c841-31df-a623-7a581476340f" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <div className="w-6 h-6 bg-[#005CA9] group-hover:bg-white rounded flex items-center justify-center text-white group-hover:text-[#005CA9] font-bold text-xs">
-                            HC
-                          </div>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">HolidayCheck</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Review Links for Beach Club */}
-                {hotel.id === "beach-club" && (
-                  <div className="mt-8 pt-8 border-t border-gray-100">
-                    <h3 className="text-xl font-serif text-brand-blue mb-6">{t("hotel.reviews")}</h3>
-                    <div className="flex flex-wrap gap-4">
-                      {/* Google Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-brand-gold text-brand-blue hover:bg-brand-gold hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm group"
-                      >
-                        <a href="https://maps.app.goo.gl/EXBcPe3twgkpnF9KA" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" className="group-hover:fill-white"/>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" className="group-hover:fill-white"/>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" className="group-hover:fill-white"/>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" className="group-hover:fill-white"/>
-                          </svg>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">{t("hotel.googleReviews")}</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-
-                      {/* TripAdvisor Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-brand-gold text-brand-blue hover:bg-brand-gold hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm group"
-                      >
-                        <a href="https://www.tripadvisor.com/Hotel_Review-g311425-d33402481-Reviews-Protels_Beach_Club_Spa-Marsa_Alam_Red_Sea_and_Sinai.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" className="text-[#00AF87] group-hover:text-white"/>
-                            <circle cx="8.5" cy="12" r="2.5" className="text-[#00AF87] group-hover:text-white"/>
-                            <circle cx="15.5" cy="12" r="2.5" className="text-[#00AF87] group-hover:text-white"/>
-                            <path d="M12 14.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-                          </svg>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-400 group-hover:text-white/80 font-medium">TripAdvisor</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Review Links for La Plage */}
-                {hotel.id === "la-plage" && (
-                  <div className="mt-8 pt-8 border-t border-[#8B5A2B]/10">
-                    <h3 className="text-xl font-serif text-[var(--color-brand-blue)] mb-6">{t("hotel.reviews")}</h3>
-                    <div className="flex flex-wrap gap-4">
-                      {/* Google Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-[var(--color-brand-gold)] text-[var(--color-brand-blue)] hover:bg-[var(--color-brand-gold)] hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm hover:shadow-md group bg-white/50 backdrop-blur-sm"
-                      >
-                        <a href="https://g.page/r/CQ2_btA0HUnEEBM/review" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" className="group-hover:fill-white"/>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" className="group-hover:fill-white"/>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" className="group-hover:fill-white"/>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" className="group-hover:fill-white"/>
-                          </svg>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">{t("hotel.googleReviews")}</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-
-                      {/* TripAdvisor Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-[var(--color-brand-gold)] text-[var(--color-brand-blue)] hover:bg-[var(--color-brand-gold)] hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm hover:shadow-md group bg-white/50 backdrop-blur-sm"
-                      >
-                        <a href="https://www.tripadvisor.com/Hotel_Review-g482884-d34015525-Reviews-Protels_La_Plage-Zanzibar_Island_Zanzibar_Archipelago.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" className="text-[#00AF87] group-hover:text-white"/>
-                            <circle cx="8.5" cy="12" r="2.5" className="text-[#00AF87] group-hover:text-white"/>
-                            <circle cx="15.5" cy="12" r="2.5" className="text-[#00AF87] group-hover:text-white"/>
-                            <path d="M12 14.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-                          </svg>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">TripAdvisor</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
-
-                      {/* HolidayCheck Review */}
-                      <Button 
-                        asChild 
-                        variant="outline" 
-                        className="border-[var(--color-brand-gold)] text-[var(--color-brand-blue)] hover:bg-[var(--color-brand-gold)] hover:text-white transition-all duration-300 rounded-lg px-6 py-6 h-auto shadow-sm hover:shadow-md group bg-white/50 backdrop-blur-sm"
-                      >
-                        <a href="https://www.holidaycheck.de/hi/protels-la-plage/1dfdb0c7-0622-42f0-9fe6-c237fc1883a1" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <div className="w-6 h-6 bg-[#005CA9] group-hover:bg-white rounded flex items-center justify-center text-white group-hover:text-[#005CA9] font-bold text-xs">
-                            HC
-                          </div>
-                          <div className="text-left">
-                            <span className="block text-xs text-gray-500 group-hover:text-white/90 font-medium">HolidayCheck</span>
-                            <span className="font-bold">{t("hotel.writeReview")}</span>
-                          </div>
-                        </a>
-                      </Button>
+                {/* Ratings & Review Links - Dynamic from CMS */}
+                {hotel.ratings && hotel.ratings.length > 0 && (
+                  <div className={cn("mt-8 pt-8 border-t", isLaPlage ? "border-[#8B5A2B]/10" : "border-gray-100")}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                      {hotel.ratings.map((r: any) => {
+                        const platformConfig: Record<string, { name: string; color: string; icon: React.ReactNode }> = {
+                          google: {
+                            name: t("hotel.googleReviews"),
+                            color: "#4285F4",
+                            icon: (
+                              <svg className="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                              </svg>
+                            ),
+                          },
+                          tripadvisor: {
+                            name: "TripAdvisor",
+                            color: "#00AF87",
+                            icon: (
+                              <svg className="w-7 h-7" viewBox="0 0 24 24" fill="#00AF87" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                <circle cx="8.5" cy="12" r="2.5"/>
+                                <circle cx="15.5" cy="12" r="2.5"/>
+                              </svg>
+                            ),
+                          },
+                          holidaycheck: {
+                            name: "HolidayCheck",
+                            color: "#005CA9",
+                            icon: (
+                              <div className="w-7 h-7 bg-[#005CA9] rounded flex items-center justify-center text-white font-bold text-xs">
+                                HC
+                              </div>
+                            ),
+                          },
+                        };
+                        const config = platformConfig[r.platform] || { name: r.platform, color: "#666", icon: null };
+                        const filledStars = Math.floor((r.rating / r.maxRating) * 5);
+                        const hasHalf = ((r.rating / r.maxRating) * 5) - filledStars >= 0.25;
+                        return (
+                          <a
+                            key={r.platform}
+                            href={r.reviewUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid={`rating-card-${r.platform}`}
+                            className={cn(
+                              "flex flex-col items-center p-5 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group cursor-pointer",
+                              isLaPlage ? "border-[var(--color-brand-gold)]/30 bg-white/60 backdrop-blur-sm hover:border-[var(--color-brand-gold)]" : "border-brand-gold/30 bg-white hover:border-brand-gold"
+                            )}
+                          >
+                            <div className="mb-2">{config.icon}</div>
+                            <span className="text-xs font-medium text-gray-500 mb-1">{config.name}</span>
+                            <div className="flex items-baseline gap-1 mb-1.5">
+                              <span className="text-2xl font-bold" style={{ color: config.color }}>{r.rating}</span>
+                              <span className="text-sm text-gray-400">/ {r.maxRating}</span>
+                            </div>
+                            <div className="flex gap-0.5 mb-1.5">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <svg key={i} className="w-4 h-4" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  {i < filledStars ? (
+                                    <path d="M10 1l2.39 4.84 5.34.78-3.87 3.77.91 5.33L10 13.27l-4.77 2.45.91-5.33L2.27 6.62l5.34-.78L10 1z" fill="#F59E0B"/>
+                                  ) : i === filledStars && hasHalf ? (
+                                    <>
+                                      <defs>
+                                        <linearGradient id={`half-${r.platform}-${i}`}>
+                                          <stop offset="50%" stopColor="#F59E0B"/>
+                                          <stop offset="50%" stopColor="#D1D5DB"/>
+                                        </linearGradient>
+                                      </defs>
+                                      <path d="M10 1l2.39 4.84 5.34.78-3.87 3.77.91 5.33L10 13.27l-4.77 2.45.91-5.33L2.27 6.62l5.34-.78L10 1z" fill={`url(#half-${r.platform}-${i})`}/>
+                                    </>
+                                  ) : (
+                                    <path d="M10 1l2.39 4.84 5.34.78-3.87 3.77.91 5.33L10 13.27l-4.77 2.45.91-5.33L2.27 6.62l5.34-.78L10 1z" fill="#D1D5DB"/>
+                                  )}
+                                </svg>
+                              ))}
+                            </div>
+                            {r.reviewCount && (
+                              <span className="text-xs text-gray-400">{r.reviewCount} {t("hotel.reviewCount")}</span>
+                            )}
+                            <span className="mt-2 text-xs font-semibold text-brand-gold group-hover:underline">{t("hotel.writeReview")}</span>
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

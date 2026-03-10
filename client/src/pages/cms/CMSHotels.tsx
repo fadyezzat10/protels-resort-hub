@@ -104,6 +104,7 @@ interface HotelForm {
     accentColor: string;
   };
   tabConfig: { id: string; label: string; visible: boolean; order: number }[];
+  ratings: { platform: string; rating: number; maxRating: number; reviewCount: number; reviewUrl: string }[];
 }
 
 const emptyForm: HotelForm = {
@@ -137,6 +138,7 @@ const emptyForm: HotelForm = {
     { id: "features", label: "Features", visible: true, order: 5 },
     { id: "location", label: "Location", visible: true, order: 6 },
   ],
+  ratings: [],
 };
 
 const FEATURE_SUGGESTIONS = [
@@ -255,6 +257,7 @@ export default function CMSHotels() {
     heroVideo: form.heroVideo || null,
     theme: (form.theme.primaryColor || form.theme.secondaryColor || form.theme.accentColor) ? form.theme : null,
     tabConfig: form.tabConfig.length > 0 ? { tabs: form.tabConfig } : null,
+    ratings: form.ratings.length > 0 ? form.ratings : null,
   });
 
   const handleSubmit = () => {
@@ -307,6 +310,7 @@ export default function CMSHotels() {
         { id: "features", label: "Features", visible: true, order: 5 },
         { id: "location", label: "Location", visible: true, order: 6 },
       ],
+      ratings: hotel.ratings || [],
     });
     setExpandedRooms(new Set());
     setView("editor");
@@ -505,6 +509,10 @@ export default function CMSHotels() {
             <TabsTrigger data-testid="tab-tabconfig" value="tabconfig" className="flex items-center gap-1.5 text-xs sm:text-sm">
               <ListOrdered className="w-3.5 h-3.5" />
               التبويبات
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-ratings" value="ratings" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <Star className="w-3.5 h-3.5" />
+              التقييمات
             </TabsTrigger>
           </TabsList>
 
@@ -1310,6 +1318,122 @@ export default function CMSHotels() {
                       >
                         {tab.visible ? <Eye className="w-4 h-4 text-green-600" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
                       </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ratings">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <div className="flex items-center justify-between border-b pb-3">
+                <h3 className="text-lg font-semibold text-brand-blue">تقييمات المنصات</h3>
+                <Button
+                  type="button"
+                  size="sm"
+                  data-testid="button-add-rating"
+                  onClick={() => {
+                    setForm({
+                      ...form,
+                      ratings: [...form.ratings, { platform: "google", rating: 0, maxRating: 5, reviewCount: 0, reviewUrl: "" }],
+                    });
+                  }}
+                  className="bg-brand-blue hover:bg-brand-blue/90"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> إضافة تقييم
+                </Button>
+              </div>
+              <p className="text-sm text-gray-500">أضف تقييمات الفندق من المنصات المختلفة (Google, TripAdvisor, HolidayCheck)</p>
+              {form.ratings.length === 0 && (
+                <div className="text-center py-8 text-gray-400">
+                  <Star className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>لا توجد تقييمات بعد. اضغط "إضافة تقييم" لإضافة أول تقييم.</p>
+                </div>
+              )}
+              <div className="space-y-4">
+                {form.ratings.map((rating, idx) => (
+                  <div key={idx} className="border rounded-lg p-4 bg-gray-50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-brand-blue">تقييم #{idx + 1}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        data-testid={`button-remove-rating-${idx}`}
+                        onClick={() => {
+                          const updated = form.ratings.filter((_, i) => i !== idx);
+                          setForm({ ...form, ratings: updated });
+                        }}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">المنصة</label>
+                        <Select
+                          value={rating.platform}
+                          onValueChange={(val) => {
+                            const updated = [...form.ratings];
+                            updated[idx] = { ...updated[idx], platform: val, maxRating: val === "holidaycheck" ? 6 : 5 };
+                            setForm({ ...form, ratings: updated });
+                          }}
+                        >
+                          <SelectTrigger data-testid={`select-platform-${idx}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="google">Google</SelectItem>
+                            <SelectItem value="tripadvisor">TripAdvisor</SelectItem>
+                            <SelectItem value="holidaycheck">HolidayCheck</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">التقييم (من {rating.maxRating})</label>
+                        <Input
+                          data-testid={`input-rating-${idx}`}
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max={rating.maxRating}
+                          value={rating.rating}
+                          onChange={(e) => {
+                            const updated = [...form.ratings];
+                            updated[idx] = { ...updated[idx], rating: parseFloat(e.target.value) || 0 };
+                            setForm({ ...form, ratings: updated });
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">عدد التقييمات</label>
+                        <Input
+                          data-testid={`input-review-count-${idx}`}
+                          type="number"
+                          min="0"
+                          value={rating.reviewCount}
+                          onChange={(e) => {
+                            const updated = [...form.ratings];
+                            updated[idx] = { ...updated[idx], reviewCount: parseInt(e.target.value) || 0 };
+                            setForm({ ...form, ratings: updated });
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">رابط صفحة التقييمات</label>
+                        <Input
+                          data-testid={`input-review-url-${idx}`}
+                          value={rating.reviewUrl}
+                          onChange={(e) => {
+                            const updated = [...form.ratings];
+                            updated[idx] = { ...updated[idx], reviewUrl: e.target.value };
+                            setForm({ ...form, ratings: updated });
+                          }}
+                          placeholder="https://..."
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
