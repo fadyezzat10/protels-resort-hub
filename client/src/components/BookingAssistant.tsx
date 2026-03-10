@@ -142,6 +142,7 @@ export default function BookingAssistant() {
         <button
           data-testid="button-open-chatbot"
           onClick={() => setIsOpen(true)}
+          aria-label={siteIsArabic ? "فتح مساعد الحجز" : "Open booking assistant chat"}
           className="chatbot-fab fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#1a2744] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-full pl-5 pr-3 py-3"
           style={{ direction: siteIsArabic ? "rtl" : "ltr" }}
         >

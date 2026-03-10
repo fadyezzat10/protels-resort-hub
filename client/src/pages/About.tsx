@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Star, Anchor, Sun, Heart, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState, useCallback } from "react";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 // Images
 import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.png";
@@ -130,6 +131,7 @@ export default function About() {
         jsonLd={aboutJsonLd}
       />
       <Navbar />
+      <PageBreadcrumb items={[{ label: t("nav.about") }]} />
       
       {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">

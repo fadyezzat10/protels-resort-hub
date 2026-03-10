@@ -5,11 +5,16 @@ import EditableText from "@/components/EditableText";
 import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
 import { useI18n } from "@/lib/i18n";
 import { usePageHeroImage } from "@/lib/cms";
-import { Mail, Phone, MapPin, Smartphone, Globe } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
+import { useState } from "react";
 
-// Configuration object for hotel contact details
 const hotelsContactInfo = [
   {
     id: "crystal-beach",
@@ -65,12 +70,47 @@ const hotelsContactInfo = [
   }
 ];
 
+const hotelOptions = [
+  { value: "crystal-beach", label: "Protels Crystal Beach Resort" },
+  { value: "beach-club", label: "Protels Beach Club & SPA" },
+  { value: "royal-bay", label: "Protels Royal Bay Resort & Spa" },
+  { value: "la-plage", label: "Protels La Plage – Zanzibar" },
+];
+
 export default function Contact() {
   const { t, language } = useI18n();
   const heroImg = usePageHeroImage("contact", "");
+  const isAr = language === "ar";
+
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", hotel: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSending(true);
+    setStatus("idle");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setFormData({ name: "", email: "", phone: "", hotel: "", message: "" });
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-brand-white">
+    <div className="min-h-screen bg-brand-white" dir={isAr ? "rtl" : "ltr"}>
       <SEOHead
         title="Contact Us | Protels Hotels & Resorts – Get in Touch"
         description="Contact Protels Hotels & Resorts for reservations, inquiries, and support. Find phone numbers, email addresses, and locations for all our resorts in Marsa Alam, Hurghada, and Zanzibar."
@@ -83,6 +123,7 @@ export default function Contact() {
         ])}
       />
       <Navbar />
+      <PageBreadcrumb items={[{ label: t("nav.contact") }]} />
       <Hero 
         image={heroImg}
         title={t("nav.contact")}
@@ -91,7 +132,7 @@ export default function Contact() {
         showButton={false}
         editPrefix="contact.hero"
       />
-      
+
       <div className="container-padding py-20">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <EditableText
@@ -103,11 +144,116 @@ export default function Contact() {
           <div className="w-24 h-1 bg-brand-gold mx-auto" />
         </div>
 
+        <div className="max-w-3xl mx-auto mb-20">
+          <Card className="p-8 md:p-10 border border-gray-100 shadow-sm">
+            <h3 className="text-2xl font-serif text-brand-blue mb-6">{t("contact.form.title")}</h3>
+
+            {status === "success" && (
+              <div data-testid="text-contact-success" className="flex items-center gap-3 bg-green-50 text-green-700 p-4 rounded-md mb-6 border border-green-200">
+                <CheckCircle className="w-5 h-5 shrink-0" />
+                <p className="text-sm">{t("contact.form.success")}</p>
+              </div>
+            )}
+            {status === "error" && (
+              <div data-testid="text-contact-error" className="flex items-center gap-3 bg-red-50 text-red-700 p-4 rounded-md mb-6 border border-red-200">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <p className="text-sm">{t("contact.form.error")}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <Label htmlFor="contact-name">{t("contact.form.name")} *</Label>
+                  <Input
+                    id="contact-name"
+                    data-testid="input-contact-name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+                    placeholder={t("contact.form.namePlaceholder")}
+                    className="bg-gray-50 border-gray-200 focus:border-brand-gold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contact-email">{t("contact.form.email")} *</Label>
+                  <Input
+                    id="contact-email"
+                    data-testid="input-contact-email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
+                    placeholder={t("contact.form.emailPlaceholder")}
+                    className="bg-gray-50 border-gray-200 focus:border-brand-gold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <Label htmlFor="contact-phone">{t("contact.form.phone")}</Label>
+                  <Input
+                    id="contact-phone"
+                    data-testid="input-contact-phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData(p => ({ ...p, phone: e.target.value }))}
+                    placeholder={t("contact.form.phonePlaceholder")}
+                    className="bg-gray-50 border-gray-200 focus:border-brand-gold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("contact.form.hotel")}</Label>
+                  <Select value={formData.hotel} onValueChange={(v) => setFormData(p => ({ ...p, hotel: v }))}>
+                    <SelectTrigger data-testid="select-contact-hotel" className="bg-gray-50 border-gray-200">
+                      <SelectValue placeholder={t("contact.form.generalInquiry")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">{t("contact.form.generalInquiry")}</SelectItem>
+                      {hotelOptions.map(h => (
+                        <SelectItem key={h.value} value={h.value}>{h.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact-message">{t("contact.form.message")} *</Label>
+                <Textarea
+                  id="contact-message"
+                  data-testid="input-contact-message"
+                  required
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData(p => ({ ...p, message: e.target.value }))}
+                  placeholder={t("contact.form.messagePlaceholder")}
+                  className="bg-gray-50 border-gray-200 focus:border-brand-gold resize-none"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                data-testid="button-contact-submit"
+                disabled={sending}
+                className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-8 py-3 rounded-none uppercase tracking-widest text-xs"
+              >
+                {sending ? t("contact.form.sending") : (
+                  <span className="flex items-center gap-2">
+                    <Send className="w-4 h-4" />
+                    {t("contact.form.submit")}
+                  </span>
+                )}
+              </Button>
+            </form>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 gap-12">
           {hotelsContactInfo.map((hotel) => (
             <Card key={hotel.id} className="overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
               <div className="grid grid-cols-1 lg:grid-cols-3">
-                {/* Contact Details */}
                 <div className="p-8 lg:p-10 lg:col-span-2 bg-white">
                   <div className="flex flex-col h-full">
                     <div className="mb-8">
@@ -120,7 +266,6 @@ export default function Contact() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 flex-grow">
-                      {/* Address */}
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
                           <MapPin className="w-5 h-5" />
@@ -131,7 +276,6 @@ export default function Contact() {
                         </div>
                       </div>
 
-                      {/* Phone & Mobile */}
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
                           <Phone className="w-5 h-5" />
@@ -154,7 +298,6 @@ export default function Contact() {
                         </div>
                       </div>
 
-                      {/* Emails */}
                       <div className="flex items-start gap-4 md:col-span-2">
                         <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
                           <Mail className="w-5 h-5" />
@@ -189,7 +332,6 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* Map Section */}
                 <div className="bg-gray-100 min-h-[300px] lg:min-h-full border-l border-gray-100 relative group">
                   <iframe 
                     src={hotel.mapEmbedUrl}
@@ -199,6 +341,7 @@ export default function Contact() {
                     allowFullScreen 
                     loading="lazy" 
                     referrerPolicy="no-referrer-when-downgrade"
+                    title={`${hotel.name} location map`}
                     className="grayscale group-hover:grayscale-0 transition-all duration-500"
                   />
                   <div className="absolute bottom-4 right-4">

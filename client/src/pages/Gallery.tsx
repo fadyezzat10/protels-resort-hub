@@ -2,16 +2,19 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMergedHotels, useCMSMedia, usePageHeroImage } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { useState, useCallback, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 export default function Gallery() {
   const { t } = useI18n();
-  const { hotels } = useMergedHotels();
-  const { data: cmsMedia } = useCMSMedia();
+  const { hotels, isLoading: hotelsLoading } = useMergedHotels();
+  const { data: cmsMedia, isLoading: mediaLoading } = useCMSMedia();
+  const isLoading = hotelsLoading || mediaLoading;
   const heroImg = usePageHeroImage("gallery", "");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   
@@ -61,6 +64,7 @@ export default function Gallery() {
         ])}
       />
       <Navbar />
+      <PageBreadcrumb items={[{ label: t("nav.gallery") }]} />
       <Hero 
         image={heroImg}
         title={t("nav.gallery")}
@@ -72,39 +76,49 @@ export default function Gallery() {
       
       <div className="container-padding py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-           {allImages.map((img, i) => (
-             <div
-               key={i}
-               className="aspect-square relative group overflow-hidden cursor-pointer"
-               data-testid={`gallery-image-${i}`}
-               onClick={() => openLightbox(i)}
-             >
-               <img loading="lazy" 
-                 src={img.src} 
-                 alt={img.title}
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-               />
-               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                 <p className="text-white font-serif text-xl text-center px-4">{img.title}</p>
+           {isLoading ? (
+             [1, 2, 3, 4, 5, 6].map((i) => (
+               <div key={i} className="aspect-square" data-testid={`skeleton-gallery-${i}`}>
+                 <Skeleton className="w-full h-full rounded-none" />
                </div>
-             </div>
-           ))}
-           {allImages.length <= 4 && allImages.map((img, i) => (
-             <div
-               key={`dup-${i}`}
-               className="aspect-square relative group overflow-hidden cursor-pointer"
-               onClick={() => openLightbox(i)}
-             >
-               <img loading="lazy" 
-                 src={img.src} 
-                 alt={img.title}
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-               />
-               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                 <p className="text-white font-serif text-xl text-center px-4">{img.title}</p>
-               </div>
-             </div>
-           ))}
+             ))
+           ) : (
+             <>
+               {allImages.map((img, i) => (
+                 <div
+                   key={i}
+                   className="aspect-square relative group overflow-hidden cursor-pointer"
+                   data-testid={`gallery-image-${i}`}
+                   onClick={() => openLightbox(i)}
+                 >
+                   <img loading="lazy" 
+                     src={img.src} 
+                     alt={img.title}
+                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                   />
+                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                     <p className="text-white font-serif text-xl text-center px-4">{img.title}</p>
+                   </div>
+                 </div>
+               ))}
+               {allImages.length <= 4 && allImages.map((img, i) => (
+                 <div
+                   key={`dup-${i}`}
+                   className="aspect-square relative group overflow-hidden cursor-pointer"
+                   onClick={() => openLightbox(i)}
+                 >
+                   <img loading="lazy" 
+                     src={img.src} 
+                     alt={img.title}
+                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                   />
+                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                     <p className="text-white font-serif text-xl text-center px-4">{img.title}</p>
+                   </div>
+                 </div>
+               ))}
+             </>
+           )}
         </div>
       </div>
 

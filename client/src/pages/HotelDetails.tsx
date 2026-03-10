@@ -15,6 +15,7 @@ import HotelGallery from "@/components/HotelGallery";
 import RoomModal from "@/components/RoomModal";
 
 import tribalPattern from "@/assets/images/tribal-pattern.webp";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 export default function HotelDetails() {
   const [location, setLocation] = useLocation();
@@ -129,6 +130,10 @@ export default function HotelDetails() {
       )}
       <div className={cn("relative z-10", (isLaPlage || hasCustomTheme) && "hotel-custom-theme")}>
       <Navbar />
+      <PageBreadcrumb items={[
+        { label: t("nav.hotels"), href: "/hotels" },
+        { label: hotel.name },
+      ]} />
       
       <Hero 
         image={hotel.image}

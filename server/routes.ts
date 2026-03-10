@@ -8,12 +8,14 @@ import fs from "fs";
 import { storage } from "./storage";
 import { pool, db } from "./db";
 import { seedAdmin, seedContent, verifyPassword, hashPassword } from "./auth";
-import { insertBlogPostSchema, pageVersions } from "@shared/schema";
+import { insertBlogPostSchema, pageVersions, contactSubmissions, insertContactSubmissionSchema } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import * as pdfParsePkg from "pdf-parse";
 const PDFParse = (pdfParsePkg as any).PDFParse || (pdfParsePkg as any).default?.PDFParse;
 import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
+import rateLimit from "express-rate-limit";
+import sharp from "sharp";
 
 declare module "express-session" {
   interface SessionData {
@@ -228,8 +230,34 @@ Sitemap: https://protels.com/sitemap.xml
     res.send(xml);
   });
 
+  // ──────── RATE LIMITING ────────
+  const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many requests, please try again later." },
+  });
+  app.use("/api/", apiLimiter);
+
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many login attempts, please try again in 15 minutes." },
+  });
+
+  const chatLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many requests. Please wait a moment." },
+  });
+
   // ──────── AUTH ────────
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", authLimiter, async (req, res) => {
     try {
       const { username, password } = req.body;
       if (!username || !password) return res.status(400).json({ message: "Username and password required" });
@@ -414,7 +442,34 @@ Sitemap: https://protels.com/sitemap.xml
     try {
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-      let fileUrl = `/uploads/${req.file.filename}`;
+      let finalFilename = req.file.filename;
+      let finalMimeType = req.file.mimetype;
+      let finalSize = req.file.size;
+      const localPath = path.join(uploadDir, req.file.filename);
+
+      const isImage = /\.(jpe?g|png|gif|bmp|tiff?)$/i.test(req.file.originalname);
+      const isAlreadyWebp = /\.webp$/i.test(req.file.originalname);
+
+      if (isImage && !isAlreadyWebp) {
+        try {
+          const webpFilename = req.file.filename.replace(/\.[^.]+$/, ".webp");
+          const webpPath = path.join(uploadDir, webpFilename);
+          await sharp(localPath)
+            .resize({ width: 1920, withoutEnlargement: true })
+            .webp({ quality: 80 })
+            .toFile(webpPath);
+
+          try { fs.unlinkSync(localPath); } catch {}
+          finalFilename = webpFilename;
+          finalMimeType = "image/webp";
+          finalSize = fs.statSync(webpPath).size;
+          console.log(`[media] Auto-optimized: ${req.file.originalname} → ${webpFilename} (${Math.round(finalSize / 1024)}KB)`);
+        } catch (sharpErr: any) {
+          console.warn(`[media] Auto-optimize failed, keeping original: ${sharpErr.message}`);
+        }
+      }
+
+      let fileUrl = `/uploads/${finalFilename}`;
 
       try {
         const objService = new ObjectStorageService();
@@ -422,7 +477,7 @@ Sitemap: https://protels.com/sitemap.xml
         if (publicPaths.length > 0) {
           const bucketPath = publicPaths[0];
           const { bucketName, objectName } = (() => {
-            const fullPath = `${bucketPath}/${req.file!.filename}`;
+            const fullPath = `${bucketPath}/${finalFilename}`;
             const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
             const parts = p.split("/");
             return { bucketName: parts[1], objectName: parts.slice(2).join("/") };
@@ -432,26 +487,26 @@ Sitemap: https://protels.com/sitemap.xml
           const bucket = objectStorageClient.bucket(bucketName);
           const objFile = bucket.file(objectName);
 
-          const localPath = path.join(uploadDir, req.file!.filename);
+          const finalPath = path.join(uploadDir, finalFilename);
           await new Promise<void>((resolve, reject) => {
-            fs.createReadStream(localPath)
-              .pipe(objFile.createWriteStream({ metadata: { contentType: req.file!.mimetype } }))
+            fs.createReadStream(finalPath)
+              .pipe(objFile.createWriteStream({ metadata: { contentType: finalMimeType } }))
               .on("finish", () => resolve())
               .on("error", (err: Error) => reject(err));
           });
 
-          fileUrl = `/uploads/${req.file!.filename}`;
-          console.log(`[media] Uploaded to Object Storage: ${req.file!.filename}`);
+          fileUrl = `/uploads/${finalFilename}`;
+          console.log(`[media] Uploaded to Object Storage: ${finalFilename}`);
         }
       } catch (objErr: any) {
         console.warn(`[media] Object Storage upload failed, using local: ${objErr.message}`);
       }
 
       const file = await storage.createMedia({
-        filename: req.file.filename,
+        filename: finalFilename,
         originalName: req.file.originalname,
-        mimeType: req.file.mimetype,
-        size: req.file.size,
+        mimeType: finalMimeType,
+        size: finalSize,
         url: fileUrl,
         alt: req.body.alt || "",
       });
@@ -1049,6 +1104,22 @@ Sitemap: https://protels.com/sitemap.xml
     res.json(post);
   });
 
+  // ──────── CONTACT FORM ────────
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const parsed = insertContactSubmissionSchema.parse(req.body);
+      const [submission] = await db.insert(contactSubmissions).values(parsed).returning();
+      res.json({ success: true, id: submission.id });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+
+  app.get("/api/cms/contact-submissions", requireAuth, async (_req, res) => {
+    const results = await db.select().from(contactSubmissions).orderBy(contactSubmissions.createdAt);
+    res.json(results);
+  });
+
   // Dashboard stats
   app.get("/api/cms/dashboard", requireAuth, async (_req, res) => {
     const [allPages, allHotels, allMedia, allUsers, allBlogPosts] = await Promise.all([
@@ -1254,7 +1325,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
 
   const BOOKING_ASSISTANT_SYSTEM = buildSystemPrompt(null);
 
-  app.post("/api/booking-assistant", async (req, res) => {
+  app.post("/api/booking-assistant", chatLimiter, async (req, res) => {
     try {
       const clientIp = req.ip || req.socket.remoteAddress || "unknown";
       const now = Date.now();
@@ -1407,7 +1478,7 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
     }
   }, 5 * 60 * 1000);
 
-  app.post("/chat", async (req, res) => {
+  app.post("/chat", chatLimiter, async (req, res) => {
     try {
       const clientIp = req.ip || req.socket.remoteAddress || "unknown";
       const now = Date.now();

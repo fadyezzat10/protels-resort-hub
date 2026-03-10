@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Calendar, Building2, ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 function fixContentLinks(html: string): string {
   return html.replace(/href="https?:\/\/[^"]*protels[^"]*\/(hotels\/[^"]*|gallery|about|contact|careers|blog[^"]*)"/gi, (match) => {
@@ -147,6 +148,10 @@ export default function BlogArticle() {
         jsonLd={blogArticleJsonLd}
       />
       <Navbar />
+      <PageBreadcrumb items={[
+        { label: isAr ? "المدونة" : "Blog", href: "/blog" },
+        { label: title },
+      ]} />
 
       {post.featuredImage && (
         <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">

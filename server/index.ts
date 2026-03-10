@@ -7,6 +7,7 @@ import { createServer } from "http";
 import path from "path";
 
 const app = express();
+app.set("trust proxy", 1);
 const httpServer = createServer(app);
 
 declare module "http" {

@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import SEOHead, { getBreadcrumbJsonLd } from "@/components/SEOHead";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Building2 } from "lucide-react";
@@ -86,10 +87,19 @@ export default function Blog() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 aspect-[16/10] rounded-sm mb-4" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div key={i} data-testid={`skeleton-blog-${i}`} className="bg-white shadow-sm rounded-sm overflow-hidden border border-gray-100">
+                  <Skeleton className="aspect-[16/10] w-full rounded-none" />
+                  <div className="p-6">
+                    <div className="flex items-center gap-4 mb-3">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                    <Skeleton className="h-5 w-3/4 mb-2" />
+                    <Skeleton className="h-3 w-full mb-1" />
+                    <Skeleton className="h-3 w-full mb-1" />
+                    <Skeleton className="h-3 w-2/3 mb-4" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
                 </div>
               ))}
             </div>

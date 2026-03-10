@@ -11,7 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Upload, Briefcase, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useI18n } from "@/lib/i18n";
 import emailjs from '@emailjs/browser';
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 // Initialize EmailJS with the Public Key from environment variables
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -51,6 +53,7 @@ const experienceLevels = [
 
 export default function Careers() {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -169,6 +172,7 @@ export default function Careers() {
         ])}
       />
       <Navbar />
+      <PageBreadcrumb items={[{ label: t("nav.careers") }]} />
       
       {/* Hero Section */}
       <div className="bg-primary text-white py-32 md:py-48 relative overflow-hidden">

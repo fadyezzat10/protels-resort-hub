@@ -78,7 +78,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-4 group">
             <img 
               src={logoSrc} 
-              alt="PROTELS" 
+              alt="Protels Hotels & Resorts - Home" 
               className={cn(
                 "transition-all duration-300 object-contain h-auto",
                 isScrolled ? "w-[100px] md:w-[140px] invert" : "w-[115px] md:w-[160px]"
@@ -105,6 +105,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Select language"
                 className={cn(
                   "flex items-center gap-2 text-xs tracking-widest uppercase font-medium hover:bg-white/10",
                   isScrolled ? "text-brand-blue hover:bg-brand-blue/5" : "text-white"
@@ -149,6 +150,8 @@ export default function Navbar() {
         <button
           className={cn("md:hidden", isScrolled ? "text-brand-blue" : "text-white")}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
