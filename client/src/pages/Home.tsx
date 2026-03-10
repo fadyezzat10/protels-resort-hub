@@ -10,11 +10,11 @@ import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
 
-import slider1 from "@assets/Gemini_Generated_Image_g6moaog6moaog6mo_1770195209224.png";
-import slider2 from "@assets/DSC05597.png11_1770195240514.png";
-import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.png";
-import slider4 from "@assets/1_1770195252319.png";
-import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.png";
+import slider1 from "@assets/Gemini_Generated_Image_g6moaog6moaog6mo_1770195209224.webp";
+import slider2 from "@assets/DSC05597.png11_1770195240514.webp";
+import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.webp";
+import slider4 from "@assets/1_1770195252319.webp";
+import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.webp";
 
 const staticSliderImages = [slider1, slider2, slider3, slider4, slider5];
 
@@ -189,7 +189,7 @@ export default function Home() {
       </section>
 
       <section className="py-24 bg-brand-blue text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div className="absolute inset-0 opacity-10" style={{backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px)"}}></div>
         <div className="container-padding relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div>
             <EditableText

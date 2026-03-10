@@ -13,10 +13,10 @@ import { useRef, useState, useCallback } from "react";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 // Images
-import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.png";
-import beachClubImg from "@assets/DSC05597.png11_1770196278235.png";
-import royalBayImg from "@assets/WhatsApp_Image_2025-12-22_at_12.58.16_PM_(1)_1770197117342.jpeg";
-import laPlageImg from "@assets/22_1770196761222.png";
+import crystalBeachImg from "@assets/Protels_Crystal_Beach_Resort_1770196464483.webp";
+import beachClubImg from "@assets/DSC05597.png11_1770196278235.webp";
+import royalBayImg from "@assets/WhatsApp_Image_2025-12-22_at_12.58.16_PM_(1)_1770197117342.webp";
+import laPlageImg from "@assets/22_1770196761222.webp";
 export default function About() {
   const { t, language } = useI18n();
   const { data: cmsAbout } = useCMSPage("about");

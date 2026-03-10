@@ -106,21 +106,30 @@ export default function Hero({
         </div>
       ) : (
         <div className="absolute inset-0 w-full h-full">
-          {heroImages.map((_, idx) => (
-            <img
-              key={idx}
-              src={getImgSrc(idx)}
-              alt={`Resort ${idx + 1}`}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading={idx === 0 ? "eager" : "lazy"}
-              {...(idx === 0 ? { fetchPriority: "high" as any } : {})}
-              style={{
-                opacity: idx === currentIndex ? 1 : 0,
-                transition: "opacity 1.5s ease-in-out",
-                zIndex: idx === currentIndex ? 2 : 1,
-              }}
-            />
-          ))}
+          {heroImages.map((_, idx) => {
+            const isVisible = idx === currentIndex;
+            const isPrev = idx === (currentIndex - 1 + heroImages.length) % heroImages.length;
+            const isNext = idx === (currentIndex + 1) % heroImages.length;
+            if (!isVisible && !isPrev && !isNext) return null;
+            return (
+              <img
+                key={idx}
+                src={getImgSrc(idx)}
+                alt={`Resort ${idx + 1}`}
+                width={1920}
+                height={1080}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading={idx === 0 ? "eager" : "lazy"}
+                decoding={idx === 0 ? "sync" : "async"}
+                {...(idx === 0 ? { fetchPriority: "high" as any } : {})}
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transition: "opacity 1.5s ease-in-out",
+                  zIndex: isVisible ? 2 : 1,
+                }}
+              />
+            );
+          })}
         </div>
       )}
       

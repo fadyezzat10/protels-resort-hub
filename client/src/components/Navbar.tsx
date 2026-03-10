@@ -5,7 +5,7 @@ import { useBookingLink, useHeaderLogo, useCMSAllSettings } from "@/lib/cms";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import defaultLogo from "@assets/سش.pngش_1770193463633.png";
+import defaultLogo from "@assets/سش.pngش_1770193463633.webp";
 import { flagComponents } from "@/components/FlagIcons";
 import {
   DropdownMenu,

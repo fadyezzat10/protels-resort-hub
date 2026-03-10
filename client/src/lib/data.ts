@@ -1,7 +1,7 @@
-import crystalBeach from "@assets/Protels_Crystal_Beach_Resort_1770196464483.png";
-import beachClub from "@assets/DSC05597.png11_1770196278235.png";
-import laPlage from "@assets/22_1770196761222.png";
-import royalBay from "@assets/WhatsApp_Image_2026-02-08_at_5.23.31_PM_1770632472363.jpeg";
+import crystalBeach from "@assets/Protels_Crystal_Beach_Resort_1770196464483.webp";
+import beachClub from "@assets/DSC05597.png11_1770196278235.webp";
+import laPlage from "@assets/22_1770196761222.webp";
+import royalBay from "@assets/WhatsApp_Image_2026-02-08_at_5.23.31_PM_1770632472363.webp";
 
 // Gallery Images for La Plage
 import laPlage1 from "@/assets/images/la-plage-1.jpg";

@@ -2,7 +2,7 @@ import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 import { useFooterContent, useHeaderLogo, useMergedHotels } from "@/lib/cms";
-import defaultLogo from "@assets/سش.pngش_1770193463633.png";
+import defaultLogo from "@assets/سش.pngش_1770193463633.webp";
 
 export default function Footer() {
   const { t, language } = useI18n();
