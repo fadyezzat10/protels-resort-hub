@@ -230,6 +230,23 @@ Sitemap: https://protels.com/sitemap.xml
     res.send(xml);
   });
 
+  app.get("/sitemap_index.xml", (_req, res) => {
+    const baseUrl = "https://protels.com";
+    const today = new Date().toISOString().split("T")[0];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    xml += `  <sitemap>\n`;
+    xml += `    <loc>${baseUrl}/sitemap.xml</loc>\n`;
+    xml += `    <lastmod>${today}</lastmod>\n`;
+    xml += `  </sitemap>\n`;
+    xml += `</sitemapindex>`;
+
+    res.set("Content-Type", "application/xml");
+    res.set("Cache-Control", "public, max-age=3600");
+    res.send(xml);
+  });
+
   // ──────── RATE LIMITING ────────
   const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
