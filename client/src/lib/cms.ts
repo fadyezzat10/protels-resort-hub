@@ -7,13 +7,9 @@ const PLACEHOLDER_IMAGE = "https://placehold.co/800x600/1a2744/c4a97d?text=Hotel
 const HOME_DATA_KEY = ["/api/public/home-data"] as const;
 
 async function fetchHomeData(): Promise<{ settings: Record<string, any>; hotels: any[]; seo: any | null }> {
-  try {
-    const res = await fetch("/api/public/home-data");
-    if (!res.ok) return { settings: {}, hotels: [], seo: null };
-    return await res.json();
-  } catch {
-    return { settings: {}, hotels: [], seo: null };
-  }
+  const res = await fetch("/api/public/home-data");
+  if (!res.ok) throw new Error(`home-data ${res.status}`);
+  return res.json();
 }
 
 export function useCMSSetting(key: string) {

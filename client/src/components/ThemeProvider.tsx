@@ -34,7 +34,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           queryKey: ["/api/public/home-data"],
           queryFn: async () => {
             const res = await fetch("/api/public/home-data");
-            if (!res.ok) return { settings: {}, hotels: [], seo: null };
+            if (!res.ok) throw new Error(`home-data ${res.status}`);
             return res.json();
           },
           staleTime: 60000,
