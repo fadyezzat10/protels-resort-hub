@@ -1,7 +1,7 @@
 import { useEffect } from "react";
+import { useCMSSetting, useCMSSeo } from "@/lib/cms";
 import { useLocation } from "wouter";
 import { useI18n } from "@/lib/i18n";
-import { useCMSSetting, useCMSSeo } from "@/lib/cms";
 
 const SUPPORTED_LANGS = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
 

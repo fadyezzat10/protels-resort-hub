@@ -1,7 +1,6 @@
 import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { fetchHomeData } from "@/lib/cms";
 
 interface ThemeData {
   primaryColor?: string;
@@ -16,46 +15,19 @@ interface ThemeData {
   logoMaxHeight?: number;
 }
 
-const SELF_HOSTED_FONTS: Record<string, { heading: string; body: string }> = {
-  "Cormorant Garamond": { heading: "'Cormorant Garamond', serif", body: "'Montserrat', sans-serif" },
-  "Montserrat": { heading: "'Cormorant Garamond', serif", body: "'Montserrat', sans-serif" },
-  "Cairo": { heading: "'Cairo', sans-serif", body: "'Cairo', sans-serif" },
-};
-
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const isCMS = location.startsWith("/controlpanal");
-  const queryClient = useQueryClient();
 
-  const { data: theme } = useQuery<ThemeData | null>({
-    queryKey: ["/api/public/settings", "theme"],
-    queryFn: async () => {
-      try {
-        const homeData = await queryClient.fetchQuery<{ settings: Record<string, any>; hotels: any[]; seo: any | null }>({
-          queryKey: ["/api/public/home-data"],
-          queryFn: fetchHomeData,
-          staleTime: 60000,
-        });
-        return (homeData?.settings?.theme as ThemeData) || null;
-      } catch {
-        try {
-          const res = await fetch("/api/public/settings/theme", { credentials: "include" });
-          if (!res.ok) return null;
-          const data = await res.json();
-          return (data?.value as ThemeData) || null;
-        } catch {
-          return null;
-        }
-      }
-    },
+  const { data: themeSetting } = useQuery<{ key: string; value: ThemeData }>({
+    queryKey: ["/api/public/settings/theme"],
     enabled: !isCMS,
-    staleTime: 60000,
-    retry: false,
   });
 
   useEffect(() => {
-    if (isCMS || !theme) return;
+    if (isCMS || !themeSetting?.value) return;
 
+    const theme = themeSetting.value;
     const root = document.documentElement;
 
     if (theme.primaryColor) {
@@ -77,15 +49,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
 
     if (theme.headingFont) {
-      const fontEntry = SELF_HOSTED_FONTS[theme.headingFont];
-      const value = fontEntry ? fontEntry.heading : `'${theme.headingFont}', serif`;
-      root.style.setProperty("--font-serif", value);
+      root.style.setProperty("--font-serif", `'${theme.headingFont}', serif`);
     }
 
     if (theme.bodyFont) {
-      const fontEntry = SELF_HOSTED_FONTS[theme.bodyFont];
-      const value = fontEntry ? fontEntry.body : `'${theme.bodyFont}', sans-serif`;
-      root.style.setProperty("--font-sans", value);
+      root.style.setProperty("--font-sans", `'${theme.bodyFont}', sans-serif`);
     }
 
     if (theme.logoMaxWidth) {
@@ -94,6 +62,21 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
     if (theme.logoMaxHeight) {
       root.style.setProperty("--logo-max-height", `${theme.logoMaxHeight}px`);
+    }
+
+    const fonts: string[] = [];
+    if (theme.headingFont) fonts.push(theme.headingFont.replace(/\s+/g, "+"));
+    if (theme.bodyFont) fonts.push(theme.bodyFont.replace(/\s+/g, "+"));
+
+    if (fonts.length > 0) {
+      const existingLink = document.getElementById("theme-google-fonts");
+      if (existingLink) existingLink.remove();
+
+      const link = document.createElement("link");
+      link.id = "theme-google-fonts";
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?${fonts.map((f) => `family=${f}:wght@300;400;500;600;700`).join("&")}&display=swap`;
+      document.head.appendChild(link);
     }
 
     return () => {
@@ -105,8 +88,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         "--logo-max-width", "--logo-max-height",
       ];
       props.forEach((p) => root.style.removeProperty(p));
+
+      const existingLink = document.getElementById("theme-google-fonts");
+      if (existingLink) existingLink.remove();
     };
-  }, [isCMS, theme]);
+  }, [isCMS, themeSetting]);
 
   return <>{children}</>;
 }

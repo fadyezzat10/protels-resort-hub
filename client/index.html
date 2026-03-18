@@ -49,26 +49,17 @@
     }
     </script>
 
-    <!-- Preload LCP hero image – responsive: mobile gets 28KB version, desktop 80KB -->
-    <link rel="preload" as="image"
-      href="/hero-lcp.webp"
-      imagesrcset="/hero-lcp-mobile.webp 768w, /hero-lcp.webp 1344w"
-      imagesizes="100vw"
-      fetchpriority="high"
-      type="image/webp" />
+    <!-- Preload LCP hero image -->
+    <link rel="preload" as="image" href="/hero-lcp.webp" fetchpriority="high" type="image/webp" />
 
-    <!-- Self-hosted fonts: preload critical body/heading fonts (same-origin, no DNS overhead) -->
-    <link rel="preload" as="font" href="/fonts/montserrat_400_latin.woff2" type="font/woff2" crossorigin>
-    <link rel="preload" as="font" href="/fonts/montserrat_600_latin.woff2" type="font/woff2" crossorigin>
-    <link rel="preload" as="font" href="/fonts/cairo_400_arabic.woff2" type="font/woff2" crossorigin>
-    <link rel="preload" as="font" href="/fonts/cormorant_garamond_700_latin.woff2" type="font/woff2" crossorigin>
+    <!-- Fonts: non-render-blocking -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@400;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-    <link rel="preconnect" href="https://img.youtube.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
-    <link rel="dns-prefetch" href="https://img.youtube.com">
-    <link rel="dns-prefetch" href="https://www.youtube.com">
 
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -81,7 +72,6 @@
     <script>
       window.addEventListener('load', function() {
         setTimeout(function() {
-          if (!navigator.onLine) return;
           var s = document.createElement('script');
           s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BXC9JE5F1T';
           s.async = true;
@@ -92,41 +82,12 @@
           gtag('js', new Date());
           gtag('config', 'G-BXC9JE5F1T');
           gtag('config', 'AW-17918703028');
-        }, 4000);
+        }, 2000);
       });
     </script>
-    <!-- Critical inline CSS: paint navbar + hero shell before React hydrates -->
-    <style>
-      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-      html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-      body{background:#0f1c2e;color:#fff;font-family:'Montserrat',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-      #root{min-height:100dvh}
-      #shell-nav{position:fixed;top:0;left:0;right:0;height:72px;background:rgba(15,28,46,.85);backdrop-filter:blur(8px);z-index:50;display:flex;align-items:center;padding:0 24px}
-      #shell-hero{height:100dvh;background:#0f1c2e url('/hero-lcp.webp') center/cover no-repeat;display:flex;align-items:flex-end;padding-bottom:80px}
-      @media(max-width:767px){#shell-hero{background-image:url('/hero-lcp-mobile.webp')}}
-    </style>
   </head>
   <body>
-    <!-- Instant shell: shows hero bg while React JS downloads -->
-    <div id="shell-nav" aria-hidden="true"></div>
-    <div id="shell-hero" aria-hidden="true"></div>
     <div id="root"></div>
-    <script>
-      (function(){
-        var root=document.getElementById('root');
-        if(!root) return;
-        var obs=new MutationObserver(function(){
-          if(root.children.length){
-            var sn=document.getElementById('shell-nav');
-            var sh=document.getElementById('shell-hero');
-            if(sn)sn.remove();
-            if(sh)sh.remove();
-            obs.disconnect();
-          }
-        });
-        obs.observe(root,{childList:true});
-      })();
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

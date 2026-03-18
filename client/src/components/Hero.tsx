@@ -120,8 +120,8 @@ export default function Hero({
                 height={1080}
                 className="absolute inset-0 w-full h-full object-cover"
                 loading={idx === 0 ? "eager" : "lazy"}
-                decoding="async"
-                fetchPriority={idx === 0 ? "high" : "low"}
+                decoding={idx === 0 ? "sync" : "async"}
+                {...(idx === 0 ? { fetchPriority: "high" as any } : {})}
                 style={{
                   opacity: isVisible ? 1 : 0,
                   transition: "opacity 1.5s ease-in-out",

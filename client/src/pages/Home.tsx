@@ -5,19 +5,17 @@ import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
 import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd, getFAQJsonLd } from "@/components/SEOHead";
-import { useHomeData, buildMergedHotels } from "@/lib/cms";
-import { bookingLink as staticBookingLink } from "@/lib/data";
+import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback } from "react";
 
-const staticSliderImages = [
-  "/hero-lcp.webp",
-  "/images/hero-slide-2.webp",
-  "/images/hero-slide-3.webp",
-  "/images/hero-slide-4.webp",
-  "/images/hero-slide-5.webp",
-];
+import slider2 from "@assets/DSC05597.png11_1770195240514.webp";
+import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.webp";
+import slider4 from "@assets/1_1770195252319.webp";
+import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.webp";
+
+const staticSliderImages = ["/hero-lcp.webp", slider2, slider3, slider4, slider5];
 
 export function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
@@ -113,27 +111,10 @@ function RoyalBayVideoSection({ videoUrl, title, description }: { videoUrl: stri
 
 export default function Home() {
   const { t, language } = useI18n();
-
-  const { data: homeData } = useHomeData();
-
-  const settings = homeData?.settings ?? {};
-  const cmsHotels = homeData?.hotels ?? null;
-
-  const hotels = useMemo(() => buildMergedHotels(cmsHotels), [cmsHotels]);
-
-  const heroTitle = settings?.hero_title?.[language] || settings?.hero_title?.en || null;
-  const heroSubtitle = settings?.hero_subtitle?.[language] || settings?.hero_subtitle?.en || null;
-  const heroImages: string[] = settings?.hero_images?.length ? settings.hero_images : [];
-  const heroVideo: string | null = settings?.hero_video || null;
-
-  const bookingLink: string = settings?.booking_link || staticBookingLink;
-
-  const royalBay = {
-    videoUrl: (settings?.royal_bay_video_url as string) || "",
-    title: settings?.royal_bay_video_title?.[language] || settings?.royal_bay_video_title?.en || "",
-    description: settings?.royal_bay_video_description?.[language] || settings?.royal_bay_video_description?.en || "",
-    visible: settings?.royal_bay_video_visible !== false,
-  };
+  const { hotels } = useMergedHotels();
+  const { heroTitle, heroSubtitle, heroImages, heroVideo } = useHeroContent(language);
+  const bookingLink = useBookingLink();
+  const royalBay = useRoyalBayVideo(language);
 
   const finalHeroImages = heroImages.length > 0 ? heroImages : staticSliderImages;
 
@@ -175,16 +156,14 @@ export default function Home() {
       />
 
       {royalBay.visible && royalBay.videoUrl && (
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}>
-          <RoyalBayVideoSection
-            videoUrl={royalBay.videoUrl}
-            title={royalBay.title}
-            description={royalBay.description}
-          />
-        </div>
+        <RoyalBayVideoSection
+          videoUrl={royalBay.videoUrl}
+          title={royalBay.title}
+          description={royalBay.description}
+        />
       )}
 
-      <section className="py-20 container-padding" style={{ contentVisibility: "auto", containIntrinsicSize: "auto 600px" }}>
+      <section className="py-20 container-padding">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <EditableText
             contentKey="home.featured.subtitle"
@@ -208,7 +187,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-brand-blue text-white relative overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}>
+      <section className="py-24 bg-brand-blue text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px)"}}></div>
         <div className="container-padding relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div>
