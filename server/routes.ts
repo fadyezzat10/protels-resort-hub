@@ -1037,7 +1037,7 @@ Sitemap: https://protels.com/sitemap.xml
         bookingLink: h.bookingLink,
         heroVideo: h.heroVideo,
         theme: h.theme,
-        ratings: (h as any).ratings,
+        ratings: h.ratings,
       }));
 
     const result = { settings: settingsMap, hotels, seo: seo || null };

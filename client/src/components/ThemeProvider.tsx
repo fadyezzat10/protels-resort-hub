@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { fetchHomeData } from "@/lib/cms";
 
 interface ThemeData {
   primaryColor?: string;
@@ -32,11 +33,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       try {
         const homeData = await queryClient.fetchQuery<{ settings: Record<string, any>; hotels: any[]; seo: any | null }>({
           queryKey: ["/api/public/home-data"],
-          queryFn: async () => {
-            const res = await fetch("/api/public/home-data");
-            if (!res.ok) throw new Error(`home-data ${res.status}`);
-            return res.json();
-          },
+          queryFn: fetchHomeData,
           staleTime: 60000,
         });
         return (homeData?.settings?.theme as ThemeData) || null;

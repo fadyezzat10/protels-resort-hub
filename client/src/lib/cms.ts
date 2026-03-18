@@ -6,7 +6,7 @@ const PLACEHOLDER_IMAGE = "https://placehold.co/800x600/1a2744/c4a97d?text=Hotel
 
 const HOME_DATA_KEY = ["/api/public/home-data"] as const;
 
-async function fetchHomeData(): Promise<{ settings: Record<string, any>; hotels: any[]; seo: any | null }> {
+export async function fetchHomeData(): Promise<{ settings: Record<string, any>; hotels: any[]; seo: any | null }> {
   const res = await fetch("/api/public/home-data");
   if (!res.ok) throw new Error(`home-data ${res.status}`);
   return res.json();
