@@ -1,7 +1,20 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { hotels as staticHotels, type Hotel as StaticHotel, bookingLink as staticBookingLink } from "@/lib/data";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/800x600/1a2744/c4a97d?text=Hotel";
+
+const HOME_DATA_KEY = ["/api/public/home-data"] as const;
+
+async function fetchHomeData(): Promise<{ settings: Record<string, any>; hotels: any[]; seo: any | null }> {
+  try {
+    const res = await fetch("/api/public/home-data");
+    if (!res.ok) return { settings: {}, hotels: [], seo: null };
+    return await res.json();
+  } catch {
+    return { settings: {}, hotels: [], seo: null };
+  }
+}
 
 export function useCMSSetting(key: string) {
   return useQuery({
@@ -21,10 +34,26 @@ export function useCMSSetting(key: string) {
   });
 }
 
+/**
+ * useCMSAllSettings — fetches settings, piggybacking on the home-data request when
+ * it is already in-flight (React Query deduplicates by key). Falls back to direct
+ * /api/public/settings fetch on pages where home-data is not in-flight/cached.
+ */
 export function useCMSAllSettings() {
+  const queryClient = useQueryClient();
   return useQuery<Record<string, any>>({
     queryKey: ["/api/public/settings"],
     queryFn: async () => {
+      try {
+        const homeData = await queryClient.fetchQuery({
+          queryKey: HOME_DATA_KEY,
+          queryFn: fetchHomeData,
+          staleTime: 60000,
+        });
+        if (homeData?.settings && Object.keys(homeData.settings).length > 0) {
+          return homeData.settings;
+        }
+      } catch {}
       try {
         const res = await fetch("/api/public/settings");
         if (!res.ok) return {};
@@ -39,47 +68,54 @@ export function useCMSAllSettings() {
 }
 
 /**
- * useHomeData — fetches /api/public/home-data (settings + hotels + seo) in ONE request.
- * After resolving, it populates the individual query caches so that
- * useCMSAllSettings, useCMSHotels, useCMSSetting, useCMSSeo("/") all return
- * data immediately without firing additional HTTP requests.
+ * useHomeData — primary hook for the homepage.
+ * Fetches /api/public/home-data once and populates all individual caches via useEffect,
+ * so subsequent renders of useCMSAllSettings, useCMSHotels, useCMSSeo("/") need zero extra requests.
  */
 export function useHomeData() {
   const queryClient = useQueryClient();
-  return useQuery<{ settings: Record<string, any>; hotels: any[]; seo: any | null }>({
-    queryKey: ["/api/public/home-data"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/public/home-data");
-        if (!res.ok) return { settings: {}, hotels: [], seo: null };
-        const data = await res.json();
-
-        if (data.settings) {
-          queryClient.setQueryData(["/api/public/settings"], data.settings);
-          for (const [key, value] of Object.entries(data.settings)) {
-            queryClient.setQueryData(["/api/public/settings", key], { key, value });
-          }
-        }
-        if (data.hotels) {
-          queryClient.setQueryData(["/api/public/hotels"], data.hotels);
-        }
-        if (data.seo !== undefined) {
-          queryClient.setQueryData(["/api/public/seo", "/"], data.seo);
-        }
-        return data;
-      } catch {
-        return { settings: {}, hotels: [], seo: null };
-      }
-    },
+  const result = useQuery<{ settings: Record<string, any>; hotels: any[]; seo: any | null }>({
+    queryKey: HOME_DATA_KEY,
+    queryFn: fetchHomeData,
     staleTime: 60000,
     retry: false,
   });
+
+  useEffect(() => {
+    const data = result.data;
+    if (!data) return;
+    if (data.settings && Object.keys(data.settings).length > 0) {
+      queryClient.setQueryData(["/api/public/settings"], data.settings);
+      for (const [key, value] of Object.entries(data.settings)) {
+        queryClient.setQueryData(["/api/public/settings", key], value);
+      }
+    }
+    if (data.hotels?.length) {
+      queryClient.setQueryData(["/api/public/hotels"], data.hotels);
+    }
+    if (data.seo !== undefined) {
+      queryClient.setQueryData(["/api/public/seo", "/"], data.seo);
+    }
+  }, [result.data, queryClient]);
+
+  return result;
 }
 
 export function useCMSSeo(path: string) {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["/api/public/seo", path],
     queryFn: async () => {
+      if (path === "/") {
+        try {
+          const homeData = await queryClient.fetchQuery({
+            queryKey: HOME_DATA_KEY,
+            queryFn: fetchHomeData,
+            staleTime: 60000,
+          });
+          if (homeData !== undefined) return homeData.seo ?? null;
+        } catch {}
+      }
       try {
         const res = await fetch(`/api/public/seo/${encodeURIComponent(path)}`);
         if (!res.ok) return null;
@@ -111,9 +147,18 @@ export function useCMSPage(slug: string) {
 }
 
 export function useCMSHotels() {
+  const queryClient = useQueryClient();
   return useQuery<any[] | null>({
     queryKey: ["/api/public/hotels"],
     queryFn: async () => {
+      try {
+        const homeData = await queryClient.fetchQuery({
+          queryKey: HOME_DATA_KEY,
+          queryFn: fetchHomeData,
+          staleTime: 60000,
+        });
+        if (homeData?.hotels?.length) return homeData.hotels;
+      } catch {}
       try {
         const res = await fetch("/api/public/hotels");
         if (!res.ok) return null;
@@ -122,7 +167,7 @@ export function useCMSHotels() {
         return null;
       }
     },
-    staleTime: 30000,
+    staleTime: 60000,
     retry: false,
   });
 }
@@ -144,7 +189,7 @@ export function useCMSHotel(slug: string) {
   });
 }
 
-function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
+export function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
   return {
     ...staticHotel,
     name: cmsHotel.name || staticHotel.name,
@@ -169,19 +214,12 @@ function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
   };
 }
 
-export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean } {
-  const { data: cmsHotels, isLoading } = useCMSHotels();
-
-  if (!cmsHotels || cmsHotels.length === 0) {
-    return { hotels: staticHotels, isLoading };
-  }
+export function buildMergedHotels(cmsHotels: any[] | null | undefined): StaticHotel[] {
+  if (!cmsHotels || cmsHotels.length === 0) return staticHotels;
 
   const merged = staticHotels.map((staticHotel) => {
     const cmsMatch = cmsHotels.find((ch: any) => ch.slug === staticHotel.id);
-    if (cmsMatch) {
-      return mergeCMSHotel(staticHotel, cmsMatch);
-    }
-    return staticHotel;
+    return cmsMatch ? mergeCMSHotel(staticHotel, cmsMatch) : staticHotel;
   });
 
   const newCMSHotels = cmsHotels
@@ -203,7 +241,12 @@ export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean }
       ratings: ch.ratings,
     }));
 
-  return { hotels: [...merged, ...newCMSHotels], isLoading };
+  return [...merged, ...newCMSHotels];
+}
+
+export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean } {
+  const { data: cmsHotels, isLoading } = useCMSHotels();
+  return { hotels: buildMergedHotels(cmsHotels), isLoading };
 }
 
 export function useCMSMedia() {

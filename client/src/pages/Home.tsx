@@ -5,10 +5,11 @@ import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
 import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd, getFAQJsonLd } from "@/components/SEOHead";
-import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo, useHomeData } from "@/lib/cms";
+import { useHomeData, buildMergedHotels } from "@/lib/cms";
+import { bookingLink as staticBookingLink } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 
 import slider2 from "@assets/DSC05597.png11_1770195240514.webp";
 import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.webp";
@@ -111,11 +112,27 @@ function RoyalBayVideoSection({ videoUrl, title, description }: { videoUrl: stri
 
 export default function Home() {
   const { t, language } = useI18n();
-  useHomeData(); // ONE request → populates settings, hotels & seo caches simultaneously
-  const { hotels } = useMergedHotels();
-  const { heroTitle, heroSubtitle, heroImages, heroVideo } = useHeroContent(language);
-  const bookingLink = useBookingLink();
-  const royalBay = useRoyalBayVideo(language);
+
+  const { data: homeData } = useHomeData();
+
+  const settings = homeData?.settings ?? {};
+  const cmsHotels = homeData?.hotels ?? null;
+
+  const hotels = useMemo(() => buildMergedHotels(cmsHotels), [cmsHotels]);
+
+  const heroTitle = settings?.hero_title?.[language] || settings?.hero_title?.en || null;
+  const heroSubtitle = settings?.hero_subtitle?.[language] || settings?.hero_subtitle?.en || null;
+  const heroImages: string[] = settings?.hero_images?.length ? settings.hero_images : [];
+  const heroVideo: string | null = settings?.hero_video || null;
+
+  const bookingLink: string = settings?.booking_link || staticBookingLink;
+
+  const royalBay = {
+    videoUrl: (settings?.royal_bay_video_url as string) || "",
+    title: settings?.royal_bay_video_title?.[language] || settings?.royal_bay_video_title?.en || "",
+    description: settings?.royal_bay_video_description?.[language] || settings?.royal_bay_video_description?.en || "",
+    visible: settings?.royal_bay_video_visible !== false,
+  };
 
   const finalHeroImages = heroImages.length > 0 ? heroImages : staticSliderImages;
 
