@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 
 interface ThemeData {
@@ -24,17 +24,31 @@ const SELF_HOSTED_FONTS: Record<string, { heading: string; body: string }> = {
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const isCMS = location.startsWith("/controlpanal");
+  const queryClient = useQueryClient();
 
   const { data: theme } = useQuery<ThemeData | null>({
     queryKey: ["/api/public/settings", "theme"],
     queryFn: async () => {
       try {
-        const res = await fetch("/api/public/settings/theme", { credentials: "include" });
-        if (!res.ok) return null;
-        const data = await res.json();
-        return (data?.value as ThemeData) || null;
+        const homeData = await queryClient.fetchQuery<{ settings: Record<string, any>; hotels: any[]; seo: any | null }>({
+          queryKey: ["/api/public/home-data"],
+          queryFn: async () => {
+            const res = await fetch("/api/public/home-data");
+            if (!res.ok) return { settings: {}, hotels: [], seo: null };
+            return res.json();
+          },
+          staleTime: 60000,
+        });
+        return (homeData?.settings?.theme as ThemeData) || null;
       } catch {
-        return null;
+        try {
+          const res = await fetch("/api/public/settings/theme", { credentials: "include" });
+          if (!res.ok) return null;
+          const data = await res.json();
+          return (data?.value as ThemeData) || null;
+        } catch {
+          return null;
+        }
       }
     },
     enabled: !isCMS,

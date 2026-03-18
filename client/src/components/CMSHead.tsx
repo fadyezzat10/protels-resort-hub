@@ -1,70 +1,16 @@
 import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useI18n } from "@/lib/i18n";
+import { useCMSSetting, useCMSSeo } from "@/lib/cms";
 
 const SUPPORTED_LANGS = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
-
-function useSettingWithHomeDataFallback(key: string) {
-  const queryClient = useQueryClient();
-  return useQuery<any>({
-    queryKey: ["/api/public/settings", key],
-    queryFn: async () => {
-      try {
-        const res = await fetch(`/api/public/settings/${key}`);
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data.value;
-      } catch {
-        return null;
-      }
-    },
-    staleTime: 60000,
-    retry: false,
-    initialData: () => {
-      const hd = queryClient.getQueryData<any>(["/api/public/home-data"]);
-      const val = hd?.settings?.[key];
-      return val !== undefined ? val : undefined;
-    },
-    initialDataUpdatedAt: () => {
-      return queryClient.getQueryState(["/api/public/home-data"])?.dataUpdatedAt;
-    },
-  });
-}
-
-function useSeoWithHomeDataFallback(path: string) {
-  const queryClient = useQueryClient();
-  return useQuery<any>({
-    queryKey: ["/api/public/seo", path],
-    queryFn: async () => {
-      try {
-        const res = await fetch(`/api/public/seo/${encodeURIComponent(path)}`);
-        if (!res.ok) return null;
-        return await res.json();
-      } catch {
-        return null;
-      }
-    },
-    staleTime: 60000,
-    retry: false,
-    initialData: () => {
-      if (path !== "/") return undefined;
-      const hd = queryClient.getQueryData<any>(["/api/public/home-data"]);
-      return hd?.seo !== undefined ? hd.seo : undefined;
-    },
-    initialDataUpdatedAt: () => {
-      if (path !== "/") return undefined;
-      return queryClient.getQueryState(["/api/public/home-data"])?.dataUpdatedAt;
-    },
-  });
-}
 
 export default function CMSHead() {
   const [location] = useLocation();
   const { language } = useI18n();
-  const { data: gtmId } = useSettingWithHomeDataFallback("gtm_id");
-  const { data: seo } = useSeoWithHomeDataFallback(location);
-  const { data: faviconUrl } = useSettingWithHomeDataFallback("favicon_url");
+  const { data: gtmId } = useCMSSetting("gtm_id");
+  const { data: seo } = useCMSSeo(location);
+  const { data: faviconUrl } = useCMSSetting("favicon_url");
 
   useEffect(() => {
     if (gtmId && typeof gtmId === "string" && gtmId.trim()) {

@@ -17,16 +17,26 @@ async function fetchHomeData(): Promise<{ settings: Record<string, any>; hotels:
 }
 
 export function useCMSSetting(key: string) {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["/api/public/settings", key],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/public/settings/${key}`);
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data.value;
+        const homeData = await queryClient.fetchQuery({
+          queryKey: HOME_DATA_KEY,
+          queryFn: fetchHomeData,
+          staleTime: 60000,
+        });
+        return homeData?.settings?.[key] ?? null;
       } catch {
-        return null;
+        try {
+          const res = await fetch(`/api/public/settings/${key}`);
+          if (!res.ok) return null;
+          const data = await res.json();
+          return data.value;
+        } catch {
+          return null;
+        }
       }
     },
     staleTime: 60000,
@@ -50,16 +60,15 @@ export function useCMSAllSettings() {
           queryFn: fetchHomeData,
           staleTime: 60000,
         });
-        if (homeData?.settings && Object.keys(homeData.settings).length > 0) {
-          return homeData.settings;
-        }
-      } catch {}
-      try {
-        const res = await fetch("/api/public/settings");
-        if (!res.ok) return {};
-        return await res.json();
+        return homeData?.settings ?? {};
       } catch {
-        return {};
+        try {
+          const res = await fetch("/api/public/settings");
+          if (!res.ok) return {};
+          return await res.json();
+        } catch {
+          return {};
+        }
       }
     },
     staleTime: 60000,
@@ -113,7 +122,7 @@ export function useCMSSeo(path: string) {
             queryFn: fetchHomeData,
             staleTime: 60000,
           });
-          if (homeData !== undefined) return homeData.seo ?? null;
+          return homeData?.seo ?? null;
         } catch {}
       }
       try {
@@ -157,14 +166,15 @@ export function useCMSHotels() {
           queryFn: fetchHomeData,
           staleTime: 60000,
         });
-        if (homeData?.hotels?.length) return homeData.hotels;
-      } catch {}
-      try {
-        const res = await fetch("/api/public/hotels");
-        if (!res.ok) return null;
-        return await res.json();
+        return homeData?.hotels ?? null;
       } catch {
-        return null;
+        try {
+          const res = await fetch("/api/public/hotels");
+          if (!res.ok) return null;
+          return await res.json();
+        } catch {
+          return null;
+        }
       }
     },
     staleTime: 60000,
