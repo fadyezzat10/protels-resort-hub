@@ -49,8 +49,13 @@
     }
     </script>
 
-    <!-- Preload LCP hero image -->
-    <link rel="preload" as="image" href="/hero-lcp.webp" fetchpriority="high" type="image/webp" />
+    <!-- Preload LCP hero image – responsive: mobile gets 28KB version, desktop 80KB -->
+    <link rel="preload" as="image"
+      href="/hero-lcp.webp"
+      imagesrcset="/hero-lcp-mobile.webp 768w, /hero-lcp.webp 1344w"
+      imagesizes="100vw"
+      fetchpriority="high"
+      type="image/webp" />
 
     <!-- Fonts: non-render-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

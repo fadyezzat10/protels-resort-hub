@@ -156,14 +156,16 @@ export default function Home() {
       />
 
       {royalBay.visible && royalBay.videoUrl && (
-        <RoyalBayVideoSection
-          videoUrl={royalBay.videoUrl}
-          title={royalBay.title}
-          description={royalBay.description}
-        />
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}>
+          <RoyalBayVideoSection
+            videoUrl={royalBay.videoUrl}
+            title={royalBay.title}
+            description={royalBay.description}
+          />
+        </div>
       )}
 
-      <section className="py-20 container-padding">
+      <section className="py-20 container-padding" style={{ contentVisibility: "auto", containIntrinsicSize: "auto 600px" }}>
         <div className="text-center max-w-2xl mx-auto mb-16">
           <EditableText
             contentKey="home.featured.subtitle"
@@ -187,7 +189,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-brand-blue text-white relative overflow-hidden">
+      <section className="py-24 bg-brand-blue text-white relative overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}>
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px)"}}></div>
         <div className="container-padding relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div>
