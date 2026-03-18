@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, Component, type ReactNode, type ErrorInfo, lazy, Suspense } from "react";
+import { useEffect, useState, Component, type ReactNode, type ErrorInfo, lazy, Suspense } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -180,8 +180,30 @@ function ScrollToTop() {
 
 function ChatbotWrapper() {
   const [location] = useLocation();
+  const [ready, setReady] = useState(false);
   const isAdminOrCMS = location.startsWith("/admin") || location.startsWith("/controlpanal");
-  if (isAdminOrCMS) return null;
+
+  useEffect(() => {
+    if (isAdminOrCMS) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const activate = () => {
+      setReady(true);
+      cleanup();
+    };
+    const cleanup = () => {
+      clearTimeout(timer);
+      ["scroll", "click", "keydown", "touchstart", "mousemove"].forEach((e) =>
+        window.removeEventListener(e, activate, { capture: true })
+      );
+    };
+    timer = setTimeout(activate, 5000);
+    ["scroll", "click", "keydown", "touchstart", "mousemove"].forEach((e) =>
+      window.addEventListener(e, activate, { once: true, passive: true, capture: true })
+    );
+    return cleanup;
+  }, [isAdminOrCMS]);
+
+  if (isAdminOrCMS || !ready) return null;
   return (
     <Suspense fallback={null}>
       <BookingAssistant />

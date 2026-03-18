@@ -49,6 +49,10 @@ export default defineConfig({
           if (id.includes("node_modules/@tanstack/react-query")) return "react-query";
           if (id.includes("node_modules/openai") || id.includes("node_modules/@emailjs")) return "vendor-services";
           if (id.includes("node_modules/lucide-react")) return "icons";
+          if (id.includes("node_modules/zod")) return "vendor-zod";
+          if (id.includes("node_modules/date-fns")) return "vendor-dates";
+          if (id.includes("node_modules/wouter")) return "vendor-router";
+          if (id.includes("node_modules/drizzle") || id.includes("node_modules/drizzle-zod")) return "vendor-db";
           if (id.includes("/pages/cms/") || id.includes("/components/CMS") || id.includes("/pages/admin/")) return "cms-admin";
         },
       },

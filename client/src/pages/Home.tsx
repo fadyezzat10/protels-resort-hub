@@ -11,12 +11,13 @@ import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
 import { useState, useRef, useCallback, useMemo } from "react";
 
-import slider2 from "@assets/DSC05597.png11_1770195240514.webp";
-import slider3 from "@assets/Protels_Beach_Club_&_SPA_1770195240514.webp";
-import slider4 from "@assets/1_1770195252319.webp";
-import slider5 from "@assets/Protels_Crystal_Beach_Resort_1770195252319.webp";
-
-const staticSliderImages = ["/hero-lcp.webp", slider2, slider3, slider4, slider5];
+const staticSliderImages = [
+  "/hero-lcp.webp",
+  "/images/hero-slide-2.webp",
+  "/images/hero-slide-3.webp",
+  "/images/hero-slide-4.webp",
+  "/images/hero-slide-5.webp",
+];
 
 export function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
