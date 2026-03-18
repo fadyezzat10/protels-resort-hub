@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { hotels as staticHotels, type Hotel as StaticHotel, bookingLink as staticBookingLink } from "@/lib/data";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/800x600/1a2744/c4a97d?text=Hotel";
@@ -31,6 +31,44 @@ export function useCMSAllSettings() {
         return await res.json();
       } catch {
         return {};
+      }
+    },
+    staleTime: 60000,
+    retry: false,
+  });
+}
+
+/**
+ * useHomeData — fetches /api/public/home-data (settings + hotels + seo) in ONE request.
+ * After resolving, it populates the individual query caches so that
+ * useCMSAllSettings, useCMSHotels, useCMSSetting, useCMSSeo("/") all return
+ * data immediately without firing additional HTTP requests.
+ */
+export function useHomeData() {
+  const queryClient = useQueryClient();
+  return useQuery<{ settings: Record<string, any>; hotels: any[]; seo: any | null }>({
+    queryKey: ["/api/public/home-data"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/public/home-data");
+        if (!res.ok) return { settings: {}, hotels: [], seo: null };
+        const data = await res.json();
+
+        if (data.settings) {
+          queryClient.setQueryData(["/api/public/settings"], data.settings);
+          for (const [key, value] of Object.entries(data.settings)) {
+            queryClient.setQueryData(["/api/public/settings", key], { key, value });
+          }
+        }
+        if (data.hotels) {
+          queryClient.setQueryData(["/api/public/hotels"], data.hotels);
+        }
+        if (data.seo !== undefined) {
+          queryClient.setQueryData(["/api/public/seo", "/"], data.seo);
+        }
+        return data;
+      } catch {
+        return { settings: {}, hotels: [], seo: null };
       }
     },
     staleTime: 60000,

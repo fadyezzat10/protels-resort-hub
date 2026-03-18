@@ -41,6 +41,13 @@ app.use("/images", (req, res, next) => {
   next();
 });
 
+app.use("/fonts", express.static(path.resolve("client/public/fonts"), {
+  maxAge: "365d",
+  immutable: true,
+  etag: false,
+  lastModified: false,
+}));
+
 app.use("/images", express.static(path.resolve("client/public/images"), {
   maxAge: "30d",
   immutable: true,

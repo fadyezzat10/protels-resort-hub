@@ -57,11 +57,11 @@
       fetchpriority="high"
       type="image/webp" />
 
-    <!-- Fonts: non-render-blocking -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@400;600;700&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <!-- Self-hosted fonts: preload critical body/heading fonts (same-origin, no DNS overhead) -->
+    <link rel="preload" as="font" href="/fonts/montserrat_400_latin.woff2" type="font/woff2" crossorigin>
+    <link rel="preload" as="font" href="/fonts/montserrat_600_latin.woff2" type="font/woff2" crossorigin>
+    <link rel="preload" as="font" href="/fonts/cairo_400_arabic.woff2" type="font/woff2" crossorigin>
+    <link rel="preload" as="font" href="/fonts/cormorant_garamond_700_latin.woff2" type="font/woff2" crossorigin>
 
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.google-analytics.com">

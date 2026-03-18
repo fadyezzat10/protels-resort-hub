@@ -399,6 +399,9 @@ Sitemap: https://protels.com/sitemap.xml
   app.patch("/api/cms/hotels/:id", requireAuth, async (req, res) => {
     const hotel = await storage.updateHotel(Number(req.params.id), req.body);
     if (!hotel) return res.status(404).json({ message: "Not found" });
+    publicApiCache.delete("home-data");
+    publicApiCache.delete("hotels-light");
+    publicApiCache.delete("hotels-full");
     res.json(hotel);
   });
 
@@ -562,6 +565,7 @@ Sitemap: https://protels.com/sitemap.xml
 
   app.put("/api/cms/settings/:key", requireAuth, async (req, res) => {
     const setting = await storage.upsertSetting(req.params.key as string, req.body.value);
+    publicApiCache.delete("home-data");
     res.json(setting);
   });
 
@@ -572,6 +576,9 @@ Sitemap: https://protels.com/sitemap.xml
 
   app.put("/api/cms/seo", requireAuth, async (req, res) => {
     const seo = await storage.upsertSeo(req.body);
+    if (req.body.path === "/" || !req.body.path) {
+      publicApiCache.delete("home-data");
+    }
     res.json(seo);
   });
 
@@ -994,6 +1001,51 @@ Sitemap: https://protels.com/sitemap.xml
   });
 
   // ──────── PUBLIC API (for website consumption) ────────
+
+  // Combined home-data endpoint: returns settings + hotels + seo(/) in ONE request
+  // Eliminates 7 separate API calls from the homepage
+  app.get("/api/public/home-data", async (_req, res) => {
+    const cacheKey = "home-data";
+    const cached = getCached(cacheKey);
+    if (cached) return res.json(cached);
+
+    const [settings, allHotels, seo] = await Promise.all([
+      storage.getSettings(),
+      storage.getHotels(),
+      storage.getSeoByPath("/"),
+    ]);
+
+    const settingsMap: Record<string, any> = {};
+    for (const s of settings) {
+      settingsMap[s.key] = s.value;
+    }
+
+    const hotels = allHotels
+      .filter((h) => h.status === "published")
+      .sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99))
+      .map((h) => ({
+        id: h.id,
+        slug: h.slug,
+        name: h.name,
+        location: h.location,
+        image: h.image,
+        description: h.description,
+        features: h.features,
+        rooms: h.rooms,
+        discount: h.discount,
+        sortOrder: h.sortOrder,
+        bookingLink: h.bookingLink,
+        heroVideo: h.heroVideo,
+        theme: h.theme,
+        ratings: (h as any).ratings,
+      }));
+
+    const result = { settings: settingsMap, hotels, seo: seo || null };
+    setCache(cacheKey, result);
+    res.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+    res.json(result);
+  });
+
   app.get("/api/public/pages/:slug/builder", async (req, res) => {
     try {
       const page = await storage.getPageBySlug(req.params.slug);

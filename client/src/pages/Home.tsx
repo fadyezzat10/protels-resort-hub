@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
 import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd, getFAQJsonLd } from "@/components/SEOHead";
-import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo } from "@/lib/cms";
+import { useMergedHotels, useHeroContent, useBookingLink, useRoyalBayVideo, useHomeData } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Play } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
@@ -111,6 +111,7 @@ function RoyalBayVideoSection({ videoUrl, title, description }: { videoUrl: stri
 
 export default function Home() {
   const { t, language } = useI18n();
+  useHomeData(); // ONE request → populates settings, hotels & seo caches simultaneously
   const { hotels } = useMergedHotels();
   const { heroTitle, heroSubtitle, heroImages, heroVideo } = useHeroContent(language);
   const bookingLink = useBookingLink();
