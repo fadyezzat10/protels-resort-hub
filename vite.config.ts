@@ -44,9 +44,12 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes("node_modules/framer-motion")) return "framer-motion";
           if (id.includes("node_modules/@radix-ui")) return "radix-ui";
+          if (id.includes("node_modules/react-dom")) return "react-dom";
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-is") || id.includes("node_modules/scheduler")) return "react";
+          if (id.includes("node_modules/@tanstack/react-query")) return "react-query";
           if (id.includes("node_modules/openai") || id.includes("node_modules/@emailjs")) return "vendor-services";
-          if (id.includes("/pages/cms/") || id.includes("/components/CMS")) return "cms";
-          if (id.includes("/pages/admin/")) return "admin";
+          if (id.includes("node_modules/lucide-react")) return "icons";
+          if (id.includes("/pages/cms/") || id.includes("/components/CMS") || id.includes("/pages/admin/")) return "cms-admin";
         },
       },
     },

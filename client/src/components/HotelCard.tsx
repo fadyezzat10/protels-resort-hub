@@ -3,10 +3,10 @@ import { useBookingLink } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
 import EditableImage from "@/components/EditableImage";
+import { useRef, useEffect, useState } from "react";
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -18,18 +18,29 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
   const { t, language } = useI18n();
   const globalBookingLink = useBookingLink();
   const bookingLink = hotel.bookingLink || globalBookingLink;
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { rootMargin: "-50px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.97 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ 
-        duration: 0.6, 
-        ease: "easeOut",
-        delay: index * 0.15 
-      }}
+    <div
+      ref={ref}
       className="h-full"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.97)",
+        transition: `opacity 0.6s ease-out ${index * 0.15}s, transform 0.6s ease-out ${index * 0.15}s`,
+      }}
     >
       <Card className="overflow-hidden border-none shadow-lg group h-full flex flex-col rounded-none">
         <div className="relative h-64 overflow-hidden">
@@ -99,6 +110,6 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

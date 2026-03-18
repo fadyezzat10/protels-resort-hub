@@ -69,10 +69,11 @@ class GlobalErrorBoundary extends Component<
 }
 
 import Home from "@/pages/Home";
-import Hotels from "@/pages/Hotels";
-import HotelDetails from "@/pages/HotelDetails";
 import CMSHead from "@/components/CMSHead";
 import ThemeProvider from "@/components/ThemeProvider";
+
+const Hotels = lazy(() => import("@/pages/Hotels"));
+const HotelDetails = lazy(() => import("@/pages/HotelDetails"));
 
 const Gallery = lazy(() => import("@/pages/Gallery"));
 const Contact = lazy(() => import("@/pages/Contact"));
