@@ -121,103 +121,58 @@ Sitemap: https://protels.com/sitemap.xml
   });
 
   app.get("/sitemap.xml", async (_req, res) => {
-    const baseUrl = "https://protels.com";
+    const BASE = "https://protels.com";
     const today = new Date().toISOString().split("T")[0];
 
     const staticPages = [
-      { path: "/", priority: "1.0", changefreq: "daily" },
-      { path: "/hotels", priority: "0.9", changefreq: "weekly" },
-      { path: "/about", priority: "0.7", changefreq: "monthly" },
-      { path: "/contact", priority: "0.8", changefreq: "monthly" },
-      { path: "/careers", priority: "0.6", changefreq: "monthly" },
-      { path: "/gallery", priority: "0.7", changefreq: "weekly" },
-      { path: "/blog", priority: "0.8", changefreq: "daily" },
-      { path: "/company-profile", priority: "0.5", changefreq: "monthly" },
+      { loc: "/",               changefreq: "daily",   priority: "1.0" },
+      { loc: "/hotels",         changefreq: "weekly",  priority: "0.9" },
+      { loc: "/about",          changefreq: "monthly", priority: "0.8" },
+      { loc: "/contact",        changefreq: "monthly", priority: "0.8" },
+      { loc: "/gallery",        changefreq: "weekly",  priority: "0.7" },
+      { loc: "/blog",           changefreq: "daily",   priority: "0.8" },
+      { loc: "/careers",        changefreq: "monthly", priority: "0.6" },
     ];
 
-    const hotelData = [
-      { slug: "crystal-beach", sections: ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] },
-      { slug: "beach-club", sections: ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] },
-      { slug: "la-plage", sections: ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] },
-      { slug: "royal-bay", sections: ["overview"] },
+    const hotelPages = [
+      { slug: "crystal-beach", image: "/images/hotel-crystal-beach-hero.webp" },
+      { slug: "beach-club",    image: "/images/hotel-beach-club-hero.webp"    },
+      { slug: "la-plage",      image: "/images/hotel-la-plage-hero.webp"      },
+      { slug: "royal-bay",     image: "/images/hotel-royal-bay-hero.webp"     },
     ];
 
-    const supportedLangs = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
-
-    const addHreflangTags = (path: string) => {
-      let tags = "";
-      for (const lang of supportedLangs) {
-        tags += `    <xhtml:link rel="alternate" hreflang="${lang}" href="${baseUrl}${path}" />\n`;
+    const urlEntry = (loc: string, changefreq: string, priority: string, lastmod = today, imageUrl?: string) => {
+      let entry = `  <url>\n`;
+      entry += `    <loc>${BASE}${loc}</loc>\n`;
+      entry += `    <lastmod>${lastmod}</lastmod>\n`;
+      entry += `    <changefreq>${changefreq}</changefreq>\n`;
+      entry += `    <priority>${priority}</priority>\n`;
+      if (imageUrl) {
+        entry += `    <image:image><image:loc>${BASE}${imageUrl}</image:loc></image:image>\n`;
       }
-      tags += `    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${path}" />\n`;
-      return tags;
+      entry += `  </url>\n`;
+      return entry;
     };
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
-    xml += `        xmlns:xhtml="http://www.w3.org/1999/xhtml"\n`;
-    xml += `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 
     for (const page of staticPages) {
-      xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}${page.path}</loc>\n`;
-      xml += `    <lastmod>${today}</lastmod>\n`;
-      xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
-      xml += `    <priority>${page.priority}</priority>\n`;
-      xml += addHreflangTags(page.path);
-      xml += `  </url>\n`;
+      xml += urlEntry(page.loc, page.changefreq, page.priority);
     }
 
-    const hotelImages: Record<string, string> = {
-      "crystal-beach": "/images/hotel-crystal-beach-hero.webp",
-      "beach-club": "/images/hotel-beach-club-hero.webp",
-      "la-plage": "/images/hotel-la-plage-hero.webp",
-      "royal-bay": "/images/hotel-royal-bay-hero.webp",
-    };
-
-    for (const hotel of hotelData) {
-      xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/hotels/${hotel.slug}</loc>\n`;
-      xml += `    <lastmod>${today}</lastmod>\n`;
-      xml += `    <changefreq>weekly</changefreq>\n`;
-      xml += `    <priority>0.9</priority>\n`;
-      xml += addHreflangTags(`/hotels/${hotel.slug}`);
-      if (hotelImages[hotel.slug]) {
-        xml += `    <image:image>\n`;
-        xml += `      <image:loc>${baseUrl}${hotelImages[hotel.slug]}</image:loc>\n`;
-        xml += `      <image:title>${hotel.slug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())} Resort</image:title>\n`;
-        xml += `    </image:image>\n`;
-      }
-      xml += `  </url>\n`;
-
-      for (const section of hotel.sections) {
-        if (section === "overview") continue;
-        xml += `  <url>\n`;
-        xml += `    <loc>${baseUrl}/hotels/${hotel.slug}/${section}</loc>\n`;
-        xml += `    <lastmod>${today}</lastmod>\n`;
-        xml += `    <changefreq>weekly</changefreq>\n`;
-        xml += `    <priority>0.7</priority>\n`;
-        xml += addHreflangTags(`/hotels/${hotel.slug}/${section}`);
-        xml += `  </url>\n`;
-      }
+    for (const hotel of hotelPages) {
+      xml += urlEntry(`/hotels/${hotel.slug}`, "weekly", "0.9", today, hotel.image);
     }
 
     try {
       const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
       for (const post of publishedPosts) {
-        const encodedSlug = encodeURIComponent(post.slug);
-        xml += `  <url>\n`;
-        xml += `    <loc>${baseUrl}/blog/${encodedSlug}</loc>\n`;
-        xml += `    <lastmod>${post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today}</lastmod>\n`;
-        xml += `    <changefreq>weekly</changefreq>\n`;
-        xml += `    <priority>0.7</priority>\n`;
-        xml += addHreflangTags(`/blog/${encodedSlug}`);
-        if ((post as any).featuredImage) {
-          xml += `    <image:image>\n`;
-          xml += `      <image:loc>${baseUrl}${(post as any).featuredImage}</image:loc>\n`;
-          xml += `    </image:image>\n`;
-        }
-        xml += `  </url>\n`;
+        const slug = post.slug.replace(/^https?:\/\/[^/]+/, "").replace(/^\/blog\//, "").replace(/\s+/g, "-");
+        const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today;
+        const featuredImage = (post as any).featuredImage;
+        const imageUrl = featuredImage && featuredImage.startsWith("/") ? featuredImage : undefined;
+        xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
       }
     } catch (e) {
       console.error("Sitemap: error loading blog posts", e);
@@ -225,24 +180,15 @@ Sitemap: https://protels.com/sitemap.xml
 
     xml += `</urlset>`;
 
-    res.set("Content-Type", "application/xml");
+    res.set("Content-Type", "application/xml; charset=utf-8");
     res.set("Cache-Control", "public, max-age=3600");
     res.send(xml);
   });
 
   app.get("/sitemap_index.xml", (_req, res) => {
-    const baseUrl = "https://protels.com";
     const today = new Date().toISOString().split("T")[0];
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-    xml += `  <sitemap>\n`;
-    xml += `    <loc>${baseUrl}/sitemap.xml</loc>\n`;
-    xml += `    <lastmod>${today}</lastmod>\n`;
-    xml += `  </sitemap>\n`;
-    xml += `</sitemapindex>`;
-
-    res.set("Content-Type", "application/xml");
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <sitemap>\n    <loc>https://protels.com/sitemap.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n</sitemapindex>`;
+    res.set("Content-Type", "application/xml; charset=utf-8");
     res.set("Cache-Control", "public, max-age=3600");
     res.send(xml);
   });
