@@ -187,9 +187,23 @@ Sitemap: https://protels.com/sitemap.xml
   app.post("/api/admin/regenerate-sitemap", requireAuth, async (_req, res) => {
     try {
       const xml = await buildSitemapXml();
-      const sitemapPath = path.resolve("client/public/sitemap.xml");
-      fs.writeFileSync(sitemapPath, xml, "utf-8");
-      res.json({ ok: true, urls: (xml.match(/<url>/g) || []).length });
+      const urlCount = (xml.match(/<url>/g) || []).length;
+      const written: string[] = [];
+
+      // Always write to the source file (picked up on next build/deploy)
+      const srcPath = path.resolve("client/public/sitemap.xml");
+      fs.writeFileSync(srcPath, xml, "utf-8");
+      written.push(srcPath);
+
+      // In production, also write to the dist/public directory that express.static
+      // actually serves, so the change is live immediately without a redeploy
+      const distPath = path.resolve(__dirname, "public", "sitemap.xml");
+      if (fs.existsSync(path.dirname(distPath))) {
+        fs.writeFileSync(distPath, xml, "utf-8");
+        written.push(distPath);
+      }
+
+      res.json({ ok: true, urls: urlCount, written });
     } catch (e: any) {
       console.error("regenerate-sitemap error:", e);
       res.status(500).json({ message: e.message || "Failed to regenerate sitemap" });
