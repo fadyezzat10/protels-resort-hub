@@ -168,10 +168,17 @@ Sitemap: https://protels.com/sitemap.xml
     try {
       const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
       for (const post of publishedPosts) {
-        const slug = post.slug.replace(/^https?:\/\/[^/]+/, "").replace(/^\/blog\//, "").replace(/\s+/g, "-");
+        // Clean slug: strip domain prefix, /blog/ prefix, replace spaces with hyphens
+        let slug = post.slug
+          .replace(/^https?:\/\/[^/]+/, "")
+          .replace(/^\/blog\//, "")
+          .trim()
+          .replace(/\s+/g, "-");
+        // Percent-encode any non-ASCII characters (Arabic, etc.) so the URL is RFC 3986 compliant
+        slug = slug.replace(/[^\x00-\x7F]/g, (ch) => encodeURIComponent(ch));
         const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today;
         const featuredImage = (post as any).featuredImage;
-        const imageUrl = featuredImage && featuredImage.startsWith("/") ? featuredImage : undefined;
+        const imageUrl = featuredImage && typeof featuredImage === "string" && featuredImage.startsWith("/") ? featuredImage : undefined;
         xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
       }
     } catch (e) {
