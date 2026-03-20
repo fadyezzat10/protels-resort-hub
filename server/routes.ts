@@ -175,8 +175,7 @@ Sitemap: https://protels.com/sitemap.xml
         .replace(/\s+/g, "-");
       slug = slug.replace(/[^\x00-\x7F]/g, (ch) => encodeURIComponent(ch));
       const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today;
-      const featuredImage = (post as any).featuredImage;
-      const imageUrl = featuredImage && typeof featuredImage === "string" && featuredImage.startsWith("/") ? featuredImage : undefined;
+      const imageUrl = post.featuredImage && post.featuredImage.startsWith("/") ? post.featuredImage : undefined;
       xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
     }
 
@@ -184,7 +183,10 @@ Sitemap: https://protels.com/sitemap.xml
     return xml;
   };
 
-  app.post("/api/admin/regenerate-sitemap", requireAuth, async (_req, res) => {
+  app.post("/api/admin/regenerate-sitemap", requireAuth, async (req, res) => {
+    if (req.session.role !== "super_admin" && req.session.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
     try {
       const xml = await buildSitemapXml();
       const urlCount = (xml.match(/<url>/g) || []).length;
