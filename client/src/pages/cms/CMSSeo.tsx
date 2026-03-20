@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,6 +60,17 @@ export default function CMSSeo() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<SeoForm>(emptyForm);
+
+  const regenerateSitemapMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/admin/regenerate-sitemap");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({ title: `Sitemap regenerated — ${data.urls} URLs written to sitemap.xml` });
+    },
+    onError: (err: Error) => toast({ title: "Error regenerating sitemap", description: err.message, variant: "destructive" }),
+  });
 
   const { data: seoEntries = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/cms/seo"],
@@ -128,9 +139,20 @@ export default function CMSSeo() {
           <h2 className="text-3xl font-serif text-brand-blue mb-2">SEO Management</h2>
           <p className="text-gray-500">Manage SEO settings per page</p>
         </div>
-        <Button data-testid="button-create-seo" onClick={openCreate}>
-          <Plus className="w-4 h-4 mr-2" /> Add SEO Entry
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            data-testid="button-regenerate-sitemap"
+            variant="outline"
+            onClick={() => regenerateSitemapMutation.mutate()}
+            disabled={regenerateSitemapMutation.isPending}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${regenerateSitemapMutation.isPending ? "animate-spin" : ""}`} />
+            {regenerateSitemapMutation.isPending ? "Regenerating..." : "Regenerate Sitemap"}
+          </Button>
+          <Button data-testid="button-create-seo" onClick={openCreate}>
+            <Plus className="w-4 h-4 mr-2" /> Add SEO Entry
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

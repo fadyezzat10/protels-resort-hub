@@ -17,6 +17,9 @@ export function serveStatic(app: Express) {
     setHeaders: (res, filePath) => {
       if (filePath.endsWith(".html")) {
         res.setHeader("Cache-Control", "no-cache");
+      } else if (filePath.endsWith(".xml")) {
+        res.setHeader("Content-Type", "application/xml; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=3600");
       } else if (filePath.match(/\.(js|css)$/)) {
         res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
       } else if (filePath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/)) {

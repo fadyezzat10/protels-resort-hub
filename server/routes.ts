@@ -120,18 +120,19 @@ Sitemap: https://protels.com/sitemap.xml
 `);
   });
 
-  app.get("/sitemap.xml", async (_req, res) => {
+  // ── Regenerate the static sitemap file (admin-only) ──────────────────
+  const buildSitemapXml = async (): Promise<string> => {
     const BASE = "https://protels.com";
     const today = new Date().toISOString().split("T")[0];
 
     const staticPages = [
-      { loc: "/",               changefreq: "daily",   priority: "1.0" },
-      { loc: "/hotels",         changefreq: "weekly",  priority: "0.9" },
-      { loc: "/about",          changefreq: "monthly", priority: "0.8" },
-      { loc: "/contact",        changefreq: "monthly", priority: "0.8" },
-      { loc: "/gallery",        changefreq: "weekly",  priority: "0.7" },
-      { loc: "/blog",           changefreq: "daily",   priority: "0.8" },
-      { loc: "/careers",        changefreq: "monthly", priority: "0.6" },
+      { loc: "/",        changefreq: "daily",   priority: "1.0" },
+      { loc: "/hotels",  changefreq: "weekly",  priority: "0.9" },
+      { loc: "/about",   changefreq: "monthly", priority: "0.8" },
+      { loc: "/contact", changefreq: "monthly", priority: "0.8" },
+      { loc: "/gallery", changefreq: "weekly",  priority: "0.7" },
+      { loc: "/blog",    changefreq: "daily",   priority: "0.8" },
+      { loc: "/careers", changefreq: "monthly", priority: "0.6" },
     ];
 
     const hotelPages = [
@@ -165,31 +166,34 @@ Sitemap: https://protels.com/sitemap.xml
       xml += urlEntry(`/hotels/${hotel.slug}`, "weekly", "0.9", today, hotel.image);
     }
 
-    try {
-      const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
-      for (const post of publishedPosts) {
-        // Clean slug: strip domain prefix, /blog/ prefix, replace spaces with hyphens
-        let slug = post.slug
-          .replace(/^https?:\/\/[^/]+/, "")
-          .replace(/^\/blog\//, "")
-          .trim()
-          .replace(/\s+/g, "-");
-        // Percent-encode any non-ASCII characters (Arabic, etc.) so the URL is RFC 3986 compliant
-        slug = slug.replace(/[^\x00-\x7F]/g, (ch) => encodeURIComponent(ch));
-        const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today;
-        const featuredImage = (post as any).featuredImage;
-        const imageUrl = featuredImage && typeof featuredImage === "string" && featuredImage.startsWith("/") ? featuredImage : undefined;
-        xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
-      }
-    } catch (e) {
-      console.error("Sitemap: error loading blog posts", e);
+    const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
+    for (const post of publishedPosts) {
+      let slug = post.slug
+        .replace(/^https?:\/\/[^/]+/, "")
+        .replace(/^\/blog\//, "")
+        .trim()
+        .replace(/\s+/g, "-");
+      slug = slug.replace(/[^\x00-\x7F]/g, (ch) => encodeURIComponent(ch));
+      const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today;
+      const featuredImage = (post as any).featuredImage;
+      const imageUrl = featuredImage && typeof featuredImage === "string" && featuredImage.startsWith("/") ? featuredImage : undefined;
+      xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
     }
 
     xml += `</urlset>`;
+    return xml;
+  };
 
-    res.set("Content-Type", "application/xml; charset=utf-8");
-    res.set("Cache-Control", "public, max-age=3600");
-    res.send(xml);
+  app.post("/api/admin/regenerate-sitemap", requireAuth, async (_req, res) => {
+    try {
+      const xml = await buildSitemapXml();
+      const sitemapPath = path.resolve("client/public/sitemap.xml");
+      fs.writeFileSync(sitemapPath, xml, "utf-8");
+      res.json({ ok: true, urls: (xml.match(/<url>/g) || []).length });
+    } catch (e: any) {
+      console.error("regenerate-sitemap error:", e);
+      res.status(500).json({ message: e.message || "Failed to regenerate sitemap" });
+    }
   });
 
   app.get("/sitemap_index.xml", (_req, res) => {
