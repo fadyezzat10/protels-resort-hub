@@ -148,12 +148,12 @@ export default function Navbar() {
         </div>
 
         <button
-          className={cn("md:hidden", isScrolled ? "text-brand-blue" : "text-white")}
+          className={cn("md:hidden p-3 min-w-[48px] min-h-[48px] flex items-center justify-center", isScrolled ? "text-brand-blue" : "text-white")}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={mobileMenuOpen}
         >
-          {mobileMenuOpen ? <X /> : <Menu />}
+          {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
         </button>
       </div>
 
@@ -180,14 +180,15 @@ export default function Navbar() {
                       setLanguage(lang.code);
                       setMobileMenuOpen(false);
                     }}
+                    aria-label={`Switch language to ${lang.label}`}
                     className={cn(
-                      "flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-medium uppercase tracking-wider rounded border transition-colors",
+                      "flex items-center justify-center gap-1.5 px-2 py-3 min-h-[44px] text-xs font-medium uppercase tracking-wider rounded border transition-colors",
                       language === lang.code 
                         ? "bg-brand-gold text-white border-brand-gold" 
                         : "bg-gray-50 text-gray-600 border-gray-200 hover:border-brand-gold/50"
                     )}
                   >
-                    {FlagComp && <FlagComp className="w-4 h-3 rounded-[1px] shrink-0" />}
+                    {FlagComp && <FlagComp className="w-4 h-3 rounded-[1px] shrink-0" aria-hidden="true" />}
                     {lang.code}
                   </button>
                 );

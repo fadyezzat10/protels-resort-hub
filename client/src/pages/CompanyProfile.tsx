@@ -398,10 +398,11 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
           <button
             data-testid="button-prev-page"
             onClick={goPrev}
-            className="p-2 rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30"
+            aria-label="Previous page"
+            className="p-3 min-w-[44px] min-h-[44px] rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30 flex items-center justify-center"
             disabled={currentPage === 0}
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
           </button>
 
           <span data-testid="text-page-indicator" className={`text-sm font-medium px-4 ${isFullscreen ? "text-white" : "text-gray-600"}`}>
@@ -411,20 +412,22 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
           <button
             data-testid="button-next-page"
             onClick={goNext}
-            className="p-2 rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30"
+            aria-label="Next page"
+            className="p-3 min-w-[44px] min-h-[44px] rounded-full bg-brand-blue text-white hover:bg-brand-blue/80 transition-colors disabled:opacity-30 flex items-center justify-center"
             disabled={currentPage >= totalPages - 1}
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5" aria-hidden="true" />
           </button>
 
           <div className="flex items-center gap-1 ml-4 border-l pl-4 border-gray-300">
             <button
               data-testid="button-zoom-out"
               onClick={handleZoomOut}
-              className={`p-2 rounded-full hover:bg-gray-200 transition-colors ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
+              aria-label="Zoom out"
+              className={`p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
               disabled={zoom <= 0.5}
             >
-              <ZoomOut className="w-4 h-4" />
+              <ZoomOut className="w-4 h-4" aria-hidden="true" />
             </button>
             <span className={`text-xs font-medium w-12 text-center ${isFullscreen ? "text-white" : "text-gray-500"}`}>
               {Math.round(zoom * 100)}%
@@ -432,19 +435,21 @@ function FlipbookViewer({ pdfUrl, coverImage }: { pdfUrl: string; coverImage?: s
             <button
               data-testid="button-zoom-in"
               onClick={handleZoomIn}
-              className={`p-2 rounded-full hover:bg-gray-200 transition-colors ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
+              aria-label="Zoom in"
+              className={`p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
               disabled={zoom >= 2.5}
             >
-              <ZoomIn className="w-4 h-4" />
+              <ZoomIn className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 
           <button
             data-testid="button-fullscreen"
             onClick={toggleFullscreen}
-            className={`p-2 rounded-full hover:bg-gray-200 transition-colors ml-2 ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            className={`p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-gray-200 transition-colors ml-2 flex items-center justify-center ${isFullscreen ? "text-white hover:bg-white/20" : "text-gray-600"}`}
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            {isFullscreen ? <Minimize2 className="w-4 h-4" aria-hidden="true" /> : <Maximize2 className="w-4 h-4" aria-hidden="true" />}
           </button>
         </div>
       )}

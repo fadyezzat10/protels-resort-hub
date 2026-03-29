@@ -177,10 +177,10 @@ export default function BookingAssistant() {
             <button
               data-testid="button-close-chatbot"
               onClick={() => setIsOpen(false)}
-              className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"
+              className="w-11 h-11 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"
               aria-label="Close chat"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 

@@ -134,26 +134,29 @@ export default function Gallery() {
           >
             <button
               onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
-              className="absolute top-4 right-4 text-white/80 hover:text-white z-10 p-2"
+              className="absolute top-4 right-4 text-white/80 hover:text-white z-10 p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
               data-testid="lightbox-close"
+              aria-label="Close image lightbox"
             >
-              <X className="w-8 h-8" />
+              <X className="w-8 h-8" aria-hidden="true" />
             </button>
 
             <button
               onClick={(e) => { e.stopPropagation(); goPrev(); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 p-2"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
               data-testid="lightbox-prev"
+              aria-label="Previous image"
             >
-              <ChevronLeft className="w-10 h-10" />
+              <ChevronLeft className="w-10 h-10" aria-hidden="true" />
             </button>
 
             <button
               onClick={(e) => { e.stopPropagation(); goNext(); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 p-2"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
               data-testid="lightbox-next"
+              aria-label="Next image"
             >
-              <ChevronRight className="w-10 h-10" />
+              <ChevronRight className="w-10 h-10" aria-hidden="true" />
             </button>
 
             <motion.img

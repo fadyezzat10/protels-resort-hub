@@ -12,10 +12,10 @@ export default function Footer() {
   const cmsLogo = useHeaderLogo();
   const logoSrc = cmsLogo || defaultLogo;
 
-  const socialIconList: { key: string; Icon: any; fallbackUrl: string }[] = [
-    { key: "facebook", Icon: Facebook, fallbackUrl: "https://www.facebook.com/ProtelsResorts/" },
-    { key: "instagram", Icon: Instagram, fallbackUrl: "https://www.instagram.com/protelsresorts" },
-    { key: "linkedin", Icon: Linkedin, fallbackUrl: "https://www.linkedin.com/company/protelsresorts/" },
+  const socialIconList: { key: string; Icon: any; fallbackUrl: string; label: string }[] = [
+    { key: "facebook", Icon: Facebook, fallbackUrl: "https://www.facebook.com/ProtelsResorts/", label: "Follow Protels on Facebook" },
+    { key: "instagram", Icon: Instagram, fallbackUrl: "https://www.instagram.com/protelsresorts", label: "Follow Protels on Instagram" },
+    { key: "linkedin", Icon: Linkedin, fallbackUrl: "https://www.linkedin.com/company/protelsresorts/", label: "Connect with Protels on LinkedIn" },
   ];
 
   return (
@@ -61,11 +61,11 @@ export default function Footer() {
           <div>
             <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">Connect</h3>
             <div className="flex gap-6">
-              {socialIconList.map(({ key, Icon, fallbackUrl }) => {
+              {socialIconList.map(({ key, Icon, fallbackUrl, label }) => {
                 const url = (socialLinks as Record<string, string>)[key] || fallbackUrl;
                 return (
-                  <a key={key} href={url} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-brand-gold transition-all transform hover:scale-110">
-                    <Icon className="w-6 h-6" />
+                  <a key={key} href={url} target="_blank" rel="noopener noreferrer" aria-label={label} className="text-white/60 hover:text-brand-gold transition-all transform hover:scale-110 p-2 -m-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                    <Icon className="w-6 h-6" aria-hidden="true" />
                   </a>
                 );
               })}
@@ -78,7 +78,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center text-white/20 text-[0.65rem] uppercase tracking-[0.3em] gap-4">
+        <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center text-white/50 text-[0.65rem] uppercase tracking-[0.3em] gap-4">
           <p>&copy; {currentYear} {siteName}. {t("footer.rights")}.</p>
         </div>
       </div>
