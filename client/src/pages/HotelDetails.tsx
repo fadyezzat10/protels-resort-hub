@@ -84,7 +84,7 @@ export default function HotelDetails() {
   const hotelSeoKeywords: Record<string, string> = {
     "crystal-beach": "Crystal Beach Resort Marsa Alam, Marsa Alam hotels, Red Sea resorts, all-inclusive Marsa Alam, diving resort Egypt, Egypt beach resorts",
     "beach-club": "Beach Club Marsa Alam, Protels Beach Club & Spa, Marsa Alam hotels, aquapark resort Egypt, family resort Red Sea, Egypt beach resorts",
-    "la-plage": "La Plage Zanzibar, Zanzibar resorts, Kiwengwa beach hotel, all-inclusive Zanzibar, Zanzibar boutique resort, Tanzania beach resort",
+    "la-plage": "La Plage Zanzibar, Zanzibar resorts, Kiwengwa beach hotel, all-inclusive Zanzibar, Zanzibar boutique resort, Tanzania beach resort, Protels La Plage, Bwejuu Zanzibar beach resorts, All-inclusive resorts Bwejuu Zanzibar, Luxury bungalows Zanzibar beachfront, Boutique hotel Bwejuu beach, Best beachfront hotels Zanzibar, Zanzibar all-inclusive luxury stay, Bwejuu beach accommodation, Luxury villas Bwejuu Zanzibar, Swahili culture beach resort Zanzibar, Private beach resort Bwejuu, Zanzibar beachfront bungalows for couples, Family friendly all-inclusive Zanzibar, Bwejuu Zanzibar honeymoon resorts, Luxury coastal living Zanzibar",
     "royal-bay": "Royal Bay Hurghada, Hurghada hotels, Hurghada resorts, Red Sea resorts, Egypt beach resorts, Hurghada all-inclusive",
   };
 
