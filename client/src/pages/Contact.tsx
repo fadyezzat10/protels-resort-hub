@@ -243,7 +243,7 @@ export default function Contact() {
                         </div>
                       )}
 
-                      {(hotel.emailReservations || hotel.emailSales) && (
+                      {(hotel.emailReservations || hotel.emailSales || hotel.email) && (
                         <div className="flex items-start gap-4 md:col-span-2">
                           <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-brand-gold shrink-0">
                             <Mail className="w-5 h-5" />
@@ -251,7 +251,7 @@ export default function Contact() {
                           <div className="w-full">
                             <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wide mb-1">{t("contact.email")}</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                              {hotel.emailReservations && (
+                              {hotel.emailReservations ? (
                                 <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between group hover:border-brand-gold/30 transition-colors">
                                   <div>
                                     <span className="text-xs text-gray-500 block mb-0.5">{t("contact.reservations")}</span>
@@ -260,7 +260,16 @@ export default function Contact() {
                                     </a>
                                   </div>
                                 </div>
-                              )}
+                              ) : hotel.email ? (
+                                <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between group hover:border-brand-gold/30 transition-colors">
+                                  <div>
+                                    <span className="text-xs text-gray-500 block mb-0.5">{t("contact.email")}</span>
+                                    <a href={`mailto:${hotel.email}`} className="text-brand-blue font-medium hover:underline text-sm break-all">
+                                      {hotel.email}
+                                    </a>
+                                  </div>
+                                </div>
+                              ) : null}
                               {hotel.emailSales && (
                                 <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between group hover:border-brand-gold/30 transition-colors">
                                   <div>
@@ -294,7 +303,7 @@ export default function Contact() {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full min-h-[300px] text-gray-400 text-sm">
-                      No map available
+                      {t("contact.noMap")}
                     </div>
                   )}
                   {hotel.mapShareUrl && (
@@ -305,7 +314,7 @@ export default function Contact() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Open in Google Maps
+                          {t("contact.openMaps")}
                         </a>
                       </Button>
                     </div>

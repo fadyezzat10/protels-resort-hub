@@ -1286,7 +1286,7 @@ export default function HotelDetails() {
                              ))}
                              {hotel.mobile && (
                                <div className="flex items-center gap-1 mt-0.5">
-                                 <span className="text-xs text-gray-400 uppercase">Mobile:</span>
+                                 <span className="text-xs text-gray-400 uppercase">{t("contact.mobile")}:</span>
                                  <a href={`tel:${hotel.mobile.replace(/\s/g, "")}`} className="text-gray-600 hover:text-brand-gold transition-colors text-sm">{hotel.mobile}</a>
                                </div>
                              )}
@@ -1300,13 +1300,13 @@ export default function HotelDetails() {
                              <span className="block font-bold text-brand-blue mb-1">{t("hotel.email")}</span>
                              {hotel.emailReservations && (
                                <div className="mb-1">
-                                 <span className="text-xs text-gray-400 uppercase block">Reservations:</span>
+                                 <span className="text-xs text-gray-400 uppercase block">{t("contact.reservations")}:</span>
                                  <a href={`mailto:${hotel.emailReservations}`} className="text-gray-600 hover:text-brand-gold transition-colors">{hotel.emailReservations}</a>
                                </div>
                              )}
                              {hotel.emailSales && (
                                <div>
-                                 <span className="text-xs text-gray-400 uppercase block">Sales:</span>
+                                 <span className="text-xs text-gray-400 uppercase block">{t("contact.sales")}:</span>
                                  <a href={`mailto:${hotel.emailSales}`} className="text-gray-600 hover:text-brand-gold transition-colors">{hotel.emailSales}</a>
                                </div>
                              )}
@@ -1331,7 +1331,7 @@ export default function HotelDetails() {
                       </div>
                     ) : (
                       <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
-                        <span className="text-gray-400 text-sm">Map Integration</span>
+                        <span className="text-gray-400 text-sm">{t("contact.noMap")}</span>
                       </div>
                     )}
                    </div>
