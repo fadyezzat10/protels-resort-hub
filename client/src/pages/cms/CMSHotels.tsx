@@ -98,8 +98,13 @@ interface HotelForm {
   mapLink: string;
   bookingLink: string;
   phone: string;
+  mobile: string;
   email: string;
+  emailReservations: string;
+  emailSales: string;
   mapEmbed: string;
+  mapShareUrl: string;
+  address: string;
   status: string;
   sortOrder: number;
   heroVideo: string;
@@ -132,8 +137,13 @@ const emptyForm: HotelForm = {
   mapLink: "",
   bookingLink: "",
   phone: "",
+  mobile: "",
   email: "",
+  emailReservations: "",
+  emailSales: "",
   mapEmbed: "",
+  mapShareUrl: "",
+  address: "",
   status: "draft",
   sortOrder: 0,
   heroVideo: "",
@@ -261,8 +271,13 @@ export default function CMSHotels() {
     mapLink: form.mapLink || null,
     bookingLink: form.bookingLink || null,
     phone: form.phone || null,
+    mobile: form.mobile || null,
     email: form.email || null,
+    emailReservations: form.emailReservations || null,
+    emailSales: form.emailSales || null,
     mapEmbed: form.mapEmbed || null,
+    mapShareUrl: form.mapShareUrl || null,
+    address: form.address || null,
     status: form.status,
     sortOrder: form.sortOrder,
     heroVideo: form.heroVideo || null,
@@ -310,8 +325,13 @@ export default function CMSHotels() {
       mapLink: hotel.mapLink || "",
       bookingLink: hotel.bookingLink || "",
       phone: hotel.phone || "",
+      mobile: hotel.mobile || "",
       email: hotel.email || "",
+      emailReservations: hotel.emailReservations || "",
+      emailSales: hotel.emailSales || "",
       mapEmbed: hotel.mapEmbed || "",
+      mapShareUrl: hotel.mapShareUrl || "",
+      address: hotel.address || "",
       status: hotel.status || "draft",
       sortOrder: hotel.sortOrder || 0,
       heroVideo: hotel.heroVideo || "",
@@ -1463,39 +1483,87 @@ export default function CMSHotels() {
           <TabsContent value="contact">
             <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
               <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">معلومات التواصل</h3>
-              <p className="text-sm text-gray-500">هذه المعلومات ستظهر في صفحة "الموقع والتواصل" الخاصة بالفندق.</p>
+              <p className="text-sm text-gray-500">هذه المعلومات ستظهر في صفحة "الموقع والتواصل" الخاصة بالفندق وصفحة التواصل الرئيسية.</p>
 
-              <div className="space-y-5">
+              {/* Address */}
+              <div>
+                <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-brand-gold" />
+                  العنوان الكامل
+                </label>
+                <Input
+                  data-testid="input-hotel-address"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  placeholder="مثال: 20 Km North of Marsa Alam, Red Sea 84721, Egypt"
+                  dir="ltr"
+                />
+              </div>
+
+              {/* Phone + Mobile */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
                     <Phone className="w-4 h-4 text-brand-gold" />
-                    رقم التليفون
+                    رقم التليفون الثابت
                   </label>
                   <Input
                     data-testid="input-hotel-phone"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    placeholder="+20 65 3380063"
+                    placeholder="+20 65 338 0063"
                     dir="ltr"
                   />
-                  <p className="text-xs text-gray-400 mt-1">لو في أكتر من رقم، افصلهم بفاصلة. مثال: +20 65 3380063, +20 150 092 5579</p>
                 </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-brand-gold" />
+                    رقم الموبايل
+                  </label>
+                  <Input
+                    data-testid="input-hotel-mobile"
+                    value={form.mobile}
+                    onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+                    placeholder="+20 150 092 5579"
+                    dir="ltr"
+                  />
+                </div>
+              </div>
 
+              {/* Email Reservations + Sales */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
                     <Mail className="w-4 h-4 text-brand-gold" />
-                    الإيميل
+                    إيميل الحجوزات
                   </label>
                   <Input
-                    data-testid="input-hotel-email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="res.cb@protels.com"
+                    data-testid="input-hotel-email-reservations"
+                    value={form.emailReservations}
+                    onChange={(e) => setForm({ ...form, emailReservations: e.target.value })}
+                    placeholder="reservation@protels.com"
                     dir="ltr"
                     type="email"
                   />
                 </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-brand-gold" />
+                    إيميل المبيعات
+                  </label>
+                  <Input
+                    data-testid="input-hotel-email-sales"
+                    value={form.emailSales}
+                    onChange={(e) => setForm({ ...form, emailSales: e.target.value })}
+                    placeholder="sales@protels.com"
+                    dir="ltr"
+                    type="email"
+                  />
+                </div>
+              </div>
 
+              {/* Map Embed + Map Share URL */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-brand-gold" />
@@ -1510,28 +1578,42 @@ export default function CMSHotels() {
                     rows={3}
                     className="font-mono text-sm"
                   />
-                  <p className="text-xs text-gray-400 mt-1">
-                    اذهب إلى Google Maps → شارك → تضمين خريطة → انسخ الرابط من src=""
-                  </p>
+                  <p className="text-xs text-gray-400 mt-1">Google Maps → شارك → تضمين → انسخ رابط الـ src</p>
                 </div>
-
-                {form.mapEmbed && (
-                  <div>
-                    <p className="text-sm font-medium mb-2 text-gray-600">معاينة الخريطة:</p>
-                    <div className="h-48 w-full bg-gray-100 overflow-hidden rounded border">
-                      <iframe
-                        src={form.mapEmbed}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen
-                        loading="lazy"
-                        title="Hotel Map Preview"
-                      />
-                    </div>
-                  </div>
-                )}
+                <div>
+                  <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-brand-gold" />
+                    رابط فتح في Google Maps
+                  </label>
+                  <Textarea
+                    data-testid="input-hotel-map-share-url"
+                    value={form.mapShareUrl}
+                    onChange={(e) => setForm({ ...form, mapShareUrl: e.target.value })}
+                    placeholder="https://www.google.com/maps?q=25.235576,34.795265"
+                    dir="ltr"
+                    rows={3}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">الرابط اللي بيفتح الخريطة في Google Maps مباشرة</p>
+                </div>
               </div>
+
+              {form.mapEmbed && (
+                <div>
+                  <p className="text-sm font-medium mb-2 text-gray-600">معاينة الخريطة:</p>
+                  <div className="h-48 w-full bg-gray-100 overflow-hidden rounded border">
+                    <iframe
+                      src={form.mapEmbed}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      title="Hotel Map Preview"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>

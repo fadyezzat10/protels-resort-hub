@@ -91,8 +91,13 @@ export interface Hotel {
   tabConfig?: { tabs: { id: string; label: string; visible: boolean; order: number }[] };
   bookingLink?: string;
   phone?: string;
+  mobile?: string;
   email?: string;
+  emailReservations?: string;
+  emailSales?: string;
   mapEmbed?: string;
+  mapShareUrl?: string;
+  address?: string;
   ratings?: { platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl: string }[];
 }
 
@@ -101,6 +106,12 @@ export const hotels: Hotel[] = [
     id: "crystal-beach",
     name: "Protels Crystal Beach Resort",
     location: "Marsa Alam, Egypt",
+    address: "20 Km North of Marsa Alam, Red Sea 84721, Egypt",
+    phone: "+20 65 338 0063",
+    mobile: "+20 150 092 5579",
+    emailReservations: "info@protels.com",
+    mapShareUrl: "https://www.google.com/maps?q=25.235576,34.795265",
+    mapEmbed: "https://maps.google.com/maps?cid=4429004655439307872&output=embed",
     mapLink: "https://maps.app.goo.gl/2jjgBH1rqGhVRXJZ8",
     image: crystalBeach,
     description: {
@@ -177,6 +188,12 @@ export const hotels: Hotel[] = [
     id: "beach-club",
     name: "Protels Beach Club & SPA",
     location: "Marsa Alam, Egypt",
+    address: "20 Km North of Marsa Alam, Red Sea 84721, Egypt",
+    phone: "+20 65 338 0063",
+    mobile: "+20 150 092 5579",
+    emailReservations: "info@protels.com",
+    mapShareUrl: "https://www.google.com/maps?q=25.23666,34.79464",
+    mapEmbed: "https://maps.google.com/maps?cid=2437922038492058707&output=embed",
     image: beachClub,
     description: {
       en: "Immerse yourself in a vibrant Red Sea getaway at Protels Beach Club & SPA. Designed for the modern traveler, our resort blends relaxation with energy, offering direct access to a private sandy beach and crystal-clear waters. Enjoy a variety of swimming pools, an exciting aquapark, and a full-service wellness center to recharge your senses. With lively entertainment, diverse dining options, and a welcoming atmosphere, it’s the perfect escape for families, couples, and friends seeking sun, fun, and comfort.",
@@ -231,6 +248,13 @@ export const hotels: Hotel[] = [
     id: "la-plage",
     name: "Protels La Plage",
     location: "Zanzibar, Tanzania",
+    address: "Kiwengwa Beach, Zanzibar Island",
+    phone: "+255 24 123 4567",
+    mobile: "+255 77 123 4567",
+    emailReservations: "reservation.laplage@protels.com",
+    emailSales: "sales.laplage@protels.com",
+    mapShareUrl: "https://www.google.com/maps?q=-6.22587,39.532805",
+    mapEmbed: "https://maps.google.com/maps?cid=14143868217406177037&output=embed",
     image: laPlage,
     description: {
       en: "Surrender to the rhythm of the Indian Ocean at Protels La Plage, an intimate sanctuary where African warmth meets barefoot luxury. Nestled on the pristine shores of Zanzibar, our boutique retreat is a celebration of Swahili culture and slow island living. Here, days drift by in harmony with the tides, and the boundaries between nature and comfort dissolve. Designed with local materials and organic textures, every corner whispers of the island's heritage. Whether you're unwinding in a palm-shaded bungalow or savoring spice-infused flavors under the stars, La Plage offers a soulful escape for those seeking deep relaxation and authentic connection.",
@@ -364,6 +388,13 @@ export const hotels: Hotel[] = [
     id: "royal-bay",
     name: "Protels Royal Bay Resort & Spa",
     location: "Hurghada, Egypt",
+    address: "Safaga Road, Hurghada, Egypt",
+    phone: "+20 65 346 0000",
+    mobile: "+20 120 000 0003",
+    emailReservations: "reservation.royalbay@protels.com",
+    emailSales: "sales.royalbay@protels.com",
+    mapShareUrl: "https://www.google.com/maps?q=27.1556,33.8236",
+    mapEmbed: "https://maps.google.com/maps?q=27.1556,33.8236&z=15&output=embed",
     image: royalBay,
     description: {
       en: "A majestic resort in the heart of Hurghada. Royal Bay offers grand architecture, extensive pool landscapes, and activities for the whole family.",

@@ -1263,12 +1263,12 @@ export default function HotelDetails() {
                          <MapPin className="w-5 h-5 text-brand-gold mt-1" />
                          <div>
                            <span className="block font-bold text-brand-blue mb-1">{t("hotel.address")}</span>
-                           <span className="text-gray-600">{hotel.location}</span>
-                           {hotel.mapLink && (
-                             <a 
-                               href={hotel.mapLink}
-                               target="_blank" 
-                               rel="noopener noreferrer" 
+                           <span className="text-gray-600">{hotel.address || hotel.location}</span>
+                           {(hotel.mapShareUrl || hotel.mapLink) && (
+                             <a
+                               href={hotel.mapShareUrl || hotel.mapLink}
+                               target="_blank"
+                               rel="noopener noreferrer"
                                className="text-xs font-bold text-brand-gold uppercase tracking-wider hover:underline flex items-center gap-1 mt-2"
                              >
                                {t("hotel.viewOnMaps")}
@@ -1276,23 +1276,43 @@ export default function HotelDetails() {
                            )}
                          </div>
                        </div>
-                       {hotel.phone && (
+                       {(hotel.phone || hotel.mobile) && (
                          <div className="flex items-start gap-3">
                            <Phone className="w-5 h-5 text-brand-gold mt-1" />
                            <div>
                              <span className="block font-bold text-brand-blue mb-1">{t("hotel.phone")}</span>
-                             {hotel.phone.split(",").map((p: string, i: number) => (
+                             {hotel.phone && hotel.phone.split(",").map((p: string, i: number) => (
                                <a key={i} href={`tel:${p.trim().replace(/\s/g, "")}`} className="block text-gray-600 hover:text-brand-gold transition-colors">{p.trim()}</a>
                              ))}
+                             {hotel.mobile && (
+                               <div className="flex items-center gap-1 mt-0.5">
+                                 <span className="text-xs text-gray-400 uppercase">Mobile:</span>
+                                 <a href={`tel:${hotel.mobile.replace(/\s/g, "")}`} className="text-gray-600 hover:text-brand-gold transition-colors text-sm">{hotel.mobile}</a>
+                               </div>
+                             )}
                            </div>
                          </div>
                        )}
-                       {hotel.email && (
+                       {(hotel.emailReservations || hotel.emailSales || hotel.email) && (
                          <div className="flex items-start gap-3">
                            <Mail className="w-5 h-5 text-brand-gold mt-1" />
                            <div>
                              <span className="block font-bold text-brand-blue mb-1">{t("hotel.email")}</span>
-                             <a href={`mailto:${hotel.email}`} className="text-gray-600 hover:text-brand-gold transition-colors">{hotel.email}</a>
+                             {hotel.emailReservations && (
+                               <div className="mb-1">
+                                 <span className="text-xs text-gray-400 uppercase block">Reservations:</span>
+                                 <a href={`mailto:${hotel.emailReservations}`} className="text-gray-600 hover:text-brand-gold transition-colors">{hotel.emailReservations}</a>
+                               </div>
+                             )}
+                             {hotel.emailSales && (
+                               <div>
+                                 <span className="text-xs text-gray-400 uppercase block">Sales:</span>
+                                 <a href={`mailto:${hotel.emailSales}`} className="text-gray-600 hover:text-brand-gold transition-colors">{hotel.emailSales}</a>
+                               </div>
+                             )}
+                             {!hotel.emailReservations && !hotel.emailSales && hotel.email && (
+                               <a href={`mailto:${hotel.email}`} className="text-gray-600 hover:text-brand-gold transition-colors">{hotel.email}</a>
+                             )}
                            </div>
                          </div>
                        )}
@@ -1308,18 +1328,6 @@ export default function HotelDetails() {
                           src={hotel.mapEmbed}
                           title={`${hotel.name} Location`}
                         />
-                      </div>
-                    ) : hotel.id === "crystal-beach" ? (
-                      <div className="h-full min-h-[300px] w-full bg-gray-100 overflow-hidden">
-                        <iframe width="100%" height="100%" style={{ border: 0, minHeight: '300px' }} loading="lazy" allowFullScreen src="https://maps.google.com/maps?cid=4429004655439307872&output=embed" title="Protels Crystal Beach Resort Location" />
-                      </div>
-                    ) : hotel.id === "la-plage" ? (
-                      <div className="h-full min-h-[300px] w-full bg-gray-100 overflow-hidden">
-                        <iframe width="100%" height="100%" style={{ border: 0, minHeight: '300px' }} loading="lazy" allowFullScreen src="https://maps.google.com/maps?cid=14143868217406177037&output=embed" title="Protels La Plage Location" />
-                      </div>
-                    ) : hotel.id === "beach-club" ? (
-                      <div className="h-full min-h-[300px] w-full bg-gray-100 overflow-hidden">
-                        <iframe width="100%" height="100%" style={{ border: 0, minHeight: '300px' }} loading="lazy" allowFullScreen src="https://maps.google.com/maps?cid=2437922038492058707&output=embed" title="Protels Beach Club & SPA Location" />
                       </div>
                     ) : (
                       <div className="bg-gray-100 h-full min-h-[200px] flex items-center justify-center">
