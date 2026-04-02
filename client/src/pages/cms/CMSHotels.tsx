@@ -13,6 +13,8 @@ import {
   ChevronDown,
   ChevronUp,
   MapPin,
+  Phone,
+  Mail,
   Hotel,
   UtensilsCrossed,
   Star,
@@ -95,6 +97,9 @@ interface HotelForm {
   gallery: string[];
   mapLink: string;
   bookingLink: string;
+  phone: string;
+  email: string;
+  mapEmbed: string;
   status: string;
   sortOrder: number;
   heroVideo: string;
@@ -126,6 +131,9 @@ const emptyForm: HotelForm = {
   gallery: [],
   mapLink: "",
   bookingLink: "",
+  phone: "",
+  email: "",
+  mapEmbed: "",
   status: "draft",
   sortOrder: 0,
   heroVideo: "",
@@ -252,6 +260,9 @@ export default function CMSHotels() {
     gallery: form.gallery,
     mapLink: form.mapLink || null,
     bookingLink: form.bookingLink || null,
+    phone: form.phone || null,
+    email: form.email || null,
+    mapEmbed: form.mapEmbed || null,
     status: form.status,
     sortOrder: form.sortOrder,
     heroVideo: form.heroVideo || null,
@@ -298,6 +309,9 @@ export default function CMSHotels() {
       gallery: hotel.gallery || [],
       mapLink: hotel.mapLink || "",
       bookingLink: hotel.bookingLink || "",
+      phone: hotel.phone || "",
+      email: hotel.email || "",
+      mapEmbed: hotel.mapEmbed || "",
       status: hotel.status || "draft",
       sortOrder: hotel.sortOrder || 0,
       heroVideo: hotel.heroVideo || "",
@@ -513,6 +527,10 @@ export default function CMSHotels() {
             <TabsTrigger data-testid="tab-ratings" value="ratings" className="flex items-center gap-1.5 text-xs sm:text-sm">
               <Star className="w-3.5 h-3.5" />
               التقييمات
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-contact" value="contact" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <Phone className="w-3.5 h-3.5" />
+              التواصل
             </TabsTrigger>
           </TabsList>
 
@@ -1437,6 +1455,82 @@ export default function CMSHotels() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Tab: Contact */}
+          <TabsContent value="contact">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">معلومات التواصل</h3>
+              <p className="text-sm text-gray-500">هذه المعلومات ستظهر في صفحة "الموقع والتواصل" الخاصة بالفندق.</p>
+
+              <div className="space-y-5">
+                <div>
+                  <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-brand-gold" />
+                    رقم التليفون
+                  </label>
+                  <Input
+                    data-testid="input-hotel-phone"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="+20 65 3380063"
+                    dir="ltr"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">لو في أكتر من رقم، افصلهم بفاصلة. مثال: +20 65 3380063, +20 150 092 5579</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-brand-gold" />
+                    الإيميل
+                  </label>
+                  <Input
+                    data-testid="input-hotel-email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="res.cb@protels.com"
+                    dir="ltr"
+                    type="email"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-brand-gold" />
+                    رابط خريطة Google (للتضمين)
+                  </label>
+                  <Textarea
+                    data-testid="input-hotel-map-embed"
+                    value={form.mapEmbed}
+                    onChange={(e) => setForm({ ...form, mapEmbed: e.target.value })}
+                    placeholder="https://maps.google.com/maps?cid=XXXX&output=embed"
+                    dir="ltr"
+                    rows={3}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    اذهب إلى Google Maps → شارك → تضمين خريطة → انسخ الرابط من src=""
+                  </p>
+                </div>
+
+                {form.mapEmbed && (
+                  <div>
+                    <p className="text-sm font-medium mb-2 text-gray-600">معاينة الخريطة:</p>
+                    <div className="h-48 w-full bg-gray-100 overflow-hidden rounded border">
+                      <iframe
+                        src={form.mapEmbed}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        title="Hotel Map Preview"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </TabsContent>

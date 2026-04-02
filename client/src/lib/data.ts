@@ -90,6 +90,9 @@ export interface Hotel {
   theme?: { primaryColor?: string; secondaryColor?: string; accentColor?: string };
   tabConfig?: { tabs: { id: string; label: string; visible: boolean; order: number }[] };
   bookingLink?: string;
+  phone?: string;
+  email?: string;
+  mapEmbed?: string;
   ratings?: { platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl: string }[];
 }
 
