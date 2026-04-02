@@ -1010,6 +1010,15 @@ Sitemap: https://protels.com/sitemap.xml
         bookingLink: h.bookingLink,
         heroVideo: h.heroVideo,
         theme: h.theme,
+        phone: h.phone,
+        mobile: h.mobile,
+        email: h.email,
+        emailReservations: h.emailReservations,
+        emailSales: h.emailSales,
+        mapEmbed: h.mapEmbed,
+        mapShareUrl: h.mapShareUrl,
+        mapLink: h.mapLink,
+        address: h.address,
       }));
       setCache(cacheKey, light);
       res.json(light);

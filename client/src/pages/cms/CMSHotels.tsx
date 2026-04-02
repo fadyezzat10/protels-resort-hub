@@ -190,6 +190,32 @@ const generateSlug = (name: string) =>
     .replace(/-+/g, "-")
     .trim();
 
+function toEmbedUrl(url: string): { embed: string; warning: string | null } {
+  const trimmed = url.trim();
+  if (!trimmed) return { embed: "", warning: null };
+
+  if (trimmed.includes("maps.app.goo.gl") || trimmed.includes("goo.gl/maps")) {
+    return {
+      embed: trimmed,
+      warning: "روابط maps.app.goo.gl المختصرة لا تدعم التضمين. افتح الرابط في المتصفح ثم اختر: Share → Embed a map → انسخ قيمة src من الـ iframe.",
+    };
+  }
+
+  if (trimmed.includes("output=embed")) {
+    return { embed: trimmed, warning: null };
+  }
+
+  if (trimmed.match(/maps\.google\.|google\.com\/maps/)) {
+    const separator = trimmed.includes("?") ? "&" : "?";
+    return { embed: trimmed + separator + "output=embed", warning: null };
+  }
+
+  return {
+    embed: trimmed,
+    warning: "تأكد أن الرابط من Google Maps وينتهي بـ &output=embed حتى تعمل المعاينة.",
+  };
+}
+
 export default function CMSHotels() {
   const { toast } = useToast();
   const [view, setView] = useState<"list" | "editor">("list");
@@ -1572,13 +1598,22 @@ export default function CMSHotels() {
                   <Textarea
                     data-testid="input-hotel-map-embed"
                     value={form.mapEmbed}
-                    onChange={(e) => setForm({ ...form, mapEmbed: e.target.value })}
+                    onChange={(e) => {
+                      const { embed } = toEmbedUrl(e.target.value);
+                      setForm({ ...form, mapEmbed: embed });
+                    }}
                     placeholder="https://maps.google.com/maps?cid=XXXX&output=embed"
                     dir="ltr"
                     rows={3}
                     className="font-mono text-sm"
                   />
-                  <p className="text-xs text-gray-400 mt-1">Google Maps → شارك → تضمين → انسخ رابط الـ src</p>
+                  <p className="text-xs text-gray-400 mt-1">Google Maps → Share → Embed a map → انسخ قيمة الـ src</p>
+                  {form.mapEmbed && toEmbedUrl(form.mapEmbed).warning && (
+                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800 flex items-start gap-2">
+                      <span className="shrink-0">⚠️</span>
+                      <span>{toEmbedUrl(form.mapEmbed).warning}</span>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 flex items-center gap-2">
@@ -1598,22 +1633,33 @@ export default function CMSHotels() {
                 </div>
               </div>
 
-              {form.mapEmbed && (
-                <div>
-                  <p className="text-sm font-medium mb-2 text-gray-600">معاينة الخريطة:</p>
-                  <div className="h-48 w-full bg-gray-100 overflow-hidden rounded border">
-                    <iframe
-                      src={form.mapEmbed}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      title="Hotel Map Preview"
-                    />
+              {form.mapEmbed && (() => {
+                const { warning } = toEmbedUrl(form.mapEmbed);
+                return (
+                  <div>
+                    <p className="text-sm font-medium mb-2 text-gray-600">معاينة الخريطة:</p>
+                    {warning ? (
+                      <div className="h-48 w-full bg-gray-100 rounded border flex flex-col items-center justify-center gap-3 text-center px-6">
+                        <span className="text-3xl">🗺️</span>
+                        <p className="text-sm text-gray-500">المعاينة غير متاحة — الرابط غير صالح للتضمين</p>
+                        <p className="text-xs text-gray-400">اتبع التعليمات أعلاه للحصول على رابط التضمين الصحيح</p>
+                      </div>
+                    ) : (
+                      <div className="h-48 w-full bg-gray-100 overflow-hidden rounded border">
+                        <iframe
+                          src={form.mapEmbed}
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          title="Hotel Map Preview"
+                        />
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </TabsContent>
         </Tabs>
