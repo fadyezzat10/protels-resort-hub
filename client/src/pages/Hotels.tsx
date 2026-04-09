@@ -47,6 +47,7 @@ export default function Hotels() {
         keywords="Marsa Alam hotels, Red Sea resorts, Protels resorts, Egypt beach resorts, Hurghada hotels, Zanzibar resorts, all-inclusive Egypt"
         ogTitle="Protels Hotels & Resorts Collection"
         ogDescription="Discover our collection of luxury beach resorts along the Red Sea and Indian Ocean."
+        ogImage="https://protels.com/images/hotel-crystal-beach-hero.webp"
         jsonLd={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Hotels", path: "/hotels" },

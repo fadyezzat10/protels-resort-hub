@@ -166,6 +166,7 @@ export default function Careers() {
         keywords="Protels careers, hotel jobs Egypt, hospitality careers Zanzibar, resort jobs Marsa Alam, Hurghada hotel employment"
         ogTitle="Careers at Protels Hotels & Resorts"
         ogDescription="Explore exciting career opportunities at our luxury beach resorts in Egypt and Zanzibar."
+        ogImage="https://protels.com/images/hotel-crystal-beach-hero.webp"
         jsonLd={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Careers", path: "/careers" },

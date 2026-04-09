@@ -15,7 +15,7 @@ interface SEOProps {
 }
 
 const BASE_URL = "https://protels.com";
-const DEFAULT_IMAGE = "https://protels.com/images/og-default.webp";
+const DEFAULT_IMAGE = "https://protels.com/images/og-image.webp";
 const SITE_NAME = "Protels Hotels & Resorts";
 
 export default function SEOHead({

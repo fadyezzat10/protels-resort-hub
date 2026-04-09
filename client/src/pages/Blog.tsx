@@ -43,6 +43,7 @@ export default function Blog() {
         keywords="Protels blog, Marsa Alam travel tips, Red Sea diving blog, Zanzibar travel guide, Egypt resort news"
         ogTitle={isAr ? "مدونة بروتيلز" : "Protels Hotels & Resorts Blog"}
         ogDescription="Travel tips, resort news, and destination guides from Protels Hotels & Resorts."
+        ogImage="https://protels.com/images/hotel-la-plage-hero.webp"
         jsonLd={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Blog", path: "/blog" },

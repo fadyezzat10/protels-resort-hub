@@ -128,6 +128,7 @@ export default function About() {
         keywords="Protels resorts about, luxury hotel brand Egypt, Red Sea hospitality, Zanzibar resort company"
         ogTitle="About Protels Hotels & Resorts"
         ogDescription="Discover the story behind Protels Hotels & Resorts – luxury beach destinations in Egypt and Zanzibar."
+        ogImage="https://protels.com/images/hotel-beach-club-hero.webp"
         jsonLd={aboutJsonLd}
       />
       <Navbar />

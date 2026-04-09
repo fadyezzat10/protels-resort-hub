@@ -56,6 +56,7 @@ export default function Contact() {
         keywords="Protels contact, Marsa Alam hotel phone, Red Sea resort reservations, Zanzibar hotel contact"
         ogTitle="Contact Protels Hotels & Resorts"
         ogDescription="Get in touch with Protels Hotels & Resorts for bookings and inquiries."
+        ogImage="https://protels.com/images/hotel-royal-bay-hero-edited.webp"
         jsonLd={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Contact", path: "/contact" },

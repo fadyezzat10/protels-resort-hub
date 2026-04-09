@@ -58,6 +58,7 @@ export default function Gallery() {
         keywords="Protels resort photos, Marsa Alam hotel gallery, Red Sea resort images, Zanzibar beach resort pictures"
         ogTitle="Protels Hotels & Resorts Gallery"
         ogDescription="Explore beautiful images from our luxury beach resorts."
+        ogImage="https://protels.com/images/hotel-la-plage-hero.webp"
         jsonLd={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Gallery", path: "/gallery" },

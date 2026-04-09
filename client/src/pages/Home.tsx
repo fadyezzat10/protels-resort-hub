@@ -136,11 +136,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-brand-white">
       <SEOHead
-        title="Protels Hotels & Resorts – Luxury Beach Resorts in Egypt & Zanzibar"
-        description="Discover luxury beachfront resorts in Marsa Alam, Hurghada & Zanzibar. All-inclusive packages, diving, spa, family activities. Book your Red Sea vacation at Protels."
-        keywords="Marsa Alam hotels, Red Sea resorts, Protels resorts, Egypt beach resorts, Hurghada hotels, Zanzibar resorts, luxury beach resort Egypt, all-inclusive Red Sea, diving resort Egypt"
-        ogTitle="Protels Hotels & Resorts – Luxury Beach Resorts"
-        ogDescription="Experience luxury at our premier beach resorts in Marsa Alam, Hurghada, and Zanzibar. All-inclusive vacation packages with diving, spa & family fun."
+        title="Luxury Beach Resorts Egypt & Zanzibar | Protels Hotels"
+        description="Discover luxury all-inclusive beach resorts in Marsa Alam, Hurghada & Zanzibar. PADI diving, water sports, and 5-star amenities. Book your paradise vacation today."
+        keywords="luxury resort Egypt, beach resort Marsa Alam, Zanzibar resort, all-inclusive diving, PADI diving Egypt, water sports Red Sea, 5-star beach resort, Protels Hotels"
+        ogTitle="Luxury Beach Resorts Egypt & Zanzibar | Protels Hotels"
+        ogDescription="Discover luxury all-inclusive beach resorts in Marsa Alam, Hurghada & Zanzibar. PADI diving, water sports, and 5-star amenities."
+        ogImage="https://protels.com/images/og-image.webp"
         canonical="https://protels.com/"
         jsonLd={homeJsonLd}
       />
