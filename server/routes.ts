@@ -390,10 +390,21 @@ Sitemap: https://protels.com/sitemap.xml
   });
 
   app.patch("/api/cms/hotels/:id", requireAuth, async (req, res) => {
-    const hotel = await storage.updateHotel(Number(req.params.id), req.body);
-    if (!hotel) return res.status(404).json({ message: "Not found" });
-    clearHotelCache(hotel.slug);
-    res.json(hotel);
+    try {
+      const hotel = await storage.updateHotel(Number(req.params.id), req.body);
+      if (!hotel) return res.status(404).json({ message: "Not found" });
+      // Explicitly save tripAdvisorRank via raw SQL to ensure it's not dropped by ORM
+      if (req.body.tripAdvisorRank !== undefined) {
+        await pool.query(
+          "UPDATE hotels SET tripadvisor_rank = $1 WHERE id = $2",
+          [req.body.tripAdvisorRank || null, hotel.id]
+        );
+      }
+      clearHotelCache(hotel.slug);
+      res.json({ ...hotel, tripAdvisorRank: req.body.tripAdvisorRank ?? hotel.tripAdvisorRank });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
   });
 
   app.delete("/api/cms/hotels/:id", requireAuth, async (req, res) => {

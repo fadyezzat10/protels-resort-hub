@@ -196,12 +196,14 @@ export default function HotelDetails() {
                     {/* TripAdvisor Rank Badge */}
                     {(hotel as any).tripAdvisorRank && (() => {
                       const taRating = hotel.ratings?.find((r: any) => r.platform === "tripadvisor");
+                      const taUrl = taRating?.reviewUrl || "https://www.tripadvisor.com";
                       return (
-                        <a
-                          href={taRating?.reviewUrl || "https://www.tripadvisor.com"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 mb-6 w-fit group"
+                        <div
+                          role="link"
+                          tabIndex={0}
+                          onClick={() => window.open(taUrl, "_blank", "noopener,noreferrer")}
+                          onKeyDown={(e) => e.key === "Enter" && window.open(taUrl, "_blank", "noopener,noreferrer")}
+                          className="flex items-center gap-3 mb-6 w-fit group cursor-pointer"
                         >
                           <div className="flex items-center gap-3 bg-white border border-[#00AF87]/30 rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[#00AF87] transition-all duration-300">
                             <svg className="w-8 h-8 flex-shrink-0" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
@@ -218,7 +220,7 @@ export default function HotelDetails() {
                               <div className="text-[10px] text-gray-400">on TripAdvisor</div>
                             </div>
                           </div>
-                        </a>
+                        </div>
                       );
                     })()}
 
