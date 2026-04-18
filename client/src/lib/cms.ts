@@ -136,6 +136,7 @@ function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
     mapShareUrl: cmsHotel.mapShareUrl || staticHotel.mapShareUrl,
     address: cmsHotel.address || staticHotel.address,
     ratings: cmsHotel.ratings || staticHotel.ratings,
+    tripAdvisorRank: cmsHotel.tripAdvisorRank ?? (staticHotel as any).tripAdvisorRank,
   };
 }
 
@@ -179,6 +180,7 @@ export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean }
       mapEmbed: ch.mapEmbed,
       mapShareUrl: ch.mapShareUrl,
       ratings: ch.ratings,
+      tripAdvisorRank: ch.tripAdvisorRank,
     }));
 
   return { hotels: [...merged, ...newCMSHotels], isLoading };

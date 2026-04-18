@@ -155,20 +155,20 @@ export default function HotelDetails() {
         <div className="container-padding">
           <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap py-2 thin-scrollbar">
             {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.id === "overview" ? basePath : `${basePath}/${tab.id}`}>
-                <a
-                  className={cn(
-                    "py-2 px-3 text-[13px] font-medium tracking-[0.5px] transition-all border-b-2 text-center shrink-0",
-                    activeSection === tab.id || (tab.id === "overview" && !params?.section)
-                      ? "border-[#C8A97E] text-[#222222]" 
-                      : "border-transparent text-[#777777] hover:text-[#222222]",
-                    isLaPlage && (activeSection === tab.id || (tab.id === "overview" && !params?.section)
-                      ? "border-[var(--color-brand-gold)] text-[var(--color-brand-blue)]" 
-                      : "text-[#8B5A2B]/70 hover:text-[var(--color-brand-blue)]")
-                  )}
-                >
-                  {tab.label}
-                </a>
+              <Link
+                key={tab.id}
+                href={tab.id === "overview" ? basePath : `${basePath}/${tab.id}`}
+                className={cn(
+                  "py-2 px-3 text-[13px] font-medium tracking-[0.5px] transition-all border-b-2 text-center shrink-0",
+                  activeSection === tab.id || (tab.id === "overview" && !params?.section)
+                    ? "border-[#C8A97E] text-[#222222]"
+                    : "border-transparent text-[#777777] hover:text-[#222222]",
+                  isLaPlage && (activeSection === tab.id || (tab.id === "overview" && !params?.section)
+                    ? "border-[var(--color-brand-gold)] text-[var(--color-brand-blue)]"
+                    : "text-[#8B5A2B]/70 hover:text-[var(--color-brand-blue)]")
+                )}
+              >
+                {tab.label}
               </Link>
             ))}
           </div>
