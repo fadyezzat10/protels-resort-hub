@@ -349,6 +349,26 @@ Sitemap: https://protels.com/sitemap.xml
     res.json({ ok: true });
   });
 
+  // ──────── PUBLIC API CACHE ────────
+  const publicApiCache = new Map<string, { data: any; time: number }>();
+  const PUBLIC_CACHE_TTL = 60 * 1000;
+
+  function getCached(key: string) {
+    const entry = publicApiCache.get(key);
+    if (entry && Date.now() - entry.time < PUBLIC_CACHE_TTL) return entry.data;
+    return null;
+  }
+
+  function setCache(key: string, data: any) {
+    publicApiCache.set(key, { data, time: Date.now() });
+  }
+
+  function clearHotelCache(slug?: string) {
+    publicApiCache.delete("hotels-light");
+    publicApiCache.delete("hotels-full");
+    if (slug) publicApiCache.delete(`hotel-${slug}`);
+  }
+
   // ──────── HOTELS ────────
   app.get("/api/cms/hotels", requireAuth, async (_req, res) => {
     res.json(await storage.getHotels());
@@ -372,6 +392,7 @@ Sitemap: https://protels.com/sitemap.xml
   app.patch("/api/cms/hotels/:id", requireAuth, async (req, res) => {
     const hotel = await storage.updateHotel(Number(req.params.id), req.body);
     if (!hotel) return res.status(404).json({ message: "Not found" });
+    clearHotelCache(hotel.slug);
     res.json(hotel);
   });
 
@@ -937,19 +958,6 @@ Sitemap: https://protels.com/sitemap.xml
       res.status(500).json({ message: e.message });
     }
   });
-
-  const publicApiCache = new Map<string, { data: any; time: number }>();
-  const PUBLIC_CACHE_TTL = 60 * 1000;
-
-  function getCached(key: string) {
-    const entry = publicApiCache.get(key);
-    if (entry && Date.now() - entry.time < PUBLIC_CACHE_TTL) return entry.data;
-    return null;
-  }
-
-  function setCache(key: string, data: any) {
-    publicApiCache.set(key, { data, time: Date.now() });
-  }
 
   // Public page content API (for website rendering)
   app.get("/api/public/page-content/:pagePath", async (req, res) => {
