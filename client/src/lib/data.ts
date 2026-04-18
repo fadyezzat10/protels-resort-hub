@@ -99,6 +99,7 @@ export interface Hotel {
   mapShareUrl?: string;
   address?: string;
   ratings?: { platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl: string }[];
+  tripAdvisorRank?: string;
 }
 
 export const hotels: Hotel[] = [

@@ -190,8 +190,39 @@ export default function HotelDetails() {
                 </p>
                 
                 {/* Ratings & Review Links - Dynamic from CMS */}
-                {hotel.ratings && hotel.ratings.length > 0 && (
+                {((hotel.ratings && hotel.ratings.length > 0) || (hotel as any).tripAdvisorRank) && (
                   <div className={cn("mt-8 pt-8 border-t", isLaPlage ? "border-[#8B5A2B]/10" : "border-gray-100")}>
+
+                    {/* TripAdvisor Rank Badge */}
+                    {(hotel as any).tripAdvisorRank && (() => {
+                      const taRating = hotel.ratings?.find((r: any) => r.platform === "tripadvisor");
+                      return (
+                        <a
+                          href={taRating?.reviewUrl || "https://www.tripadvisor.com"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 mb-6 w-fit group"
+                        >
+                          <div className="flex items-center gap-3 bg-white border border-[#00AF87]/30 rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[#00AF87] transition-all duration-300">
+                            <svg className="w-8 h-8 flex-shrink-0" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="30" cy="30" r="30" fill="#00AF87"/>
+                              <circle cx="19" cy="30" r="8" fill="white"/>
+                              <circle cx="41" cy="30" r="8" fill="white"/>
+                              <circle cx="19" cy="30" r="4" fill="#00AF87"/>
+                              <circle cx="41" cy="30" r="4" fill="#00AF87"/>
+                              <path d="M30 16 C22 16 15 22 14 30 C20 26 25 25 30 25 C35 25 40 26 46 30 C45 22 38 16 30 16Z" fill="white"/>
+                            </svg>
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-[#00AF87] font-semibold">Travellers' Choice</div>
+                              <div className="text-sm font-bold text-gray-800">{(hotel as any).tripAdvisorRank}</div>
+                              <div className="text-[10px] text-gray-400">on TripAdvisor</div>
+                            </div>
+                          </div>
+                        </a>
+                      );
+                    })()}
+
+                    {hotel.ratings && hotel.ratings.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                       {hotel.ratings.map((r: any) => {
                         const platformConfig: Record<string, { name: string; color: string; icon: React.ReactNode }> = {
@@ -278,6 +309,7 @@ export default function HotelDetails() {
                         );
                       })}
                     </div>
+                    )}
                   </div>
                 )}
 

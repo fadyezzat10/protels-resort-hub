@@ -1019,6 +1019,8 @@ Sitemap: https://protels.com/sitemap.xml
         mapShareUrl: h.mapShareUrl,
         mapLink: h.mapLink,
         address: h.address,
+        ratings: h.ratings,
+        tripAdvisorRank: h.tripAdvisorRank,
       }));
       setCache(cacheKey, light);
       res.json(light);

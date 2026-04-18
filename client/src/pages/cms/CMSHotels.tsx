@@ -115,6 +115,7 @@ interface HotelForm {
   };
   tabConfig: { id: string; label: string; visible: boolean; order: number }[];
   ratings: { platform: string; rating: number; maxRating: number; reviewCount: number; reviewUrl: string }[];
+  tripAdvisorRank: string;
 }
 
 const emptyForm: HotelForm = {
@@ -157,6 +158,7 @@ const emptyForm: HotelForm = {
     { id: "location", label: "Location", visible: true, order: 6 },
   ],
   ratings: [],
+  tripAdvisorRank: "",
 };
 
 const FEATURE_SUGGESTIONS = [
@@ -310,6 +312,7 @@ export default function CMSHotels() {
     theme: (form.theme.primaryColor || form.theme.secondaryColor || form.theme.accentColor) ? form.theme : null,
     tabConfig: form.tabConfig.length > 0 ? { tabs: form.tabConfig } : null,
     ratings: form.ratings.length > 0 ? form.ratings : null,
+    tripAdvisorRank: form.tripAdvisorRank || null,
   });
 
   const handleSubmit = () => {
@@ -371,6 +374,7 @@ export default function CMSHotels() {
         { id: "location", label: "Location", visible: true, order: 6 },
       ],
       ratings: hotel.ratings || [],
+      tripAdvisorRank: (hotel as any).tripAdvisorRank || "",
     });
     setExpandedRooms(new Set());
     setView("editor");
@@ -1501,6 +1505,29 @@ export default function CMSHotels() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* TripAdvisor Rank */}
+              <div className="border-t pt-5 mt-2">
+                <h4 className="text-sm font-semibold text-brand-blue mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#00AF87" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"/>
+                    <circle cx="8.5" cy="11.5" r="2.5"/>
+                    <circle cx="15.5" cy="11.5" r="2.5"/>
+                    <path d="M12 7c-1.5 0-2.9.5-4 1.3L9.5 10c.7-.6 1.6-1 2.5-1s1.8.4 2.5 1l1.5-1.7C15 7.5 13.6 7 12 7z"/>
+                  </svg>
+                  ترتيب TripAdvisor (Travellers' Choice)
+                </h4>
+                <p className="text-xs text-gray-400 mb-2">مثال: Ranked #2 of 15 Hotels in Marsa Alam</p>
+                <input
+                  type="text"
+                  data-testid="input-tripadvisor-rank"
+                  value={form.tripAdvisorRank}
+                  onChange={(e) => setForm({ ...form, tripAdvisorRank: e.target.value })}
+                  placeholder="Ranked #1 of 24 Hotels in Marsa Alam"
+                  dir="ltr"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
+                />
               </div>
             </div>
           </TabsContent>

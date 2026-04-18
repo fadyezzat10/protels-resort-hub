@@ -63,6 +63,7 @@ export const hotels = pgTable("hotels", {
   mapShareUrl: text("map_share_url"),
   address: text("address"),
   ratings: jsonb("ratings").$type<{ platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl: string }[]>(),
+  tripAdvisorRank: text("tripadvisor_rank"),
   status: text("status").notNull().default("draft"),
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),

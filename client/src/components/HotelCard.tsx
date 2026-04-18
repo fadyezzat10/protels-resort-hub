@@ -63,6 +63,16 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
               {hotel.discount}
             </div>
           )}
+          {hotel.tripAdvisorRank && hotel.id !== "royal-bay" && (
+            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-md pointer-events-none">
+              <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#00AF87" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"/>
+                <circle cx="8.5" cy="11.5" r="2.5"/>
+                <circle cx="15.5" cy="11.5" r="2.5"/>
+              </svg>
+              <span className="text-[10px] font-bold text-[#00AF87] whitespace-nowrap">{hotel.tripAdvisorRank}</span>
+            </div>
+          )}
         </div>
         <CardContent className="flex-1 p-6 flex flex-col bg-white">
           <div className="flex items-start justify-between mb-2">
