@@ -113,18 +113,16 @@ export default function BlogArticle() {
           <p className="text-gray-500 mb-8">
             {isAr ? "عذراً، هذا المقال غير متوفر" : "Sorry, this article could not be found."}
           </p>
-          <Link href="/blog">
-            <span className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-blue transition-colors cursor-pointer">
-              {isAr ? (
-                <>
-                  {"العودة إلى المدونة"} <ArrowLeft className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  <ArrowLeft className="w-4 h-4" /> {"Back to Blog"}
-                </>
-              )}
-            </span>
+          <Link href="/blog" className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-blue transition-colors cursor-pointer">
+            {isAr ? (
+              <>
+                {"العودة إلى المدونة"} <ArrowLeft className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                <ArrowLeft className="w-4 h-4" /> {"Back to Blog"}
+              </>
+            )}
           </Link>
         </div>
         <Footer />
@@ -170,18 +168,16 @@ export default function BlogArticle() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link href="/blog">
-            <span className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-blue transition-colors text-sm mb-8 cursor-pointer">
-              {isAr ? (
-                <>
-                  {"العودة إلى المدونة"} <ArrowRight className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  <ArrowLeft className="w-4 h-4" /> {"Back to Blog"}
-                </>
-              )}
-            </span>
+          <Link href="/blog" className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-blue transition-colors text-sm mb-8 cursor-pointer">
+            {isAr ? (
+              <>
+                {"العودة إلى المدونة"} <ArrowRight className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                <ArrowLeft className="w-4 h-4" /> {"Back to Blog"}
+              </>
+            )}
           </Link>
 
           <div className="flex items-center gap-4 mb-6 text-sm text-gray-400">
@@ -194,11 +190,9 @@ export default function BlogArticle() {
               })}
             </span>
             {post.hotelSlug && (
-              <Link href={`/hotels/${post.hotelSlug}`}>
-                <span className="flex items-center gap-1 text-brand-gold hover:text-brand-blue transition-colors cursor-pointer">
-                  <Building2 className="w-4 h-4" />
-                  {hotelNames[post.hotelSlug] || post.hotelSlug}
-                </span>
+              <Link href={`/hotels/${post.hotelSlug}`} className="flex items-center gap-1 text-brand-gold hover:text-brand-blue transition-colors cursor-pointer">
+                <Building2 className="w-4 h-4" />
+                {hotelNames[post.hotelSlug] || post.hotelSlug}
               </Link>
             )}
           </div>
@@ -233,10 +227,8 @@ export default function BlogArticle() {
               <h3 className="text-xl font-serif text-brand-blue mb-4">
                 Protels {hotelNames[post.hotelSlug] || post.hotelSlug}
               </h3>
-              <Link href={`/hotels/${post.hotelSlug}`}>
-                <span className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-blue transition-colors text-sm font-medium cursor-pointer">
-                  {isAr ? "استكشف المنتجع" : "Explore this resort"} <ArrowRight className="w-4 h-4" />
-                </span>
+              <Link href={`/hotels/${post.hotelSlug}`} className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-blue transition-colors text-sm font-medium cursor-pointer">
+                {isAr ? "استكشف المنتجع" : "Explore this resort"} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           )}
