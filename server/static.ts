@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
+import { getMetaForUrl, injectMeta } from "./metaInjection";
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
@@ -14,6 +15,7 @@ export function serveStatic(app: Express) {
     maxAge: "7d",
     etag: true,
     lastModified: true,
+    index: false,
     setHeaders: (res, filePath) => {
       if (filePath.endsWith(".html")) {
         res.setHeader("Cache-Control", "no-cache");
@@ -28,7 +30,18 @@ export function serveStatic(app: Express) {
     },
   }));
 
-  app.use((_req, res, _next) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  const indexPath = path.resolve(distPath, "index.html");
+
+  app.use(async (req, res, _next) => {
+    try {
+      let template = await fs.promises.readFile(indexPath, "utf-8");
+      const meta = await getMetaForUrl(req.originalUrl);
+      template = injectMeta(template, meta);
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Cache-Control", "no-cache");
+      res.status(200).end(template);
+    } catch {
+      res.sendFile(indexPath);
+    }
   });
 }
