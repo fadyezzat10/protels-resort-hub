@@ -158,6 +158,7 @@ export default function HotelDetails() {
               <Link
                 key={tab.id}
                 href={tab.id === "overview" ? basePath : `${basePath}/${tab.id}`}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 className={cn(
                   "py-2 px-3 text-[13px] font-medium tracking-[0.5px] transition-all border-b-2 text-center shrink-0",
                   activeSection === tab.id || (tab.id === "overview" && !params?.section)
