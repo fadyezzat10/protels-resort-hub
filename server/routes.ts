@@ -554,6 +554,95 @@ Sitemap: https://protels.com/sitemap.xml
     res.json({ ok: true });
   });
 
+  // ──────── HERO IMAGE UPLOAD ────────
+  app.post("/api/cms/hero-upload", requireAuth, upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+      const slot = req.body.slot as string;
+      if (!slot) return res.status(400).json({ message: "Missing slot parameter" });
+
+      const maxSize = 2 * 1024 * 1024;
+      if (req.file.size > maxSize) {
+        fs.unlinkSync(path.join(uploadDir, req.file.filename));
+        return res.status(400).json({ message: "File size exceeds 2MB limit" });
+      }
+
+      const allowed = /\.(jpe?g|png|webp)$/i;
+      if (!allowed.test(req.file.originalname)) {
+        fs.unlinkSync(path.join(uploadDir, req.file.filename));
+        return res.status(400).json({ message: "Only JPG, PNG, and WebP files are allowed" });
+      }
+
+      const dimensionMap: Record<string, { w: number; h: number }> = {
+        homepage: { w: 1920, h: 1080 },
+        room: { w: 1200, h: 800 },
+      };
+      const dims = slot.startsWith("hotel-") ? { w: 1920, h: 600 } : (dimensionMap[slot] || { w: 1920, h: 1080 });
+
+      const localPath = path.join(uploadDir, req.file.filename);
+      const webpFilename = `hero-${slot}-${Date.now()}.webp`;
+      const webpPath = path.join(uploadDir, webpFilename);
+
+      await sharp(localPath)
+        .resize({ width: dims.w, height: dims.h, fit: "cover", withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toFile(webpPath);
+
+      try { fs.unlinkSync(localPath); } catch {}
+
+      const finalSize = fs.statSync(webpPath).size;
+      let fileUrl = `/uploads/${webpFilename}`;
+
+      try {
+        const objService = new ObjectStorageService();
+        const publicPaths = objService.getPublicObjectSearchPaths();
+        if (publicPaths.length > 0) {
+          const bucketPath = publicPaths[0];
+          const fullPath = `${bucketPath}/${webpFilename}`;
+          const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+          const parts = p.split("/");
+          const bucketName = parts[1];
+          const objectName = parts.slice(2).join("/");
+          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+          const bucket = objectStorageClient.bucket(bucketName);
+          const objFile = bucket.file(objectName);
+          await new Promise<void>((resolve, reject) => {
+            fs.createReadStream(webpPath)
+              .pipe(objFile.createWriteStream({ metadata: { contentType: "image/webp" } }))
+              .on("finish", () => resolve())
+              .on("error", (err: Error) => reject(err));
+          });
+        }
+      } catch {}
+
+      if (slot === "homepage") {
+        const existing = await storage.getSetting("hero_images");
+        const arr: string[] = existing?.value || [];
+        arr.unshift(fileUrl);
+        await storage.upsertSetting("hero_images", arr.slice(0, 10));
+      } else if (slot.startsWith("hotel-")) {
+        const hotelSlug = slot.replace(/^hotel-/, "");
+        const hotels = await storage.getHotels();
+        const hotel = hotels.find((h: any) => h.slug === hotelSlug);
+        if (hotel) {
+          await storage.updateHotel(hotel.id, { image: fileUrl });
+        }
+      }
+
+      res.json({
+        url: fileUrl,
+        filename: webpFilename,
+        size: finalSize,
+        width: dims.w,
+        height: dims.h,
+        slot,
+      });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // ──────── GLOBAL SETTINGS ────────
   app.get("/api/cms/settings", requireAuth, async (_req, res) => {
     res.json(await storage.getSettings());

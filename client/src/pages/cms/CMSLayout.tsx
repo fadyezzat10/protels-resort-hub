@@ -21,6 +21,7 @@ import {
   MessageCircle,
   Zap,
   Gauge,
+  ImagePlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/controlpanal/hotels", label: "Hotels", icon: Building2 },
   { href: "/controlpanal/blog", label: "Blog", icon: Newspaper },
   { href: "/controlpanal/media", label: "Media Library", icon: Image },
+  { href: "/controlpanal/hero-images", label: "Hero Images", icon: ImagePlus },
   { href: "/controlpanal/company-profile", label: "Company Profile", icon: BookOpen },
   { href: "/controlpanal/seo", label: "SEO", icon: Search },
   { href: "/controlpanal/settings", label: "Settings", icon: Settings },

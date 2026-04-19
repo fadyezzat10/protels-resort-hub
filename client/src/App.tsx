@@ -94,6 +94,7 @@ const CMSDashboard = lazy(() => import("@/pages/cms/CMSDashboard"));
 const CMSPages = lazy(() => import("@/pages/cms/CMSPages"));
 const CMSHotels = lazy(() => import("@/pages/cms/CMSHotels"));
 const CMSMedia = lazy(() => import("@/pages/cms/CMSMedia"));
+const CMSHeroImages = lazy(() => import("@/pages/cms/CMSHeroImages"));
 const CMSSeo = lazy(() => import("@/pages/cms/CMSSeo"));
 const CMSSettings = lazy(() => import("@/pages/cms/CMSSettings"));
 const CMSBlog = lazy(() => import("@/pages/cms/CMSBlog"));
@@ -146,6 +147,7 @@ function Router() {
         <Route path="/controlpanal/pages" component={CMSPages} />
         <Route path="/controlpanal/hotels" component={CMSHotels} />
         <Route path="/controlpanal/media" component={CMSMedia} />
+        <Route path="/controlpanal/hero-images" component={CMSHeroImages} />
         <Route path="/controlpanal/seo" component={CMSSeo} />
         <Route path="/controlpanal/settings" component={CMSSettings} />
         <Route path="/controlpanal/theme" component={CMSTheme} />
