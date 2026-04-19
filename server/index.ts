@@ -120,21 +120,21 @@ async function fixTyposInDb() {
   try {
     await pool.query(`
       UPDATE global_settings
-      SET value = REPLACE(value::text, 'Restorts', 'Resorts')::jsonb
-      WHERE value::text ILIKE '%Restorts%'
+      SET value = regexp_replace(value::text, 'restorts', 'Resorts', 'gi')::jsonb
+      WHERE value::text ILIKE '%restorts%'
     `);
     await pool.query(`
       UPDATE hotels
-      SET name = REPLACE(name, 'Restorts', 'Resorts')
-      WHERE name ILIKE '%Restorts%'
+      SET name = regexp_replace(name, 'restorts', 'Resorts', 'gi')
+      WHERE name ILIKE '%restorts%'
     `);
     await pool.query(`
       UPDATE pages
-      SET content = REPLACE(content::text, 'Restorts', 'Resorts')::jsonb
-      WHERE content::text ILIKE '%Restorts%'
+      SET content = regexp_replace(content::text, 'restorts', 'Resorts', 'gi')::jsonb
+      WHERE content::text ILIKE '%restorts%'
     `);
-  } catch {
-    // Non-critical; proceed with server startup
+  } catch (err) {
+    console.warn("[startup] fixTyposInDb failed (non-critical):", err);
   }
 }
 
