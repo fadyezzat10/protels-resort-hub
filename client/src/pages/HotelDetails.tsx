@@ -132,7 +132,13 @@ export default function HotelDetails() {
       <Navbar />
       <PageBreadcrumb items={[
         { label: t("nav.hotels"), href: "/hotels" },
-        { label: hotel.name },
+        ...(activeSection === "overview" || !params?.section
+          ? [{ label: hotel.name }]
+          : [
+              { label: hotel.name, href: basePath },
+              { label: tabs.find(tab => tab.id === activeSection)?.label || activeSection },
+            ]
+        ),
       ]} />
       
       <Hero 
