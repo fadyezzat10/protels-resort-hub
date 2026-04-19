@@ -1,6 +1,4 @@
-import pg from "pg";
-
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+import { pool } from "./db";
 
 export interface PageMeta {
   title: string;
@@ -251,6 +249,18 @@ export function injectMeta(html: string, meta: PageMeta): string {
     /<link rel="canonical"[^>]*>/,
     `<link rel="canonical" href="${meta.canonical}" />`,
   );
+
+  if (meta.ogImage) {
+    const escapedOgImage = meta.ogImage.replace(/"/g, "&quot;");
+    head = head.replace(
+      /<meta property="og:image"[^>]*>/,
+      `<meta property="og:image" content="${escapedOgImage}" />`,
+    );
+    head = head.replace(
+      /<meta name="twitter:image"[^>]*>/,
+      `<meta name="twitter:image" content="${escapedOgImage}" />`,
+    );
+  }
 
   return head + rest;
 }

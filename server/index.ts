@@ -5,6 +5,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import path from "path";
+import { pool } from "./db";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -115,8 +116,31 @@ app.use((req, res, next) => {
   next();
 });
 
+async function fixTyposInDb() {
+  try {
+    await pool.query(`
+      UPDATE global_settings
+      SET value = REPLACE(value::text, 'Restorts', 'Resorts')::jsonb
+      WHERE value::text ILIKE '%Restorts%'
+    `);
+    await pool.query(`
+      UPDATE hotels
+      SET name = REPLACE(name, 'Restorts', 'Resorts')
+      WHERE name ILIKE '%Restorts%'
+    `);
+    await pool.query(`
+      UPDATE pages
+      SET content = REPLACE(content::text, 'Restorts', 'Resorts')::jsonb
+      WHERE content::text ILIKE '%Restorts%'
+    `);
+  } catch {
+    // Non-critical; proceed with server startup
+  }
+}
+
 (async () => {
   try {
+    await fixTyposInDb();
     await registerRoutes(httpServer, app);
 
     app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
