@@ -36,12 +36,12 @@ export default function Blog() {
   return (
     <div className="min-h-screen bg-brand-white font-sans" dir={isAr ? "rtl" : "ltr"}>
       <SEOHead
-        title={isAr ? "مدونة بروتيلز | أخبار ومقالات السفر والفنادق" : "Blog | Protels Hotels & Resorts – Travel Tips & News"}
+        title={isAr ? "مدونة بروتيلز | نصائح السفر وأدلة المنتجعات" : "Protels Blog | Travel Tips & Resort Guides"}
         description={isAr
           ? "اكتشف أحدث الأخبار والنصائح حول وجهاتنا ومنتجعاتنا الفاخرة في مصر وزنجبار"
           : "Discover the latest news, travel tips, and stories from Protels luxury beach resorts in Egypt and Zanzibar."}
         keywords="Protels blog, Marsa Alam travel tips, Red Sea diving blog, Zanzibar travel guide, Egypt resort news"
-        ogTitle={isAr ? "مدونة بروتيلز" : "Protels Hotels & Resorts Blog"}
+        ogTitle={isAr ? "مدونة بروتيلز | نصائح السفر وأدلة المنتجعات" : "Protels Blog | Travel Tips & Resort Guides"}
         ogDescription="Travel tips, resort news, and destination guides from Protels Hotels & Resorts."
         ogImage="https://protels.com/images/hotel-la-plage-hero.webp"
         jsonLd={getBreadcrumbJsonLd([
