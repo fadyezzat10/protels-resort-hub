@@ -137,10 +137,10 @@ Sitemap: https://protels.com/sitemap.xml
     const staticPages = [
       { loc: "/",                changefreq: "monthly", priority: "1.0" },
       { loc: "/hotels",          changefreq: "weekly",  priority: "0.9" },
-      { loc: "/blog",            changefreq: "daily",   priority: "0.8" },
+      { loc: "/blog",            changefreq: "weekly",  priority: "0.8" },
       { loc: "/about",           changefreq: "monthly", priority: "0.6" },
       { loc: "/contact",         changefreq: "monthly", priority: "0.6" },
-      { loc: "/gallery",         changefreq: "weekly",  priority: "0.6" },
+      { loc: "/gallery",         changefreq: "monthly", priority: "0.6" },
       { loc: "/careers",         changefreq: "monthly", priority: "0.6" },
       { loc: "/company-profile", changefreq: "monthly", priority: "0.6" },
     ];
@@ -188,13 +188,10 @@ Sitemap: https://protels.com/sitemap.xml
     }
 
     // Published CMS builder pages
-    try {
-      const pages = await storage.getPages();
-      const publishedPages = pages.filter((p: any) => p.status === "published" && p.slug);
-      for (const p of publishedPages) {
-        xml += urlEntry(`/page/${p.slug}`, "monthly", "0.6");
-      }
-    } catch (_) { /* storage.getPages may not exist in all envs */ }
+    const cmsPages = await storage.getPages();
+    for (const p of cmsPages.filter(pg => pg.status === "published" && pg.slug)) {
+      xml += urlEntry(`/page/${p.slug}`, "monthly", "0.6");
+    }
 
     xml += `</urlset>`;
     return xml;
