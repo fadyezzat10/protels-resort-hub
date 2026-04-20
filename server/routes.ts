@@ -120,26 +120,29 @@ Sitemap: https://protels.com/sitemap.xml
 `);
   });
 
-  // ── Regenerate the static sitemap file (admin-only) ──────────────────
+  // ── Dynamic sitemap & static-file regeneration ───────────────────────
+  const HOTEL_SLUGS = ["crystal-beach", "beach-club", "la-plage", "royal-bay"] as const;
+  const HOTEL_SECTIONS = ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] as const;
+  const HOTEL_IMAGES: Record<string, string> = {
+    "crystal-beach": "/images/hotel-crystal-beach-hero.webp",
+    "beach-club":    "/images/hotel-beach-club-hero.webp",
+    "la-plage":      "/images/hotel-la-plage-hero.webp",
+    "royal-bay":     "/images/hotel-royal-bay-hero.webp",
+  };
+
   const buildSitemapXml = async (): Promise<string> => {
     const BASE = "https://protels.com";
     const today = new Date().toISOString().split("T")[0];
 
     const staticPages = [
-      { loc: "/",        changefreq: "daily",   priority: "1.0" },
-      { loc: "/hotels",  changefreq: "weekly",  priority: "0.9" },
-      { loc: "/about",   changefreq: "monthly", priority: "0.8" },
-      { loc: "/contact", changefreq: "monthly", priority: "0.8" },
-      { loc: "/gallery", changefreq: "weekly",  priority: "0.7" },
-      { loc: "/blog",    changefreq: "daily",   priority: "0.8" },
-      { loc: "/careers", changefreq: "monthly", priority: "0.6" },
-    ];
-
-    const hotelPages = [
-      { slug: "crystal-beach", image: "/images/hotel-crystal-beach-hero.webp" },
-      { slug: "beach-club",    image: "/images/hotel-beach-club-hero.webp"    },
-      { slug: "la-plage",      image: "/images/hotel-la-plage-hero.webp"      },
-      { slug: "royal-bay",     image: "/images/hotel-royal-bay-hero.webp"     },
+      { loc: "/",                changefreq: "monthly", priority: "1.0" },
+      { loc: "/hotels",          changefreq: "weekly",  priority: "0.9" },
+      { loc: "/blog",            changefreq: "daily",   priority: "0.8" },
+      { loc: "/about",           changefreq: "monthly", priority: "0.6" },
+      { loc: "/contact",         changefreq: "monthly", priority: "0.6" },
+      { loc: "/gallery",         changefreq: "weekly",  priority: "0.6" },
+      { loc: "/careers",         changefreq: "monthly", priority: "0.6" },
+      { loc: "/company-profile", changefreq: "monthly", priority: "0.6" },
     ];
 
     const urlEntry = (loc: string, changefreq: string, priority: string, lastmod = today, imageUrl?: string) => {
@@ -162,10 +165,15 @@ Sitemap: https://protels.com/sitemap.xml
       xml += urlEntry(page.loc, page.changefreq, page.priority);
     }
 
-    for (const hotel of hotelPages) {
-      xml += urlEntry(`/hotels/${hotel.slug}`, "weekly", "0.9", today, hotel.image);
+    // Hotel main pages (priority 0.9) + section sub-pages (priority 0.8)
+    for (const slug of HOTEL_SLUGS) {
+      xml += urlEntry(`/hotels/${slug}`, "weekly", "0.9", today, HOTEL_IMAGES[slug]);
+      for (const section of HOTEL_SECTIONS) {
+        xml += urlEntry(`/hotels/${slug}/${section}`, "weekly", "0.8");
+      }
     }
 
+    // All published blog articles
     const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
     for (const post of publishedPosts) {
       let slug = post.slug
@@ -179,9 +187,31 @@ Sitemap: https://protels.com/sitemap.xml
       xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
     }
 
+    // Published CMS builder pages
+    try {
+      const pages = await storage.getPages();
+      const publishedPages = pages.filter((p: any) => p.status === "published" && p.slug);
+      for (const p of publishedPages) {
+        xml += urlEntry(`/page/${p.slug}`, "monthly", "0.6");
+      }
+    } catch (_) { /* storage.getPages may not exist in all envs */ }
+
     xml += `</urlset>`;
     return xml;
   };
+
+  // Serve sitemap dynamically so new blog articles appear without any manual step
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const xml = await buildSitemapXml();
+      res.set("Content-Type", "application/xml; charset=utf-8");
+      res.set("Cache-Control", "public, max-age=3600");
+      res.send(xml);
+    } catch (e: any) {
+      console.error("sitemap.xml error:", e);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
 
   app.post("/api/admin/regenerate-sitemap", requireAuth, async (req, res) => {
     if (req.session.role !== "super_admin" && req.session.role !== "admin") {
