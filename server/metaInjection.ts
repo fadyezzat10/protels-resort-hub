@@ -182,7 +182,7 @@ function generateHotelHtml(hotel: {
   ratings: Array<{ platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl?: string }> | null;
   image: string | null;
   address: string | null;
-  tripadvisoryRank: string | null;
+  tripAdvisorRank: string | null;
 }): string {
   const descEn = hotel.description?.en || hotel.description?.ar || "";
   const googleRating = hotel.ratings?.find(r => r.platform === "google");
@@ -212,10 +212,10 @@ function generateHotelHtml(hotel: {
       </span>`
     );
   }
-  if (hotel.tripadvisoryRank) {
+  if (hotel.tripAdvisorRank) {
     ratingBadges.push(
       `<span style="display:inline-flex;align-items:center;gap:0.4rem;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.875rem;">
-        🏆 <span style="color:#6b7280;">TripAdvisor Rank:</span> <strong>${escapeHtml(hotel.tripadvisoryRank)}</strong>
+        🏆 <span style="color:#6b7280;">TripAdvisor Rank:</span> <strong>${escapeHtml(hotel.tripAdvisorRank)}</strong>
       </span>`
     );
   }
@@ -248,7 +248,7 @@ function generateHotelHtml(hotel: {
       "name": f,
       "value": true,
     })),
-  });
+  }).replace(/</g, "\\u003c");
 
   return `<main id="ssr-prerender" itemscope itemtype="https://schema.org/LodgingBusiness" style="max-width:900px;margin:0 auto;padding:2rem 1.5rem;">
   <script type="application/ld+json">${jsonLd}</script>
@@ -293,7 +293,7 @@ export async function getPrerenderedHtml(urlPath: string): Promise<string | null
         ratings: r.ratings || null,
         image: r.image || null,
         address: r.address || null,
-        tripadvisoryRank: r.tripadvisor_rank || null,
+        tripAdvisorRank: r.tripadvisor_rank || null,
       });
     } catch {
       return null;
