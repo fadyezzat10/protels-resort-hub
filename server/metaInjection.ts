@@ -173,8 +173,132 @@ async function generateBlogArticleHtml(post: {
 </main>`;
 }
 
+function generateHotelHtml(hotel: {
+  slug: string;
+  name: string;
+  location: string;
+  description: Record<string, string>;
+  features: string[];
+  ratings: Array<{ platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl?: string }> | null;
+  image: string | null;
+  address: string | null;
+  tripadvisoryRank: string | null;
+}): string {
+  const descEn = hotel.description?.en || hotel.description?.ar || "";
+  const googleRating = hotel.ratings?.find(r => r.platform === "google");
+  const taRating = hotel.ratings?.find(r => r.platform === "tripadvisor");
+
+  const featuresHtml = hotel.features?.length
+    ? `<ul style="display:flex;flex-wrap:wrap;gap:0.5rem;list-style:none;padding:0;margin:1rem 0;">
+        ${hotel.features.map(f => `<li style="background:#f3f0e8;color:#1a2744;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.875rem;">${escapeHtml(f)}</li>`).join("")}
+      </ul>`
+    : "";
+
+  const ratingBadges: string[] = [];
+  if (googleRating) {
+    ratingBadges.push(
+      `<span itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating" style="display:inline-flex;align-items:center;gap:0.4rem;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.875rem;">
+        <meta itemprop="ratingValue" content="${googleRating.rating}" />
+        <meta itemprop="bestRating" content="${googleRating.maxRating}" />
+        ${googleRating.reviewCount ? `<meta itemprop="reviewCount" content="${googleRating.reviewCount}" />` : ""}
+        ⭐ <strong>${googleRating.rating}</strong><span style="color:#6b7280;">/ ${googleRating.maxRating} Google</span>
+      </span>`
+    );
+  }
+  if (taRating) {
+    ratingBadges.push(
+      `<span style="display:inline-flex;align-items:center;gap:0.4rem;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.875rem;">
+        🏅 <strong>${taRating.rating}</strong><span style="color:#6b7280;">/ ${taRating.maxRating} TripAdvisor</span>
+      </span>`
+    );
+  }
+  if (hotel.tripadvisoryRank) {
+    ratingBadges.push(
+      `<span style="display:inline-flex;align-items:center;gap:0.4rem;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.875rem;">
+        🏆 <span style="color:#6b7280;">TripAdvisor Rank:</span> <strong>${escapeHtml(hotel.tripadvisoryRank)}</strong>
+      </span>`
+    );
+  }
+
+  const imgTag = hotel.image
+    ? `<img src="${escapeHtml(hotel.image)}" alt="${escapeHtml(hotel.name)}" style="width:100%;max-height:420px;object-fit:cover;border-radius:4px;margin-bottom:1.5rem;" />`
+    : "";
+
+  const jsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    "name": hotel.name,
+    "description": descEn.substring(0, 300),
+    "url": `${BASE_URL}/hotels/${hotel.slug}`,
+    "image": hotel.image || DEFAULT_OG_IMAGE,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": hotel.location,
+    },
+    ...(googleRating ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": googleRating.rating,
+        "bestRating": googleRating.maxRating,
+        ...(googleRating.reviewCount ? { "reviewCount": googleRating.reviewCount } : {}),
+      },
+    } : {}),
+    "amenityFeature": (hotel.features || []).map(f => ({
+      "@type": "LocationFeatureSpecification",
+      "name": f,
+      "value": true,
+    })),
+  });
+
+  return `<main id="ssr-prerender" itemscope itemtype="https://schema.org/LodgingBusiness" style="max-width:900px;margin:0 auto;padding:2rem 1.5rem;">
+  <script type="application/ld+json">${jsonLd}</script>
+  <nav aria-label="breadcrumb" style="margin-bottom:1.5rem;font-size:0.875rem;color:#9ca3af;">
+    <a href="/" style="color:#c9a96e;">Home</a> &rsaquo;
+    <a href="/hotels" style="color:#c9a96e;">Hotels</a> &rsaquo;
+    <span style="color:#1a2744;">${escapeHtml(hotel.name)}</span>
+  </nav>
+  ${imgTag}
+  <h1 itemprop="name" style="font-size:2rem;color:#1a2744;margin:0 0 0.5rem;line-height:1.3;">${escapeHtml(hotel.name)}</h1>
+  <p style="color:#c9a96e;font-size:1rem;margin:0 0 1rem;">
+    📍 <span itemprop="address">${escapeHtml(hotel.location)}</span>${hotel.address ? ` — ${escapeHtml(hotel.address)}` : ""}
+  </p>
+  ${ratingBadges.length ? `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.25rem;">${ratingBadges.join("")}</div>` : ""}
+  ${descEn ? `<p itemprop="description" style="color:#374151;line-height:1.75;font-size:1rem;margin-bottom:1.5rem;">${escapeHtml(descEn.substring(0, 500))}</p>` : ""}
+  ${featuresHtml}
+  <p style="margin-top:1.5rem;">
+    <a href="/hotels" style="color:#c9a96e;font-size:0.875rem;">← All Hotels</a>
+  </p>
+</main>`;
+}
+
 export async function getPrerenderedHtml(urlPath: string): Promise<string | null> {
   const cleanPath = urlPath.split("?")[0].split("#")[0].replace(/\/$/, "") || "/";
+
+  const hotelMatch = cleanPath.match(/^\/hotels\/([^/]+)$/);
+  if (hotelMatch) {
+    try {
+      const result = await pool.query(
+        `SELECT slug, name, location, description, features, ratings, image, address, tripadvisor_rank
+         FROM hotels WHERE slug = $1 AND status = 'published' LIMIT 1`,
+        [hotelMatch[1]],
+      );
+      if (!result.rows.length) return null;
+      const r = result.rows[0];
+      return generateHotelHtml({
+        slug: r.slug,
+        name: r.name,
+        location: r.location,
+        description: r.description || {},
+        features: r.features || [],
+        ratings: r.ratings || null,
+        image: r.image || null,
+        address: r.address || null,
+        tripadvisoryRank: r.tripadvisor_rank || null,
+      });
+    } catch {
+      return null;
+    }
+  }
 
   if (cleanPath === "/blog") {
     try {
