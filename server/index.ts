@@ -20,7 +20,7 @@ declare module "http" {
 app.use(compression());
 
 app.use((req, res, next) => {
-  if (!req.path.startsWith("/api") && req.path.endsWith(".html")) {
+  if (!req.path.startsWith("/api") && !req.path.startsWith("/google") && req.path.endsWith(".html")) {
     let clean = req.path.slice(0, -5) || "/";
     if (clean === "/index" || clean === "") clean = "/";
     const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
