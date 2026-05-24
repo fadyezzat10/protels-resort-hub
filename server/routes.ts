@@ -120,9 +120,10 @@ Sitemap: https://protels.com/sitemap.xml
 `);
   });
 
-  // ── Dynamic sitemap & static-file regeneration ───────────────────────
+  // ── Dynamic sitemap index + child sitemaps ───────────────────────
   const HOTEL_SLUGS = ["crystal-beach", "beach-club", "la-plage", "royal-bay"] as const;
   const HOTEL_SECTIONS = ["overview", "accommodation", "dining", "gallery", "facilities", "contact"] as const;
+
   const HOTEL_IMAGES: Record<string, string> = {
     "crystal-beach": "/images/hotel-crystal-beach-hero.webp",
     "beach-club":    "/images/hotel-beach-club-hero.webp",
@@ -130,10 +131,30 @@ Sitemap: https://protels.com/sitemap.xml
     "royal-bay":     "/images/hotel-royal-bay-hero.webp",
   };
 
-  const buildSitemapXml = async (): Promise<string> => {
-    const BASE = "https://protels.com";
-    const today = new Date().toISOString().split("T")[0];
+  const BASE = "https://protels.com";
 
+  const urlEntry = (loc: string, changefreq: string, priority: string, lastmod: string, imageUrl?: string) => {
+    let entry = `  <url>\n`;
+    entry += `    <loc>${BASE}${loc}</loc>\n`;
+    entry += `    <lastmod>${lastmod}</lastmod>\n`;
+    entry += `    <changefreq>${changefreq}</changefreq>\n`;
+    entry += `    <priority>${priority}</priority>\n`;
+    if (imageUrl) {
+      entry += `    <image:image><image:loc>${BASE}${imageUrl}</image:loc></image:image>\n`;
+    }
+    entry += `  </url>\n`;
+    return entry;
+  };
+
+  const urlsetWrap = (inner: string) =>
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
+    inner +
+    `</urlset>`;
+
+  // /sitemap-static.xml — 8 static pages + published CMS builder pages
+  const buildStaticSitemapXml = async (): Promise<string> => {
+    const today = new Date().toISOString().split("T")[0];
     const staticPages = [
       { loc: "/",                changefreq: "monthly", priority: "1.0" },
       { loc: "/hotels",          changefreq: "weekly",  priority: "0.9" },
@@ -144,37 +165,35 @@ Sitemap: https://protels.com/sitemap.xml
       { loc: "/careers",         changefreq: "monthly", priority: "0.6" },
       { loc: "/company-profile", changefreq: "monthly", priority: "0.6" },
     ];
-
-    const urlEntry = (loc: string, changefreq: string, priority: string, lastmod = today, imageUrl?: string) => {
-      let entry = `  <url>\n`;
-      entry += `    <loc>${BASE}${loc}</loc>\n`;
-      entry += `    <lastmod>${lastmod}</lastmod>\n`;
-      entry += `    <changefreq>${changefreq}</changefreq>\n`;
-      entry += `    <priority>${priority}</priority>\n`;
-      if (imageUrl) {
-        entry += `    <image:image><image:loc>${BASE}${imageUrl}</image:loc></image:image>\n`;
-      }
-      entry += `  </url>\n`;
-      return entry;
-    };
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
-
+    let inner = "";
     for (const page of staticPages) {
-      xml += urlEntry(page.loc, page.changefreq, page.priority);
+      inner += urlEntry(page.loc, page.changefreq, page.priority, today);
     }
+    const cmsPages = await storage.getPages();
+    for (const p of cmsPages.filter(pg => pg.status === "published" && pg.slug)) {
+      inner += urlEntry(`/page/${p.slug}`, "monthly", "0.6", today);
+    }
+    return urlsetWrap(inner);
+  };
 
-    // Hotel main pages (priority 0.9) + section sub-pages (priority 0.8)
+  // /sitemap-hotels.xml — hotel main pages + section sub-pages
+  const buildHotelsSitemapXml = (): string => {
+    const today = new Date().toISOString().split("T")[0];
+    let inner = "";
     for (const slug of HOTEL_SLUGS) {
-      xml += urlEntry(`/hotels/${slug}`, "weekly", "0.9", today, HOTEL_IMAGES[slug]);
+      inner += urlEntry(`/hotels/${slug}`, "weekly", "0.9", today, HOTEL_IMAGES[slug]);
       for (const section of HOTEL_SECTIONS) {
-        xml += urlEntry(`/hotels/${slug}/${section}`, "weekly", "0.8");
+        inner += urlEntry(`/hotels/${slug}/${section}`, "weekly", "0.8", today);
       }
     }
+    return urlsetWrap(inner);
+  };
 
-    // All published blog articles
+  // /sitemap-blog.xml — all published blog articles
+  const buildBlogSitemapXml = async (): Promise<string> => {
+    const today = new Date().toISOString().split("T")[0];
     const publishedPosts = (await storage.getBlogPosts()).filter(p => p.status === "published");
+    let inner = "";
     for (const post of publishedPosts) {
       let slug = post.slug
         .replace(/^https?:\/\/[^/]+/, "")
@@ -184,28 +203,71 @@ Sitemap: https://protels.com/sitemap.xml
       slug = slug.replace(/[^\x00-\x7F]/g, (ch) => encodeURIComponent(ch));
       const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : today;
       const imageUrl = post.featuredImage && post.featuredImage.startsWith("/") ? post.featuredImage : undefined;
-      xml += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
+      inner += urlEntry(`/blog/${slug}`, "weekly", "0.7", lastmod, imageUrl);
     }
+    return urlsetWrap(inner);
+  };
 
-    // Published CMS builder pages
-    const cmsPages = await storage.getPages();
-    for (const p of cmsPages.filter(pg => pg.status === "published" && pg.slug)) {
-      xml += urlEntry(`/page/${p.slug}`, "monthly", "0.6");
+  // /sitemap.xml — sitemap index pointing to the three child sitemaps
+  const buildSitemapXml = (): string => {
+    const today = new Date().toISOString().split("T")[0];
+    const sitemaps = ["/sitemap-static.xml", "/sitemap-hotels.xml", "/sitemap-blog.xml"];
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    for (const loc of sitemaps) {
+      xml += `  <sitemap>\n    <loc>${BASE}${loc}</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n`;
     }
-
-    xml += `</urlset>`;
+    xml += `</sitemapindex>`;
     return xml;
   };
 
-  // Serve sitemap dynamically so new blog articles appear without any manual step
-  app.get("/sitemap.xml", async (_req, res) => {
+  const sitemapHeaders = (res: any) => {
+    res.set("Content-Type", "application/xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=3600");
+  };
+
+  // Sitemap index
+  app.get("/sitemap.xml", (_req, res) => {
     try {
-      const xml = await buildSitemapXml();
-      res.set("Content-Type", "application/xml; charset=utf-8");
-      res.set("Cache-Control", "public, max-age=3600");
-      res.send(xml);
+      sitemapHeaders(res);
+      res.send(buildSitemapXml());
     } catch (e: any) {
       console.error("sitemap.xml error:", e);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  // Child sitemap: static pages + CMS pages
+  app.get("/sitemap-static.xml", async (_req, res) => {
+    try {
+      const xml = await buildStaticSitemapXml();
+      sitemapHeaders(res);
+      res.send(xml);
+    } catch (e: any) {
+      console.error("sitemap-static.xml error:", e);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  // Child sitemap: hotel pages
+  app.get("/sitemap-hotels.xml", (_req, res) => {
+    try {
+      sitemapHeaders(res);
+      res.send(buildHotelsSitemapXml());
+    } catch (e: any) {
+      console.error("sitemap-hotels.xml error:", e);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  // Child sitemap: blog articles
+  app.get("/sitemap-blog.xml", async (_req, res) => {
+    try {
+      const xml = await buildBlogSitemapXml();
+      sitemapHeaders(res);
+      res.send(xml);
+    } catch (e: any) {
+      console.error("sitemap-blog.xml error:", e);
       res.status(500).send("Error generating sitemap");
     }
   });
@@ -215,24 +277,38 @@ Sitemap: https://protels.com/sitemap.xml
       return res.status(403).json({ message: "Forbidden" });
     }
     try {
-      const xml = await buildSitemapXml();
-      const urlCount = (xml.match(/<url>/g) || []).length;
+      const [staticXml, hotelsXml, blogXml] = await Promise.all([
+        buildStaticSitemapXml(),
+        Promise.resolve(buildHotelsSitemapXml()),
+        buildBlogSitemapXml(),
+      ]);
+      const indexXml = buildSitemapXml();
+
+      const files: Record<string, string> = {
+        "sitemap.xml":        indexXml,
+        "sitemap-static.xml": staticXml,
+        "sitemap-hotels.xml": hotelsXml,
+        "sitemap-blog.xml":   blogXml,
+      };
+
       const written: string[] = [];
-
-      // Always write to the source file (picked up on next build/deploy)
-      const srcPath = path.resolve("client/public/sitemap.xml");
-      fs.writeFileSync(srcPath, xml, "utf-8");
-      written.push(srcPath);
-
-      // In production, also write to the dist/public directory that express.static
-      // actually serves, so the change is live immediately without a redeploy
-      const distPath = path.resolve(__dirname, "public", "sitemap.xml");
-      if (fs.existsSync(path.dirname(distPath))) {
-        fs.writeFileSync(distPath, xml, "utf-8");
-        written.push(distPath);
+      for (const [name, xml] of Object.entries(files)) {
+        const srcPath = path.resolve("client/public", name);
+        fs.writeFileSync(srcPath, xml, "utf-8");
+        written.push(srcPath);
+        const distPath = path.resolve(__dirname, "public", name);
+        if (fs.existsSync(path.dirname(distPath))) {
+          fs.writeFileSync(distPath, xml, "utf-8");
+          written.push(distPath);
+        }
       }
 
-      res.json({ ok: true, urls: urlCount, written });
+      const urlCount =
+        (staticXml.match(/<url>/g) || []).length +
+        (hotelsXml.match(/<url>/g) || []).length +
+        (blogXml.match(/<url>/g) || []).length;
+
+      res.json({ ok: true, urls: urlCount, sitemaps: Object.keys(files), written });
     } catch (e: any) {
       console.error("regenerate-sitemap error:", e);
       res.status(500).json({ message: e.message || "Failed to regenerate sitemap" });
@@ -240,11 +316,8 @@ Sitemap: https://protels.com/sitemap.xml
   });
 
   app.get("/sitemap_index.xml", (_req, res) => {
-    const today = new Date().toISOString().split("T")[0];
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <sitemap>\n    <loc>https://protels.com/sitemap.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n</sitemapindex>`;
-    res.set("Content-Type", "application/xml; charset=utf-8");
-    res.set("Cache-Control", "public, max-age=3600");
-    res.send(xml);
+    sitemapHeaders(res);
+    res.send(buildSitemapXml());
   });
 
   // ──────── RATE LIMITING ────────
