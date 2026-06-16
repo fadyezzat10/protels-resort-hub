@@ -28,6 +28,9 @@ import {
   Eye,
   EyeOff,
   GripVertical,
+  Upload,
+  FolderOpen,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +62,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
 interface RoomDetail {
@@ -227,10 +236,68 @@ export default function CMSHotels() {
   const [expandedRooms, setExpandedRooms] = useState<Set<number>>(new Set());
   const [featureInput, setFeatureInput] = useState("");
   const [galleryInput, setGalleryInput] = useState("");
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<"gallery" | "hero">("gallery");
 
   const { data: hotels = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/cms/hotels"],
   });
+
+  const { data: mediaFiles = [] } = useQuery<any[]>({
+    queryKey: ["/api/cms/media"],
+  });
+
+  const uploadImageFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/cms/media", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error("فشل رفع الصورة");
+    const data = await res.json();
+    return data.url;
+  };
+
+  const handleHeroUpload = async (file: File) => {
+    setUploadingHero(true);
+    try {
+      const url = await uploadImageFile(file);
+      setForm((f) => ({ ...f, image: url }));
+      queryClient.invalidateQueries({ queryKey: ["/api/cms/media"] });
+      toast({ title: "تم رفع الصورة الرئيسية بنجاح" });
+    } catch {
+      toast({ title: "خطأ في الرفع", description: "تعذّر رفع الصورة. تأكد من صيغة الملف.", variant: "destructive" });
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const handleGalleryUpload = async (files: FileList) => {
+    setUploadingGallery(true);
+    try {
+      const urls = await Promise.all(Array.from(files).map(uploadImageFile));
+      setForm((f) => ({ ...f, gallery: [...f.gallery, ...urls] }));
+      queryClient.invalidateQueries({ queryKey: ["/api/cms/media"] });
+      toast({ title: `تم رفع ${urls.length} صورة بنجاح` });
+    } catch {
+      toast({ title: "خطأ في الرفع", description: "تعذّر رفع الصور.", variant: "destructive" });
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
+  const pickFromLibrary = (url: string) => {
+    if (mediaPickerTarget === "hero") {
+      setForm((f) => ({ ...f, image: url }));
+    } else {
+      setForm((f) => ({ ...f, gallery: [...f.gallery, url] }));
+    }
+    setMediaPickerOpen(false);
+  };
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -734,16 +801,50 @@ export default function CMSHotels() {
             <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
               <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">الصور</h3>
 
+              {/* Hero Image */}
               <div>
-                <label className="text-sm font-medium mb-1.5 block">الصورة الرئيسية</label>
-                <Input
-                  data-testid="input-hotel-image"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  placeholder="رابط الصورة الرئيسية (https://...)"
-                />
+                <label className="text-sm font-medium mb-2 block">الصورة الرئيسية</label>
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    data-testid="input-hotel-image"
+                    value={form.image}
+                    onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    placeholder="رابط الصورة الرئيسية (https://...)"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={uploadingHero}
+                    onClick={() => {
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = "image/*";
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) handleHeroUpload(file);
+                      };
+                      input.click();
+                    }}
+                    data-testid="button-upload-hero-image"
+                  >
+                    {uploadingHero ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    <span className="mr-1.5 hidden sm:inline">{uploadingHero ? "جاري الرفع..." : "رفع صورة"}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { setMediaPickerTarget("hero"); setMediaPickerOpen(true); }}
+                    data-testid="button-pick-hero-from-library"
+                  >
+                    <FolderOpen className="w-4 h-4" />
+                    <span className="mr-1.5 hidden sm:inline">من المكتبة</span>
+                  </Button>
+                </div>
                 {form.image && (
-                  <div className="mt-3">
+                  <div className="mt-2">
                     <img
                       src={form.image}
                       alt="Main preview"
@@ -754,14 +855,52 @@ export default function CMSHotels() {
                 )}
               </div>
 
+              {/* Gallery */}
               <div className="border-t pt-6">
-                <label className="text-sm font-medium mb-3 block">معرض الصور</label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-medium">معرض الصور</label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingGallery}
+                      onClick={() => {
+                        const input = document.createElement("input");
+                        input.type = "file";
+                        input.accept = "image/*";
+                        input.multiple = true;
+                        input.onchange = (e) => {
+                          const files = (e.target as HTMLInputElement).files;
+                          if (files && files.length > 0) handleGalleryUpload(files);
+                        };
+                        input.click();
+                      }}
+                      data-testid="button-upload-gallery"
+                    >
+                      {uploadingGallery ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      <span className="mr-1.5">{uploadingGallery ? "جاري الرفع..." : "رفع صور"}</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setMediaPickerTarget("gallery"); setMediaPickerOpen(true); }}
+                      data-testid="button-pick-gallery-from-library"
+                    >
+                      <FolderOpen className="w-4 h-4" />
+                      <span className="mr-1.5">من المكتبة</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* URL input as additional option */}
                 <div className="flex gap-2 mb-4">
                   <Input
                     data-testid="input-gallery-url"
                     value={galleryInput}
                     onChange={(e) => setGalleryInput(e.target.value)}
-                    placeholder="رابط الصورة"
+                    placeholder="أو أدخل رابط صورة مباشرة..."
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
@@ -778,6 +917,7 @@ export default function CMSHotels() {
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
+
                 {form.gallery.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {form.gallery.map((url, index) => (
@@ -806,7 +946,11 @@ export default function CMSHotels() {
                   </div>
                 )}
                 {form.gallery.length === 0 && (
-                  <p className="text-sm text-gray-400 text-center py-4">لم تتم إضافة صور بعد</p>
+                  <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                    <ImageIcon className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm text-gray-400">اضغط "رفع صور" لرفع صور من جهازك</p>
+                    <p className="text-xs text-gray-300 mt-1">أو "من المكتبة" لاختيار صور مرفوعة مسبقاً</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -1690,6 +1834,52 @@ export default function CMSHotels() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Media Picker Dialog */}
+        <Dialog open={mediaPickerOpen} onOpenChange={setMediaPickerOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                <span className="flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5" />
+                  مكتبة الصور — {mediaPickerTarget === "hero" ? "اختر صورة رئيسية" : "أضف للمعرض"}
+                </span>
+              </DialogTitle>
+            </DialogHeader>
+            {(mediaFiles as any[]).filter((f) => f.mimeType?.startsWith("image/")).length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>لا توجد صور في المكتبة حتى الآن</p>
+                <p className="text-xs mt-1">ارفع صوراً من تبويب "رفع صور" أو صفحة مكتبة الوسائط</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-2">
+                {(mediaFiles as any[])
+                  .filter((f) => f.mimeType?.startsWith("image/"))
+                  .map((file) => (
+                    <button
+                      key={file.id}
+                      type="button"
+                      data-testid={`media-pick-${file.id}`}
+                      className="relative group rounded-lg overflow-hidden border-2 border-transparent hover:border-brand-blue transition-all focus:outline-none focus:border-brand-blue"
+                      onClick={() => pickFromLibrary(file.url)}
+                    >
+                      <img
+                        src={file.url}
+                        alt={file.originalName || file.filename}
+                        className="w-full h-24 object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Plus className="w-6 h-6 text-white" />
+                      </div>
+                      <p className="text-xs text-gray-500 truncate px-1 py-0.5 bg-white/80">{file.originalName || file.filename}</p>
+                    </button>
+                  ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </CMSLayout>
     );
   }
@@ -1809,18 +1999,41 @@ export default function CMSHotels() {
 
 function RoomImageInput({ roomIndex, onAdd }: { roomIndex: number; onAdd: (roomIndex: number, url: string) => void }) {
   const [url, setUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+
+  const handleUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/cms/media", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("فشل الرفع");
+      const data = await res.json();
+      onAdd(roomIndex, data.url);
+      toast({ title: "تم رفع صورة الغرفة بنجاح" });
+    } catch {
+      toast({ title: "خطأ في الرفع", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="flex gap-2">
       <Input
         data-testid={`input-room-image-${roomIndex}`}
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="رابط صورة الغرفة"
+        placeholder="رابط صورة الغرفة أو ارفع من جهازك"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            onAdd(roomIndex, url);
-            setUrl("");
+            if (url.trim()) { onAdd(roomIndex, url); setUrl(""); }
           }
         }}
       />
@@ -1829,11 +2042,31 @@ function RoomImageInput({ roomIndex, onAdd }: { roomIndex: number; onAdd: (roomI
         variant="outline"
         size="sm"
         onClick={() => {
-          onAdd(roomIndex, url);
-          setUrl("");
+          if (url.trim()) { onAdd(roomIndex, url); setUrl(""); }
         }}
+        title="إضافة رابط"
       >
         <Plus className="w-4 h-4" />
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={uploading}
+        title="رفع صورة من جهازك"
+        onClick={() => {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.onchange = (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (file) handleUpload(file);
+          };
+          input.click();
+        }}
+        data-testid={`button-upload-room-image-${roomIndex}`}
+      >
+        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
       </Button>
     </div>
   );
