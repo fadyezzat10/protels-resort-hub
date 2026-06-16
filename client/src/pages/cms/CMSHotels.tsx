@@ -2000,7 +2000,12 @@ export default function CMSHotels() {
 function RoomImageInput({ roomIndex, onAdd }: { roomIndex: number; onAdd: (roomIndex: number, url: string) => void }) {
   const [url, setUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const { toast } = useToast();
+
+  const { data: mediaFiles = [] } = useQuery<any[]>({
+    queryKey: ["/api/cms/media"],
+  });
 
   const handleUpload = async (file: File) => {
     setUploading(true);
@@ -2024,50 +2029,109 @@ function RoomImageInput({ roomIndex, onAdd }: { roomIndex: number; onAdd: (roomI
   };
 
   return (
-    <div className="flex gap-2">
-      <Input
-        data-testid={`input-room-image-${roomIndex}`}
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="رابط صورة الغرفة أو ارفع من جهازك"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
+    <>
+      <div className="flex gap-2">
+        <Input
+          data-testid={`input-room-image-${roomIndex}`}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="رابط صورة الغرفة أو ارفع من جهازك"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (url.trim()) { onAdd(roomIndex, url); setUrl(""); }
+            }
+          }}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => {
             if (url.trim()) { onAdd(roomIndex, url); setUrl(""); }
-          }
-        }}
-      />
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => {
-          if (url.trim()) { onAdd(roomIndex, url); setUrl(""); }
-        }}
-        title="إضافة رابط"
-      >
-        <Plus className="w-4 h-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled={uploading}
-        title="رفع صورة من جهازك"
-        onClick={() => {
-          const input = document.createElement("input");
-          input.type = "file";
-          input.accept = "image/*";
-          input.onchange = (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (file) handleUpload(file);
-          };
-          input.click();
-        }}
-        data-testid={`button-upload-room-image-${roomIndex}`}
-      >
-        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-      </Button>
-    </div>
+          }}
+          title="إضافة رابط"
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={uploading}
+          title="رفع صورة من جهازك"
+          onClick={() => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/*";
+            input.onchange = (e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (file) handleUpload(file);
+            };
+            input.click();
+          }}
+          data-testid={`button-upload-room-image-${roomIndex}`}
+        >
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          title="اختر من المكتبة"
+          onClick={() => setPickerOpen(true)}
+          data-testid={`button-pick-room-image-${roomIndex}`}
+        >
+          <FolderOpen className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-2xl max-h-[75vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              <span className="flex items-center gap-2">
+                <FolderOpen className="w-5 h-5" />
+                مكتبة الصور — اختر صورة للغرفة
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+          {(mediaFiles as any[]).filter((f) => f.mimeType?.startsWith("image/")).length === 0 ? (
+            <div className="text-center py-10 text-gray-400">
+              <ImageIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p>لا توجد صور في المكتبة حتى الآن</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-2">
+              {(mediaFiles as any[])
+                .filter((f) => f.mimeType?.startsWith("image/"))
+                .map((file) => (
+                  <button
+                    key={file.id}
+                    type="button"
+                    data-testid={`room-media-pick-${roomIndex}-${file.id}`}
+                    className="relative group rounded-lg overflow-hidden border-2 border-transparent hover:border-brand-blue transition-all focus:outline-none focus:border-brand-blue"
+                    onClick={() => {
+                      onAdd(roomIndex, file.url);
+                      setPickerOpen(false);
+                    }}
+                  >
+                    <img
+                      src={file.url}
+                      alt={file.originalName || file.filename}
+                      className="w-full h-24 object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Plus className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-xs text-gray-500 truncate px-1 py-0.5 bg-white/80">{file.originalName || file.filename}</p>
+                  </button>
+                ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
