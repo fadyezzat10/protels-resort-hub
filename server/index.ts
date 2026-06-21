@@ -116,6 +116,21 @@ app.use((req, res, next) => {
   next();
 });
 
+async function runStartupMigrations() {
+  try {
+    await pool.query(`
+      ALTER TABLE contact_submissions
+      ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'unread'
+    `);
+    await pool.query(`
+      UPDATE contact_submissions SET status = 'unread' WHERE status IS NULL
+    `);
+    console.log("[migrate] contact_submissions.status column ensured.");
+  } catch (err) {
+    console.warn("[startup] runStartupMigrations failed (non-critical):", err);
+  }
+}
+
 async function fixTyposInDb() {
   try {
     await pool.query(`
@@ -140,6 +155,7 @@ async function fixTyposInDb() {
 
 (async () => {
   try {
+    await runStartupMigrations();
     await fixTyposInDb();
     await registerRoutes(httpServer, app);
 

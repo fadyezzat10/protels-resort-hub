@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/controlpanal/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/controlpanal/messages", label: "Messages", icon: Mail },
+  { href: "/controlpanal/messages", label: "الرسائل", icon: Mail },
   { href: "/controlpanal/pages", label: "Pages", icon: FileText },
   { href: "/controlpanal/hotels", label: "Hotels", icon: Building2 },
   { href: "/controlpanal/blog", label: "Blog", icon: Newspaper },
