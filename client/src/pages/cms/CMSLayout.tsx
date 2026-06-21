@@ -22,12 +22,14 @@ import {
   Zap,
   Gauge,
   ImagePlus,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/controlpanal/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/controlpanal/messages", label: "Messages", icon: Mail },
   { href: "/controlpanal/pages", label: "Pages", icon: FileText },
   { href: "/controlpanal/hotels", label: "Hotels", icon: Building2 },
   { href: "/controlpanal/blog", label: "Blog", icon: Newspaper },
@@ -69,6 +71,18 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
     enabled: !!user,
   });
   const unseenLeads = unseenData?.count || 0;
+
+  const { data: unreadMsgsData } = useQuery({
+    queryKey: ["/api/cms/messages-unread-count"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/messages-unread-count", { credentials: "include" });
+      if (!res.ok) return { count: 0 };
+      return res.json();
+    },
+    refetchInterval: 30000,
+    enabled: !!user,
+  });
+  const unreadMessages = unreadMsgsData?.count || 0;
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -147,6 +161,11 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
               {item.label === "Chatbot" && unseenLeads > 0 && (
                 <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                   {unseenLeads}
+                </span>
+              )}
+              {item.label === "Messages" && unreadMessages > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {unreadMessages}
                 </span>
               )}
             </Link>

@@ -172,6 +172,7 @@ export const contactSubmissions = pgTable("contact_submissions", {
   phone: text("phone"),
   hotel: text("hotel"),
   message: text("message").notNull(),
+  status: text("status").default("unread").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

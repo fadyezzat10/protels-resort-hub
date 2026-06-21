@@ -1329,6 +1329,33 @@ Sitemap: https://protels.com/sitemap.xml
     res.json(results);
   });
 
+  app.get("/api/cms/messages-unread-count", requireAuth, async (_req, res) => {
+    const results = await db.select().from(contactSubmissions);
+    const count = results.filter((r) => r.status === "unread").length;
+    res.json({ count });
+  });
+
+  app.patch("/api/cms/contact-submissions/:id", requireAuth, async (req, res) => {
+    const id = Number(req.params.id);
+    const { status } = req.body;
+    if (!["read", "unread"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+    const [updated] = await db
+      .update(contactSubmissions)
+      .set({ status })
+      .where(eq(contactSubmissions.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    res.json(updated);
+  });
+
+  app.delete("/api/cms/contact-submissions/:id", requireAuth, async (req, res) => {
+    const id = Number(req.params.id);
+    await db.delete(contactSubmissions).where(eq(contactSubmissions.id, id));
+    res.json({ ok: true });
+  });
+
   // Dashboard stats
   app.get("/api/cms/dashboard", requireAuth, async (_req, res) => {
     const [allPages, allHotels, allMedia, allUsers, allBlogPosts] = await Promise.all([
