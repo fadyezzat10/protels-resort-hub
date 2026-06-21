@@ -177,7 +177,7 @@ export const contactSubmissions = pgTable("contact_submissions", {
 });
 
 // Insert schemas
-export const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).omit({ id: true, createdAt: true });
+export const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).omit({ id: true, createdAt: true, status: true });
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
 export const chatConversations = pgTable("chat_conversations", {

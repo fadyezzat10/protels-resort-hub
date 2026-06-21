@@ -1317,7 +1317,10 @@ Sitemap: https://protels.com/sitemap.xml
   app.post("/api/contact", async (req, res) => {
     try {
       const parsed = insertContactSubmissionSchema.parse(req.body);
-      const [submission] = await db.insert(contactSubmissions).values(parsed).returning();
+      const [submission] = await db
+        .insert(contactSubmissions)
+        .values({ ...parsed, status: "unread" })
+        .returning();
       res.json({ success: true, id: submission.id });
     } catch (e: any) {
       res.status(400).json({ message: e.message });
