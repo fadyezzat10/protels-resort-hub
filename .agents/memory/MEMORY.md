@@ -1,0 +1,1 @@
+- [VPS Migration](vps-migration.md) — App deployed to Hostinger VPS 187.124.223.34; domain DNS still points to old server, SSL pending DNS switch.
