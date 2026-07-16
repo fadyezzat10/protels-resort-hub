@@ -10,56 +10,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          node-version: '20'
-          cache: 'npm'
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            cd /var/www/protels
 
-      - name: Install dependencies
-        run: npm ci
+            echo "=== Pulling latest code ==="
+            git pull origin main
 
-      - name: Build application
-        run: npm run build
+            echo "=== Installing dependencies ==="
+            npm ci --prefer-offline
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+            echo "=== Building application ==="
+            npm run build
 
-      - name: Sync built files to VPS
-        run: |
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            dist/ \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/protels/dist/
+            echo "=== Restarting PM2 ==="
+            pm2 restart protels
+            pm2 save
 
-      - name: Sync static images to VPS
-        run: |
-          rsync -az \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            client/public/images/ \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/protels/client/public/images/
+            echo "=== Verifying ==="
+            sleep 3
+            pm2 list | grep protels
+            echo "Deployment complete!"
 
-      - name: Restart PM2 on VPS
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o StrictHostKeyChecking=no \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /var/www/protels && pm2 restart protels && pm2 save"
-
-      - name: Verify deployment
+      - name: Verify site is up
         run: |
           sleep 5
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://protels.com/)
-          echo "Site status: $STATUS"
+          echo "HTTP Status: $STATUS"
           if [ "$STATUS" != "200" ]; then
-            echo "Deployment verification failed!"
+            echo "ERROR: Site returned $STATUS after deployment"
             exit 1
           fi
-          echo "Deployment successful!"
+          echo "Site is live!"
