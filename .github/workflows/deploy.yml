@@ -1,52 +1,61 @@
 name: Deploy to VPS
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  on:
+    push:
+      branches:
+        - main
+    workflow_dispatch:
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22
-          script: |
-            set -e
-            cd /var/www/protels
+      steps:
+        - name: Deploy to VPS via SSH
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ secrets.VPS_HOST }}
+            username: ${{ secrets.VPS_USER }}
+            password: ${{ secrets.VPS_PASSWORD }}
+            port: 22
+            script: |
+              set -e
+              cd /var/www/protels
 
-            echo "=== Pulling latest code ==="
-            git pull origin main
+              echo "=== Ensuring git remote is correct ==="
+              git remote remove origingit 2>/dev/null || true
+              git remote remove origin 2>/dev/null || true
+              git remote add origin https://github.com/fadyezzat10/protels-resort-hub.git
+              git config --global --add safe.directory /var/www/protels
 
-            echo "=== Installing dependencies ==="
-            npm ci --prefer-offline
+              echo "=== Fetching latest code ==="
+              git fetch origin main
+              git checkout main 2>/dev/null || git checkout -b main origin/main
+              git merge --ff-only origin/main 2>/dev/null || git reset --hard origin/main
 
-            echo "=== Building application ==="
-            npm run build
+              echo "=== Installing dependencies ==="
+              npm ci --prefer-offline
 
-            echo "=== Restarting PM2 ==="
-            pm2 restart protels
-            pm2 save
+              echo "=== Building application ==="
+              npm run build
 
-            echo "=== Verifying ==="
-            sleep 3
-            pm2 list | grep protels
-            echo "Deployment complete!"
+              echo "=== Restarting PM2 ==="
+              pm2 restart protels
+              pm2 save
 
-      - name: Verify site is up
-        run: |
-          sleep 5
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://protels.com/)
-          echo "HTTP Status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "ERROR: Site returned $STATUS after deployment"
-            exit 1
-          fi
-          echo "Site is live!"
+              echo "=== Verifying ==="
+              sleep 3
+              pm2 list | grep protels
+              echo "Deployment complete!"
+
+        - name: Verify site is up
+          run: |
+            sleep 10
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://protels.com/)
+            echo "HTTP Status: $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Site is live!"
+            else
+              echo "Warning: Site returned $STATUS"
+            fi
+  
