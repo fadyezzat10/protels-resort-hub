@@ -22,16 +22,20 @@ jobs:
             set -e
             cd /var/www/protels
 
-            echo "=== Setting up git ==="
+            echo "=== Setting up git remote ==="
             git config --global --add safe.directory /var/www/protels
             git remote remove origingit 2>/dev/null || true
             git remote remove origin 2>/dev/null || true
             git remote add origin https://github.com/fadyezzat10/protels-resort-hub.git
 
-            echo "=== Pulling latest code ==="
+            echo "=== Fetching latest code ==="
             git fetch origin main
-            git checkout main 2>/dev/null || git checkout -b main origin/main
-            git merge --ff-only origin/main 2>/dev/null || git reset --hard origin/main
+
+            echo "=== Removing untracked conflicting files ==="
+            git clean -fd
+
+            echo "=== Checking out main branch ==="
+            git checkout -B main origin/main
 
             echo "=== Installing dependencies ==="
             npm ci --prefer-offline
