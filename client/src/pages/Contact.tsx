@@ -24,9 +24,18 @@ export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", hotel: "", message: "" });
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [emailError, setEmailError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setEmailError(false);
+
+    if (!formData.email.trim()) {
+      setEmailError(true);
+      document.getElementById("contact-email")?.focus();
+      return;
+    }
+
     setSending(true);
     setStatus("idle");
     try {
@@ -123,10 +132,15 @@ export default function Contact() {
                     type="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
+                    onChange={(e) => { setFormData(p => ({ ...p, email: e.target.value })); setEmailError(false); }}
                     placeholder={t("contact.form.emailPlaceholder")}
-                    className="bg-gray-50 border-gray-200 focus:border-brand-gold"
+                    className={`bg-gray-50 focus:border-brand-gold ${emailError ? "border-red-500 bg-red-50" : "border-gray-200"}`}
                   />
+                  {emailError && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {isAr ? "البريد الإلكتروني مطلوب" : "Email address is required"}
+                    </p>
+                  )}
                 </div>
               </div>
 
