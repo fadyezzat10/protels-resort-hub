@@ -22,6 +22,10 @@ jobs:
             set -e
             cd /var/www/protels
 
+            echo "=== Backup critical config files ==="
+            cp ecosystem.config.cjs /tmp/ecosystem.config.cjs.bak 2>/dev/null || true
+            cp .env /tmp/.env.bak 2>/dev/null || true
+
             echo "=== Setting up git remote ==="
             git config --global --add safe.directory /var/www/protels
             git remote remove origingit 2>/dev/null || true
@@ -31,11 +35,15 @@ jobs:
             echo "=== Fetching latest code ==="
             git fetch origin main
 
-            echo "=== Removing untracked conflicting files ==="
-            git clean -fd
+            echo "=== Removing untracked files (preserving config) ==="
+            git clean -fd --exclude=ecosystem.config.cjs --exclude=.env --exclude=start.sh --exclude=uploads
 
             echo "=== Checking out main branch ==="
             git checkout -B main origin/main
+
+            echo "=== Restoring config files ==="
+            test -f ecosystem.config.cjs || cp /tmp/ecosystem.config.cjs.bak ecosystem.config.cjs 2>/dev/null || true
+            test -f .env || cp /tmp/.env.bak .env 2>/dev/null || true
 
             echo "=== Installing dependencies ==="
             npm ci --prefer-offline
@@ -43,22 +51,24 @@ jobs:
             echo "=== Building application ==="
             npm run build
 
-            echo "=== Restarting PM2 ==="
-            pm2 restart protels
+            echo "=== Restarting PM2 via ecosystem ==="
+            pm2 delete protels 2>/dev/null || true
+            pm2 start ecosystem.config.cjs
             pm2 save
 
             echo "=== Verifying ==="
-            sleep 3
+            sleep 5
             pm2 list | grep protels
             echo "Deployment complete!"
 
       - name: Verify site is up
         run: |
-          sleep 10
+          sleep 15
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://protels.com/)
           echo "HTTP Status: $STATUS"
           if [ "$STATUS" = "200" ]; then
             echo "Site is live!"
           else
             echo "Warning: Site returned $STATUS"
+            exit 1
           fi
