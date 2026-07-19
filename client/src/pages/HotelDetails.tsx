@@ -489,8 +489,8 @@ export default function HotelDetails() {
               <section className="animate-in fade-in duration-500">
                 <h2 className={cn("text-3xl font-serif text-brand-blue mb-8", isLaPlage && "text-[var(--color-brand-blue)]")}>{t("hotel.diningDrinks")}</h2>
                 
-                {/* El Dokka Restaurant Section - Hidden for La Plage */}
-                {!isLaPlage && (
+                {/* Specialty Restaurant Sections - Dynamic from CMS or Hardcoded fallback */}
+                {!isLaPlage && !((hotel.dining?.specialty?.length ?? 0) > 0) && (
                 <>
                 <div className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg">
                   {/* Hero Image */}
@@ -896,9 +896,37 @@ export default function HotelDetails() {
                       </div>
                     )}
 
+                    {/* Rich layout for specialty restaurants WITH heroImage from CMS */}
+                    {hotel.dining.specialty?.filter((rest: any) => rest.heroImage).map((rest: any, idx: number) => (
+                      <div key={idx} className="mb-16 bg-white border border-gray-100 shadow-sm overflow-hidden rounded-lg">
+                        <div className="h-[400px] relative">
+                          <img loading="lazy" src={rest.heroImage} alt={rest.name} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
+                            <h3 className="text-4xl font-serif text-white mb-2">{rest.name}</h3>
+                            {rest.subtitle && <p className="text-white/90 text-lg font-light">{rest.subtitle}</p>}
+                          </div>
+                        </div>
+                        <div className="p-8 md:p-12">
+                          <div className="max-w-3xl mx-auto text-center mb-12">
+                            <div className="flex justify-center mb-6"><Utensils className="w-10 h-10 text-[#C8A97E]" /></div>
+                            <p className="text-gray-600 leading-relaxed text-lg mb-8">{rest.desc}</p>
+                          </div>
+                          {rest.galleryImages?.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                              {rest.galleryImages.slice(0, 3).map((img: string, i: number) => (
+                                <div key={i} className="aspect-[4/3] overflow-hidden rounded-lg group cursor-pointer">
+                                  <img loading="lazy" src={img} alt={`${rest.name} ${i + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Specialty Restaurants */}
-                      {hotel.dining.specialty?.map((rest, idx) => (
+                      {/* Simple card specialty restaurants WITHOUT heroImage */}
+                      {hotel.dining.specialty?.filter((rest: any) => !rest.heroImage).map((rest: any, idx: number) => (
                         <div key={idx} className="bg-white p-6 border border-gray-100 hover:border-brand-gold transition-colors">
                           <Coffee className="w-6 h-6 text-brand-gold mb-3" />
                           <h3 className="font-serif text-lg font-bold text-brand-blue mb-2">{rest.name}</h3>
@@ -912,7 +940,7 @@ export default function HotelDetails() {
                           <Wine className="w-6 h-6 text-brand-gold mb-3" />
                           <h3 className="font-serif text-lg font-bold text-brand-blue mb-2">Bars</h3>
                           <ul className="space-y-2">
-                            {hotel.dining.bars.map((bar, idx) => (
+                            {hotel.dining.bars.map((bar: string, idx: number) => (
                               <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
                                 <div className="w-1 h-1 bg-brand-gold rounded-full" /> {bar}
                               </li>
@@ -955,8 +983,61 @@ export default function HotelDetails() {
                   ))}
                 </div>
 
-                {/* Fitness Center Section - Hidden for La Plage */}
-                {!isLaPlage && (
+                {/* Dynamic Facility Sections from CMS */}
+                {hotel.facilitySections?.filter((sec: any) => sec.visible !== false).map((sec: any, idx: number) => (
+                  <div key={idx} className={`mt-16 border border-gray-100 shadow-sm rounded-lg overflow-hidden ${idx % 2 === 0 ? "bg-white" : "bg-[#FDFCF8]"}`}>
+                    <div className="p-8 md:p-10">
+                      <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-[#C8A97E]/10 rounded-full">
+                              <Sparkles className="w-6 h-6 text-[#C8A97E]" />
+                            </div>
+                            <div>
+                              <h3 className="text-3xl font-serif text-[#1a2332]">{sec.title}</h3>
+                              {sec.subtitle && <p className="text-sm text-gray-500 mt-1">{sec.subtitle}</p>}
+                            </div>
+                          </div>
+                          {sec.description && (
+                            <p className="text-gray-600 leading-relaxed text-lg font-light mb-8 max-w-3xl">{sec.description}</p>
+                          )}
+                          {sec.bulletPoints?.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6">
+                              {sec.bulletPoints.map((bp: string, bi: number) => (
+                                <div key={bi} className="flex items-center gap-3 text-sm text-gray-600">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-[#C8A97E]" />
+                                  {bp}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {sec.heroImage && (
+                          <div className="w-full md:w-5/12 shrink-0">
+                            <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md">
+                              <img loading="lazy" src={sec.heroImage} alt={sec.title} className="w-full h-full object-cover" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      {sec.galleryImages?.length > 0 && (
+                        <div className="pt-8 border-t border-gray-100">
+                          <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory thin-scrollbar">
+                            {sec.galleryImages.map((img: string, gi: number) => (
+                              <div key={gi} className="snap-center shrink-0 w-[280px] md:w-[360px] aspect-[4/3] rounded-lg overflow-hidden relative group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                                <img loading="lazy" src={img} alt={`${sec.title} ${gi + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Fitness Center Section - Hardcoded fallback (hidden if CMS facility sections exist or La Plage) */}
+                {!isLaPlage && !((hotel.facilitySections?.length ?? 0) > 0) && (
                 <div className="mt-16 bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
                     <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
@@ -1008,8 +1089,8 @@ export default function HotelDetails() {
                 </div>
                 )}
 
-                {/* Spa & Wellness Center Section - Hidden for La Plage */}
-                {!isLaPlage && (
+                {/* Spa & Wellness Center Section - Hardcoded fallback */}
+                {!isLaPlage && !((hotel.facilitySections?.length ?? 0) > 0) && (
                 <div className="mt-16 bg-[#FDFCF8] border border-gray-100 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
                     <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
@@ -1060,8 +1141,8 @@ export default function HotelDetails() {
                   </div>
                 </div>
                 )}
-                {/* Private Beach Facilities Section - Hidden for La Plage */}
-                {!isLaPlage && (
+                {/* Private Beach Facilities Section - Hardcoded fallback */}
+                {!isLaPlage && !((hotel.facilitySections?.length ?? 0) > 0) && (
                 <div className="mt-16 bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
                     <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
@@ -1119,8 +1200,8 @@ export default function HotelDetails() {
                 </div>
                 )}
 
-                {/* Pools & Aquapark Section - Hidden for La Plage */}
-                {!isLaPlage && (
+                {/* Pools & Aquapark Section - Hardcoded fallback */}
+                {!isLaPlage && !((hotel.facilitySections?.length ?? 0) > 0) && (
                 <div className="mt-16 bg-[#FDFCF8] border border-gray-100 shadow-sm rounded-lg overflow-hidden">
                   <div className="p-8 md:p-10">
                     <div className="flex flex-col md:flex-row gap-8 items-start mb-10">

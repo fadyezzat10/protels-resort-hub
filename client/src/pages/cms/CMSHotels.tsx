@@ -83,8 +83,19 @@ interface RoomDetail {
 
 interface DiningInfo {
   main?: { name: string; desc: string; hours: string };
-  specialty?: { name: string; desc: string }[];
+  specialty?: { name: string; desc: string; subtitle?: string; heroImage?: string; galleryImages?: string[] }[];
   bars?: string[];
+}
+
+interface FacilitySection {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  bulletPoints: string[];
+  heroImage: string;
+  galleryImages: string[];
+  visible: boolean;
 }
 
 interface HotelForm {
@@ -125,6 +136,7 @@ interface HotelForm {
   tabConfig: { id: string; label: string; visible: boolean; order: number }[];
   ratings: { platform: string; rating: number; maxRating: number; reviewCount: number; reviewUrl: string }[];
   tripAdvisorRank: string;
+  facilitySections: FacilitySection[];
 }
 
 const emptyForm: HotelForm = {
@@ -168,6 +180,7 @@ const emptyForm: HotelForm = {
   ],
   ratings: [],
   tripAdvisorRank: "",
+  facilitySections: [],
 };
 
 const FEATURE_SUGGESTIONS = [
@@ -380,6 +393,7 @@ export default function CMSHotels() {
     tabConfig: form.tabConfig.length > 0 ? { tabs: form.tabConfig } : null,
     ratings: form.ratings.length > 0 ? form.ratings : null,
     tripAdvisorRank: form.tripAdvisorRank || null,
+    facilitySections: form.facilitySections.length > 0 ? form.facilitySections : null,
   });
 
   const handleSubmit = () => {
@@ -442,6 +456,7 @@ export default function CMSHotels() {
       ],
       ratings: hotel.ratings || [],
       tripAdvisorRank: (hotel as any).tripAdvisorRank || "",
+      facilitySections: hotel.facilitySections || [],
     });
     setExpandedRooms(new Set());
     setView("editor");
@@ -564,6 +579,69 @@ export default function CMSHotels() {
     const bars = [...(form.dining.bars || [])];
     bars[index] = value;
     setForm({ ...form, dining: { ...form.dining, bars } });
+  };
+
+  const addFacilitySection = () => {
+    const newSection: FacilitySection = {
+      id: `section-${Date.now()}`,
+      title: "",
+      subtitle: "",
+      description: "",
+      bulletPoints: [],
+      heroImage: "",
+      galleryImages: [],
+      visible: true,
+    };
+    setForm({ ...form, facilitySections: [...form.facilitySections, newSection] });
+  };
+
+  const updateFacilitySection = (index: number, field: string, value: any) => {
+    const sections = [...form.facilitySections];
+    sections[index] = { ...sections[index], [field]: value };
+    setForm({ ...form, facilitySections: sections });
+  };
+
+  const removeFacilitySection = (index: number) => {
+    setForm({ ...form, facilitySections: form.facilitySections.filter((_, i) => i !== index) });
+  };
+
+  const addFacilityBullet = (secIdx: number, bullet: string) => {
+    if (!bullet.trim()) return;
+    const sections = [...form.facilitySections];
+    sections[secIdx] = { ...sections[secIdx], bulletPoints: [...(sections[secIdx].bulletPoints || []), bullet.trim()] };
+    setForm({ ...form, facilitySections: sections });
+  };
+
+  const removeFacilityBullet = (secIdx: number, bIdx: number) => {
+    const sections = [...form.facilitySections];
+    sections[secIdx] = { ...sections[secIdx], bulletPoints: sections[secIdx].bulletPoints.filter((_, i) => i !== bIdx) };
+    setForm({ ...form, facilitySections: sections });
+  };
+
+  const addFacilityGalleryImage = (secIdx: number, url: string) => {
+    if (!url.trim()) return;
+    const sections = [...form.facilitySections];
+    sections[secIdx] = { ...sections[secIdx], galleryImages: [...(sections[secIdx].galleryImages || []), url.trim()] };
+    setForm({ ...form, facilitySections: sections });
+  };
+
+  const removeFacilityGalleryImage = (secIdx: number, imgIdx: number) => {
+    const sections = [...form.facilitySections];
+    sections[secIdx] = { ...sections[secIdx], galleryImages: sections[secIdx].galleryImages.filter((_, i) => i !== imgIdx) };
+    setForm({ ...form, facilitySections: sections });
+  };
+
+  const addSpecialtyGalleryImage = (restIdx: number, url: string) => {
+    if (!url.trim()) return;
+    const specialty = [...(form.dining.specialty || [])];
+    specialty[restIdx] = { ...specialty[restIdx], galleryImages: [...(specialty[restIdx].galleryImages || []), url.trim()] };
+    setForm({ ...form, dining: { ...form.dining, specialty } });
+  };
+
+  const removeSpecialtyGalleryImage = (restIdx: number, imgIdx: number) => {
+    const specialty = [...(form.dining.specialty || [])];
+    specialty[restIdx] = { ...specialty[restIdx], galleryImages: (specialty[restIdx].galleryImages || []).filter((_, i) => i !== imgIdx) };
+    setForm({ ...form, dining: { ...form.dining, specialty } });
   };
 
   if (view === "editor") {
@@ -1197,6 +1275,11 @@ export default function CMSHotels() {
                         onChange={(e) => updateSpecialty(index, "name", e.target.value)}
                         placeholder="اسم المطعم"
                       />
+                      <Input
+                        value={rest.subtitle || ""}
+                        onChange={(e) => updateSpecialty(index, "subtitle", e.target.value)}
+                        placeholder="الوصف المختصر (مثال: Oriental Cuisine)"
+                      />
                       <Textarea
                         data-testid={`input-specialty-desc-${index}`}
                         value={rest.desc}
@@ -1204,6 +1287,34 @@ export default function CMSHotels() {
                         placeholder="وصف المطعم"
                         rows={2}
                       />
+                      <div className="border-t border-gray-50 pt-2 space-y-1.5">
+                        <p className="text-xs font-medium text-gray-500">صورة الـ Hero (اختياري — لعرض قسم كامل بدل البطاقة)</p>
+                        <Input
+                          value={rest.heroImage || ""}
+                          onChange={(e) => updateSpecialty(index, "heroImage", e.target.value)}
+                          placeholder="رابط الصورة الرئيسية"
+                        />
+                        <p className="text-xs text-gray-400">صور الـ Gallery (رابط واحد في كل سطر):</p>
+                        {(rest.galleryImages || []).map((img, gi) => (
+                          <div key={gi} className="flex gap-1">
+                            <Input value={img} readOnly className="text-xs h-7" />
+                            <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => removeSpecialtyGalleryImage(index, gi)}><X className="w-3 h-3" /></Button>
+                          </div>
+                        ))}
+                        <div className="flex gap-1">
+                          <Input
+                            placeholder="أضف رابط صورة gallery"
+                            className="text-xs h-7"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                addSpecialtyGalleryImage(index, (e.target as HTMLInputElement).value);
+                                (e.target as HTMLInputElement).value = "";
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
                     <Button
                       data-testid={`button-remove-specialty-${index}`}
@@ -1319,6 +1430,108 @@ export default function CMSHotels() {
                     </Badge>
                   ))}
                 </div>
+              </div>
+
+              {/* Facility Sections */}
+              <div className="border-t pt-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-gray-800">أقسام المرافق التفصيلية</h4>
+                    <p className="text-xs text-gray-400 mt-0.5">يحل محل الأقسام الثابتة (Fitness، Spa، Beach، Pools) في صفحة الفندق</p>
+                  </div>
+                  <Button data-testid="button-add-facility-section" type="button" variant="outline" size="sm" onClick={addFacilitySection}>
+                    <Plus className="w-4 h-4 mr-1" />
+                    إضافة قسم
+                  </Button>
+                </div>
+
+                {form.facilitySections.map((sec, idx) => (
+                  <div key={sec.id} className="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={sec.visible}
+                          onChange={(e) => updateFacilitySection(idx, "visible", e.target.checked)}
+                          className="rounded"
+                        />
+                        <span className="text-xs text-gray-500">مرئي</span>
+                      </div>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => removeFacilitySection(idx)}>
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input
+                        value={sec.title}
+                        onChange={(e) => updateFacilitySection(idx, "title", e.target.value)}
+                        placeholder="العنوان (مثال: Fitness Center)"
+                      />
+                      <Input
+                        value={sec.subtitle}
+                        onChange={(e) => updateFacilitySection(idx, "subtitle", e.target.value)}
+                        placeholder="العنوان الفرعي (مثال: Stay Active)"
+                      />
+                    </div>
+                    <Textarea
+                      value={sec.description}
+                      onChange={(e) => updateFacilitySection(idx, "description", e.target.value)}
+                      placeholder="وصف القسم..."
+                      rows={2}
+                    />
+                    <Input
+                      value={sec.heroImage}
+                      onChange={(e) => updateFacilitySection(idx, "heroImage", e.target.value)}
+                      placeholder="رابط الصورة الرئيسية (Hero)"
+                    />
+                    <div className="space-y-1.5">
+                      <p className="text-xs text-gray-500">نقاط القائمة (Bullet Points):</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(sec.bulletPoints || []).map((bp, bi) => (
+                          <Badge key={bi} variant="secondary" className="text-xs cursor-pointer" onClick={() => removeFacilityBullet(idx, bi)}>
+                            {bp} <X className="w-2.5 h-2.5 ml-1" />
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex gap-1">
+                        <Input
+                          placeholder="نقطة جديدة (Enter للإضافة)"
+                          className="text-xs h-7"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addFacilityBullet(idx, (e.target as HTMLInputElement).value);
+                              (e.target as HTMLInputElement).value = "";
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-xs text-gray-500">صور الـ Gallery:</p>
+                      {(sec.galleryImages || []).map((img, gi) => (
+                        <div key={gi} className="flex gap-1 items-center">
+                          <Input value={img} readOnly className="text-xs h-7 flex-1" />
+                          <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => removeFacilityGalleryImage(idx, gi)}><X className="w-3 h-3" /></Button>
+                        </div>
+                      ))}
+                      <Input
+                        placeholder="أضف رابط صورة (Enter للإضافة)"
+                        className="text-xs h-7"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addFacilityGalleryImage(idx, (e.target as HTMLInputElement).value);
+                            (e.target as HTMLInputElement).value = "";
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                {form.facilitySections.length === 0 && (
+                  <p className="text-sm text-gray-400 text-center py-3">لا توجد أقسام مرافق — سيتم عرض الأقسام الافتراضية (Fitness/Spa/Beach/Pools)</p>
+                )}
               </div>
             </div>
           </TabsContent>

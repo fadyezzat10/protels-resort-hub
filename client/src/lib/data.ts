@@ -80,7 +80,7 @@ export interface Hotel {
   discount?: string;
   dining?: {
     main?: { name: string; desc: string; hours: string };
-    specialty?: { name: string; desc: string }[];
+    specialty?: { name: string; desc: string; subtitle?: string; heroImage?: string; galleryImages?: string[] }[];
     bars?: string[];
   };
   roomDetails?: RoomDetail[];
@@ -100,6 +100,7 @@ export interface Hotel {
   address?: string;
   ratings?: { platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl: string }[];
   tripAdvisorRank?: string;
+  facilitySections?: { id: string; title: string; subtitle: string; description: string; bulletPoints: string[]; heroImage: string; galleryImages: string[]; visible: boolean }[];
 }
 
 export const hotels: Hotel[] = [
