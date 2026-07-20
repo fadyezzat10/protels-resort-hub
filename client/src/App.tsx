@@ -108,11 +108,13 @@ const CMSChatbot = lazy(() => import("./pages/cms/CMSChatbot"));
 const CMSImageOptimization = lazy(() => import("./pages/cms/CMSImageOptimization"));
 const CMSPerformance = lazy(() => import("./pages/cms/CMSPerformance"));
 const CMSMessages = lazy(() => import("./pages/cms/CMSMessages"));
+const CMSPromotionalPopup = lazy(() => import("./pages/cms/CMSPromotionalPopup"));
 
 const AdminToolbar = lazy(() => import("@/components/AdminToolbar"));
 const FloatingEditToolbar = lazy(() => import("@/components/FloatingEditToolbar"));
 const BookingAssistant = lazy(() => import("@/components/BookingAssistant"));
 const CMSAssistant = lazy(() => import("@/components/CMSAssistant"));
+const PromotionalPopup = lazy(() => import("@/components/PromotionalPopup"));
 
 function LazyFallback() {
   return (
@@ -162,6 +164,7 @@ function Router() {
         <Route path="/controlpanal/performance" component={CMSPerformance} />
         <Route path="/controlpanal/ai-assistant" component={CMSAIAssistant} />
         <Route path="/controlpanal/messages" component={CMSMessages} />
+        <Route path="/controlpanal/promotional-popup" component={CMSPromotionalPopup} />
         
         <Route path="/hotels/:hotelId" component={HotelDetails} />
         <Route path="/hotels/:hotelId/:section" component={HotelDetails} />
@@ -189,6 +192,17 @@ function ChatbotWrapper() {
   return (
     <Suspense fallback={null}>
       <BookingAssistant />
+    </Suspense>
+  );
+}
+
+function PromotionalPopupWrapper() {
+  const [location] = useLocation();
+  const isAdminOrCMS = location.startsWith("/admin") || location.startsWith("/controlpanal");
+  if (isAdminOrCMS) return null;
+  return (
+    <Suspense fallback={null}>
+      <PromotionalPopup />
     </Suspense>
   );
 }
@@ -221,6 +235,7 @@ function App() {
                 <FloatingEditToolbar />
               </Suspense>
               <ChatbotWrapper />
+              <PromotionalPopupWrapper />
               <CMSAssistantWrapper />
               </ThemeProvider>
             </EditModeProvider>

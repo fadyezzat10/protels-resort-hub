@@ -3606,5 +3606,42 @@ PROACTIVE BEHAVIOR:
     }
   });
 
+  // ── Promotional Popup ─────────────────────────────────────────────────
+  const POPUP_KEY = "promotional_popup";
+
+  app.get("/api/public/promotional-popup", async (_req, res) => {
+    try {
+      const setting = await storage.getSetting(POPUP_KEY);
+      if (!setting) return res.json(null);
+      const config = typeof setting.value === "string" ? JSON.parse(setting.value) : setting.value;
+      if (!config?.enabled) return res.json(null);
+      res.json(config);
+    } catch {
+      res.json(null);
+    }
+  });
+
+  app.get("/api/cms/promotional-popup", requireAuth, async (_req, res) => {
+    try {
+      const setting = await storage.getSetting(POPUP_KEY);
+      if (!setting) return res.json(null);
+      const config = typeof setting.value === "string" ? JSON.parse(setting.value) : setting.value;
+      res.json(config);
+    } catch {
+      res.json(null);
+    }
+  });
+
+  app.put("/api/cms/promotional-popup", requireAuth, async (req, res) => {
+    try {
+      const config = req.body;
+      await storage.upsertSetting(POPUP_KEY, JSON.stringify(config));
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+  // ── End Promotional Popup ──────────────────────────────────────────────
+
   return httpServer;
 }
