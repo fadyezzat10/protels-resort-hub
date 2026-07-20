@@ -11,6 +11,7 @@ import {
   EyeOff,
   Newspaper,
   Link as LinkIcon,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -339,11 +340,38 @@ export default function CMSBlog() {
                   />
                 </div>
                 <div>
-                  <Label>Content (English) — HTML supported</Label>
+                  <div className="flex items-center justify-between mb-1">
+                    <Label>Content (English) — HTML supported</Label>
+                    <label className="cursor-pointer" title="Upload .html file">
+                      <input
+                        type="file"
+                        accept=".html,.htm"
+                        className="hidden"
+                        data-testid="upload-html-en"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            const raw = ev.target?.result as string;
+                            const bodyMatch = raw.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                            const content = bodyMatch ? bodyMatch[1].trim() : raw;
+                            setForm((f) => ({ ...f, contentEn: content }));
+                            toast({ title: "HTML loaded", description: `${file.name} content loaded into editor.` });
+                          };
+                          reader.readAsText(file);
+                          e.target.value = "";
+                        }}
+                      />
+                      <span className="inline-flex items-center gap-1 text-xs text-brand-gold border border-brand-gold/40 rounded px-2 py-1 hover:bg-brand-gold/10 transition-colors">
+                        <Upload className="w-3 h-3" /> Upload .html
+                      </span>
+                    </label>
+                  </div>
                   <Textarea
                     data-testid="input-blog-content-en"
                     placeholder="<h2>Introduction</h2><p>Write your article content here...</p>"
-                    rows={12}
+                    rows={18}
                     className="font-mono text-sm"
                     value={form.contentEn}
                     onChange={(e) => setForm({ ...form, contentEn: e.target.value })}
@@ -372,11 +400,38 @@ export default function CMSBlog() {
                   />
                 </div>
                 <div>
-                  <Label>Content (Arabic) — HTML supported</Label>
+                  <div className="flex items-center justify-between mb-1">
+                    <Label>Content (Arabic) — HTML supported</Label>
+                    <label className="cursor-pointer" title="رفع ملف HTML">
+                      <input
+                        type="file"
+                        accept=".html,.htm"
+                        className="hidden"
+                        data-testid="upload-html-ar"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            const raw = ev.target?.result as string;
+                            const bodyMatch = raw.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                            const content = bodyMatch ? bodyMatch[1].trim() : raw;
+                            setForm((f) => ({ ...f, contentAr: content }));
+                            toast({ title: "تم تحميل HTML", description: `تم تحميل محتوى ${file.name} في المحرر.` });
+                          };
+                          reader.readAsText(file);
+                          e.target.value = "";
+                        }}
+                      />
+                      <span className="inline-flex items-center gap-1 text-xs text-brand-gold border border-brand-gold/40 rounded px-2 py-1 hover:bg-brand-gold/10 transition-colors">
+                        <Upload className="w-3 h-3" /> رفع .html
+                      </span>
+                    </label>
+                  </div>
                   <Textarea
                     data-testid="input-blog-content-ar"
                     placeholder="<h2>المقدمة</h2><p>اكتب محتوى المقال هنا...</p>"
-                    rows={12}
+                    rows={18}
                     className="font-mono text-sm"
                     value={form.contentAr}
                     onChange={(e) => setForm({ ...form, contentAr: e.target.value })}
