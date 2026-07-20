@@ -1,0 +1,82 @@
+أريد إضافة Welcome Promotional Popup احترافي إلى الصفحة الرئيسية لموقع الفندق.
+
+المطلوب
+
+عند دخول الزائر للموقع، وبعد 4 ثوانٍ، يظهر Popup في منتصف الشاشة بتصميم فاخر ومتناسق مع هوية PROTELS Hotels & Resorts.
+
+يظهر الـ Popup مرة واحدة فقط لكل زائر باستخدام Local Storage أو Cookie، ولا يظهر مرة أخرى إلا بعد انتهاء المدة التي أحددها.
+
+محتوى الـ Popup
+
+العنوان
+
+Exclusive Direct Booking Offer
+
+العنوان الفرعي
+
+Book Direct & Enjoy Exclusive Savings
+
+الوصف
+Book directly through our official website and enjoy exclusive discounts, the best available rates, flexible cancellation, and instant confirmation.
+
+المميزات
+
+Best Price Guarantee
+Exclusive Discount
+Free Cancellation
+Instant Confirmation
+
+الأزرار
+
+زر رئيسي: Book Now (ينقل إلى صفحة الحجز)
+زر ثانوي: Maybe Later
+زر إغلاق (X)
+مهم جدًا
+
+لا أريد أي بيانات تكون ثابتة داخل الكود.
+
+أريد إنشاء قسم كامل داخل الـ CMS باسم:
+
+Promotional Popup
+
+ويكون فيه الحقول التالية:
+
+Enable / Disable Popup
+Popup Title
+Popup Subtitle
+Description
+Features (يمكن إضافة أكثر من ميزة)
+Button Text
+Button URL
+Secondary Button Text
+Secondary Button Action
+Background Image
+Discount Badge (اختياري)
+Delay Before Showing (بالثواني)
+Auto Close (اختياري)
+Show Once Per Visitor
+Number of Days Before Showing Again
+Popup Width
+Border Radius
+Overlay Opacity
+Theme Colors
+
+بحيث أستطيع تعديل كل شيء من لوحة التحكم بدون تعديل الكود.
+
+التصميم
+التصميم يكون Luxury يناسب فنادق ومنتجعات خمس نجوم.
+استخدام Glass Effect مع Blur خفيف.
+Animation عند الظهور (Fade + Scale).
+متجاوب مع الموبايل والتابلت والديسكتوب.
+لا يؤثر على سرعة الموقع.
+إمكانية إغلاقه بالضغط على زر X أو خارج الـ Popup أو زر Maybe Later.
+الكود
+استخدم React + TypeScript.
+استخدم Tailwind CSS.
+اجعل الكود نظيفًا وقابلًا لإعادة الاستخدام.
+أنشئ Component مستقل باسم PromotionalPopup.
+اربطه ببيانات الـ CMS بحيث يتم جلب جميع الإعدادات ديناميكيًا.
+إذا كانت خاصية Enable Popup مغلقة فلا يتم تحميل الـ Popup نهائيًا.
+أضف Local Storage للتحكم في عدم ظهور الـ Popup أكثر من مرة حسب عدد الأيام المحدد في الـ CMS.
+
+أريد الكود جاهز للإنتاج (Production Ready) ويتوافق مع المشروع الحالي دون التأثير على أي جزء آخر من الموقع.

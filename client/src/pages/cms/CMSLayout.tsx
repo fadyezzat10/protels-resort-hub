@@ -23,6 +23,7 @@ import {
   Gauge,
   ImagePlus,
   Mail,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ const navItems = [
   { href: "/controlpanal/chatbot", label: "Chatbot", icon: MessageCircle },
   { href: "/controlpanal/image-optimization", label: "Image Optimization", icon: Zap },
   { href: "/controlpanal/performance", label: "Performance", icon: Gauge },
+  { href: "/controlpanal/promotional-popup", label: "Promotional Popup", icon: Megaphone },
   { href: "/controlpanal/ai-assistant", label: "AI Assistant", icon: Bot },
 ];
 
