@@ -9,7 +9,24 @@ import {
   setObjectAclPolicy,
 } from "./objectAcl";
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+// This sidecar is a Replit-internal process that provides GCS credentials.
+// It ONLY runs inside Replit containers (port 1106). On any other server it
+// does not exist. Override via REPLIT_OBJECT_STORAGE_SIDECAR_HOST env var.
+const REPLIT_SIDECAR_ENDPOINT =
+  process.env.REPLIT_OBJECT_STORAGE_SIDECAR_HOST || "http://127.0.0.1:1106";
+
+/**
+ * Returns true only when the Replit Object Storage bucket env vars are
+ * present. This is the fast, zero-network check. Routes should call this
+ * first, then additionally check isSidecarAvailable() before using the GCS
+ * client so they fall back gracefully on non-Replit servers.
+ */
+export function isObjectStorageConfigured(): boolean {
+  return !!(
+    process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID &&
+    process.env.PUBLIC_OBJECT_SEARCH_PATHS
+  );
+}
 
 // The object storage client is used to interact with the object storage service.
 export const objectStorageClient = new Storage({
