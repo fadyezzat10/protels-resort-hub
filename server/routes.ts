@@ -17,6 +17,22 @@ import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_inte
 import rateLimit from "express-rate-limit";
 import sharp from "sharp";
 
+let _sidecarAvailable: boolean | null = null;
+async function isSidecarAvailable(): Promise<boolean> {
+  if (_sidecarAvailable !== null) return _sidecarAvailable;
+  try {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 400);
+    await fetch("http://127.0.0.1:1106/credential", { signal: ac.signal });
+    clearTimeout(t);
+    _sidecarAvailable = true;
+  } catch {
+    _sidecarAvailable = false;
+    console.log("[object-storage] Sidecar not reachable on port 1106, using local disk storage");
+  }
+  return _sidecarAvailable;
+}
+
 declare module "express-session" {
   interface SessionData {
     userId: number;
@@ -593,10 +609,9 @@ Sitemap: https://protels.com/sitemap.xml
 
       let fileUrl = `/uploads/${finalFilename}`;
 
-      try {
-        const objService = new ObjectStorageService();
-        const publicPaths = objService.getPublicObjectSearchPaths();
-        if (publicPaths.length > 0) {
+      const publicPaths = new ObjectStorageService().getPublicObjectSearchPaths();
+      if (publicPaths.length > 0 && await isSidecarAvailable()) {
+        try {
           const bucketPath = publicPaths[0];
           const { bucketName, objectName } = (() => {
             const fullPath = `${bucketPath}/${finalFilename}`;
@@ -604,11 +619,9 @@ Sitemap: https://protels.com/sitemap.xml
             const parts = p.split("/");
             return { bucketName: parts[1], objectName: parts.slice(2).join("/") };
           })();
-
           const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
           const bucket = objectStorageClient.bucket(bucketName);
           const objFile = bucket.file(objectName);
-
           const finalPath = path.join(uploadDir, finalFilename);
           await new Promise<void>((resolve, reject) => {
             fs.createReadStream(finalPath)
@@ -616,12 +629,10 @@ Sitemap: https://protels.com/sitemap.xml
               .on("finish", () => resolve())
               .on("error", (err: Error) => reject(err));
           });
-
-          fileUrl = `/uploads/${finalFilename}`;
           console.log(`[media] Uploaded to Object Storage: ${finalFilename}`);
+        } catch (objErr: any) {
+          console.warn(`[media] Object Storage upload failed, using local: ${objErr.message}`);
         }
-      } catch (objErr: any) {
-        console.warn(`[media] Object Storage upload failed, using local: ${objErr.message}`);
       }
 
       const file = await storage.createMedia({
@@ -694,11 +705,10 @@ Sitemap: https://protels.com/sitemap.xml
       const finalSize = fs.statSync(webpPath).size;
       let fileUrl = `/uploads/${webpFilename}`;
 
-      try {
-        const objService = new ObjectStorageService();
-        const publicPaths = objService.getPublicObjectSearchPaths();
-        if (publicPaths.length > 0) {
-          const bucketPath = publicPaths[0];
+      const heroPublicPaths = new ObjectStorageService().getPublicObjectSearchPaths();
+      if (heroPublicPaths.length > 0 && await isSidecarAvailable()) {
+        try {
+          const bucketPath = heroPublicPaths[0];
           const fullPath = `${bucketPath}/${webpFilename}`;
           const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
           const parts = p.split("/");
@@ -713,8 +723,8 @@ Sitemap: https://protels.com/sitemap.xml
               .on("finish", () => resolve())
               .on("error", (err: Error) => reject(err));
           });
-        }
-      } catch {}
+        } catch {}
+      }
 
       if (slot === "homepage") {
         const existing = await storage.getSetting("hero_images");
@@ -834,10 +844,9 @@ Sitemap: https://protels.com/sitemap.xml
       const fileName = `company-profile-${Date.now()}-${sanitizedName}`;
       let serveUrl = `/uploads/${fileName}`;
 
-      try {
-        const objService = new ObjectStorageService();
-        const searchPaths = objService.getPublicObjectSearchPaths();
-        if (searchPaths.length > 0) {
+      const searchPaths = new ObjectStorageService().getPublicObjectSearchPaths();
+      if (searchPaths.length > 0 && await isSidecarAvailable()) {
+        try {
           const publicPath = searchPaths[0];
           const fullObjectPath = `${publicPath}/${fileName}`;
           const parts = fullObjectPath.split("/").filter(Boolean);
@@ -849,13 +858,15 @@ Sitemap: https://protels.com/sitemap.xml
           await file.save(req.file.buffer, { metadata: { contentType: "application/pdf" } });
           serveUrl = `/public/uploads/${encodeURIComponent(fileName)}`;
           console.log(`[pdf-upload] Uploaded to Object Storage: ${fileName}`);
-        } else {
+        } catch (objErr: any) {
+          console.warn(`[pdf-upload] Object Storage failed, saving locally: ${objErr.message}`);
+          fs.mkdirSync(uploadDir, { recursive: true });
           fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
-          console.log(`[pdf-upload] Saved locally (no Object Storage): ${fileName}`);
         }
-      } catch (objErr: any) {
-        console.warn(`[pdf-upload] Object Storage unavailable, saving locally: ${objErr.message}`);
+      } else {
+        fs.mkdirSync(uploadDir, { recursive: true });
         fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
+        console.log(`[pdf-upload] Saved locally: ${fileName}`);
       }
 
       await storage.upsertSetting("company_profile_pdf", serveUrl);
@@ -898,10 +909,9 @@ Sitemap: https://protels.com/sitemap.xml
       const fontName = req.body.fontName || sanitizedName.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
       let serveUrl = `/uploads/${fileName}`;
 
-      try {
-        const objService = new ObjectStorageService();
-        const searchPaths = objService.getPublicObjectSearchPaths();
-        if (searchPaths.length > 0) {
+      const searchPaths = new ObjectStorageService().getPublicObjectSearchPaths();
+      if (searchPaths.length > 0 && await isSidecarAvailable()) {
+        try {
           const publicPath = searchPaths[0];
           const fullObjectPath = `${publicPath}/fonts/${fileName}`;
           const parts = fullObjectPath.split("/").filter(Boolean);
@@ -915,13 +925,15 @@ Sitemap: https://protels.com/sitemap.xml
           });
           serveUrl = `/public/uploads/fonts/${encodeURIComponent(fileName)}`;
           console.log(`[font-upload] Uploaded to Object Storage: ${fileName}`);
-        } else {
+        } catch (objErr: any) {
+          console.warn(`[font-upload] Object Storage failed, saving locally: ${objErr.message}`);
+          fs.mkdirSync(uploadDir, { recursive: true });
           fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
-          console.log(`[font-upload] Saved locally (no Object Storage): ${fileName}`);
         }
-      } catch (objErr: any) {
-        console.warn(`[font-upload] Object Storage unavailable, saving locally: ${objErr.message}`);
+      } else {
+        fs.mkdirSync(uploadDir, { recursive: true });
         fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
+        console.log(`[font-upload] Saved locally: ${fileName}`);
       }
 
       await storage.upsertSetting("company_profile_custom_font_url", serveUrl);
