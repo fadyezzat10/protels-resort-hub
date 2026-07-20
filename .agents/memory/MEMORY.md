@@ -1,1 +1,2 @@
 - [VPS Migration](vps-migration.md) — App deployed to Hostinger VPS 187.124.223.34; domain DNS still points to old server, SSL pending DNS switch.
+- [Object Storage VPS Guard](object-storage-vps.md) — VPS doesn't run Replit sidecar on port 1106; isSidecarAvailable() check prevents ECONNREFUSED errors.
