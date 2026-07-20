@@ -14,12 +14,22 @@ import OpenAI from "openai";
 import * as pdfParsePkg from "pdf-parse";
 const PDFParse = (pdfParsePkg as any).PDFParse || (pdfParsePkg as any).default?.PDFParse;
 import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
+import { isObjectStorageConfigured } from "./replit_integrations/object_storage/objectStorage";
 import rateLimit from "express-rate-limit";
 import sharp from "sharp";
 
 let _sidecarAvailable: boolean | null = null;
 async function isSidecarAvailable(): Promise<boolean> {
   if (_sidecarAvailable !== null) return _sidecarAvailable;
+  // Fast env-var check first — if bucket env vars are absent the sidecar
+  // definitely isn't needed (e.g. plain VPS without Replit Object Storage).
+  if (!isObjectStorageConfigured()) {
+    _sidecarAvailable = false;
+    console.log("[object-storage] Object Storage env vars absent — using local disk");
+    return false;
+  }
+  // Network probe: the Replit sidecar on port 1106 may still be absent even
+  // when env vars are set (e.g. copied vars to a VPS). 400 ms timeout.
   try {
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), 400);
@@ -28,7 +38,7 @@ async function isSidecarAvailable(): Promise<boolean> {
     _sidecarAvailable = true;
   } catch {
     _sidecarAvailable = false;
-    console.log("[object-storage] Sidecar not reachable on port 1106, using local disk storage");
+    console.log("[object-storage] Sidecar not reachable on port 1106 — using local disk storage");
   }
   return _sidecarAvailable;
 }
@@ -540,7 +550,12 @@ Sitemap: https://protels.com/sitemap.xml
 
       const objService = new ObjectStorageService();
       const publicPaths = objService.getPublicObjectSearchPaths();
-      if (!publicPaths.length) return res.status(500).json({ message: "Object Storage not configured" });
+      if (!publicPaths.length) return res.status(503).json({ message: "Object Storage not available on this server" });
+
+      // Guard: sidecar must be reachable (only exists inside Replit containers)
+      if (!(await isSidecarAvailable())) {
+        return res.status(503).json({ message: "Object Storage sidecar not available on this server — video upload via signed URL is only supported on Replit" });
+      }
 
       const bucketPath = publicPaths[0];
       const safeName = `video-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(filename)}`;
@@ -550,7 +565,7 @@ Sitemap: https://protels.com/sitemap.xml
       const bucketName = parts[1];
       const objectName = parts.slice(2).join("/");
 
-      const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+      const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_OBJECT_STORAGE_SIDECAR_HOST || "http://127.0.0.1:1106";
       const signRes = await fetch(
         `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
         {
@@ -2012,22 +2027,27 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       if (resolved.isRemote) {
         const objService = new ObjectStorageService();
         const publicPaths = objService.getPublicObjectSearchPaths();
-        if (publicPaths.length > 0) {
-          const outFileName = newUrl.replace(/^.*\//, "");
-          const bucketPath = publicPaths[0];
-          const fullPath = `${bucketPath}/${outFileName}`;
-          const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
-          const pathParts = p.split("/");
-          const bucketName = pathParts[1];
-          const objectName = pathParts.slice(2).join("/");
-          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
-          const bucket = objectStorageClient.bucket(bucketName);
-          const objFile = bucket.file(objectName);
-          await objFile.save(processedBuffer, { metadata: { contentType: "image/webp" } });
-
-          const localUploadsDir = path.join(process.cwd(), "uploads");
-          if (!fs.existsSync(localUploadsDir)) fs.mkdirSync(localUploadsDir, { recursive: true });
-          fs.writeFileSync(path.join(localUploadsDir, outFileName), processedBuffer);
+        const localUploadsDir = path.join(process.cwd(), "uploads");
+        if (!fs.existsSync(localUploadsDir)) fs.mkdirSync(localUploadsDir, { recursive: true });
+        const outFileName = newUrl.replace(/^.*\//, "");
+        // Always save locally so the file is accessible even without Object Storage
+        fs.writeFileSync(path.join(localUploadsDir, outFileName), processedBuffer);
+        // Also upload to Object Storage when the sidecar is available
+        if (publicPaths.length > 0 && await isSidecarAvailable()) {
+          try {
+            const bucketPath = publicPaths[0];
+            const fullPath = `${bucketPath}/${outFileName}`;
+            const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+            const pathParts = p.split("/");
+            const bucketName = pathParts[1];
+            const objectName = pathParts.slice(2).join("/");
+            const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+            const bucket = objectStorageClient.bucket(bucketName);
+            const objFile = bucket.file(objectName);
+            await objFile.save(processedBuffer, { metadata: { contentType: "image/webp" } });
+          } catch (gcsErr) {
+            console.warn("[image-optimize] GCS upload failed, local copy kept:", gcsErr);
+          }
         }
       } else {
         const webpPath = resolved.localPath.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, ".webp");
@@ -2291,25 +2311,29 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
 
         const objService = new ObjectStorageService();
         const publicPaths = objService.getPublicObjectSearchPaths();
-        if (publicPaths.length > 0) {
-          const bucketPath = publicPaths[0];
-          const fullPath = `${bucketPath}/${outFileName}`;
-          const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
-          const parts = p.split("/");
-          const bucketName = parts[1];
-          const objectName = parts.slice(2).join("/");
-
-          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
-          const bucket = objectStorageClient.bucket(bucketName);
-          const objFile = bucket.file(objectName);
-          const mimeType = outputFormat === "webp" ? "image/webp" : outputFormat === "png" ? "image/png" : "image/jpeg";
-          await objFile.save(processedBuffer, { metadata: { contentType: mimeType } });
-        }
-
         const newUrl = `/uploads/${outFileName}`;
         const localUploadsDir = path.join(process.cwd(), "uploads");
         if (!fs.existsSync(localUploadsDir)) fs.mkdirSync(localUploadsDir, { recursive: true });
+        // Always write locally first so it is always accessible
         fs.writeFileSync(path.join(localUploadsDir, outFileName), processedBuffer);
+        // Upload to Object Storage only when sidecar is reachable
+        if (publicPaths.length > 0 && await isSidecarAvailable()) {
+          try {
+            const bucketPath = publicPaths[0];
+            const fullPath = `${bucketPath}/${outFileName}`;
+            const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+            const parts = p.split("/");
+            const bucketName = parts[1];
+            const objectName = parts.slice(2).join("/");
+            const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+            const bucket = objectStorageClient.bucket(bucketName);
+            const objFile = bucket.file(objectName);
+            const mimeType = outputFormat === "webp" ? "image/webp" : outputFormat === "png" ? "image/png" : "image/jpeg";
+            await objFile.save(processedBuffer, { metadata: { contentType: mimeType } });
+          } catch (gcsErr) {
+            console.warn("[image-edit] GCS upload failed, local copy kept:", gcsErr);
+          }
+        }
 
         await updateImageReferencesInDb(url, newUrl);
         const previewPipeline2 = sharp(processedBuffer).resize({ width: 600, withoutEnlargement: true }).webp({ quality: 70 });
@@ -2464,13 +2488,6 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
       }
 
       if (isRemoteUrl) {
-        const objService = new ObjectStorageService();
-        const publicPaths = objService.getPublicObjectSearchPaths();
-        if (!publicPaths.length) {
-          fs.unlinkSync(req.file.path);
-          return res.status(500).json({ message: "Object Storage not configured" });
-        }
-
         const origFilename = targetUrl.split("/").pop() || "replaced.webp";
         const origBase = origFilename.replace(/\.[^.]+$/, "");
         const format = requestedFormat || "webp";
@@ -2483,32 +2500,39 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
         else pipeline = pipeline.jpeg({ quality: qualityVal, mozjpeg: true });
 
         const processedBuffer = await pipeline.toBuffer();
-
-        const bucketPath = publicPaths[0];
-        const fullPath = `${bucketPath}/${newFilename}`;
-        const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
-        const parts = p.split("/");
-        const bucketName = parts[1];
-        const objectName = parts.slice(2).join("/");
-
-        const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
-        const bucket = objectStorageClient.bucket(bucketName);
-        const objFile = bucket.file(objectName);
-
-        const mimeType = format === "webp" ? "image/webp" : format === "png" ? "image/png" : "image/jpeg";
-        await objFile.save(processedBuffer, { metadata: { contentType: mimeType } });
-
         fs.unlinkSync(req.file.path);
 
-        const newUrl = `/uploads/${newFilename}`;
+        // Always save locally — works on all servers
         const localUploadsDir2 = path.join(process.cwd(), "uploads");
         if (!fs.existsSync(localUploadsDir2)) fs.mkdirSync(localUploadsDir2, { recursive: true });
         fs.writeFileSync(path.join(localUploadsDir2, newFilename), processedBuffer);
+        const newUrl = `/uploads/${newFilename}`;
+
+        // Also upload to Object Storage when the sidecar is available
+        const objService = new ObjectStorageService();
+        const publicPaths = objService.getPublicObjectSearchPaths();
+        if (publicPaths.length > 0 && await isSidecarAvailable()) {
+          try {
+            const bucketPath = publicPaths[0];
+            const fullPath = `${bucketPath}/${newFilename}`;
+            const p = fullPath.startsWith("/") ? fullPath : `/${fullPath}`;
+            const parts = p.split("/");
+            const bucketName = parts[1];
+            const objectName = parts.slice(2).join("/");
+            const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+            const bucket = objectStorageClient.bucket(bucketName);
+            const objFile = bucket.file(objectName);
+            const mimeType = format === "webp" ? "image/webp" : format === "png" ? "image/png" : "image/jpeg";
+            await objFile.save(processedBuffer, { metadata: { contentType: mimeType } });
+          } catch (gcsErr) {
+            console.warn("[image-replace] GCS upload failed, local copy kept:", gcsErr);
+          }
+        }
 
         await updateImageReferencesInDb(targetUrl, newUrl);
 
         res.json({
-          message: "Image replaced in Object Storage",
+          message: "Image replaced",
           newUrl,
           newSize: Math.round(processedBuffer.length / 1024),
         });
