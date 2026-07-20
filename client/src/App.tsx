@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { EditModeProvider } from "@/lib/editMode";
 import NotFound from "@/pages/not-found";
+import PromotionalPopup from "@/components/PromotionalPopup";
 
 class GlobalErrorBoundary extends Component<
   { children: ReactNode },
@@ -114,7 +115,6 @@ const AdminToolbar = lazy(() => import("@/components/AdminToolbar"));
 const FloatingEditToolbar = lazy(() => import("@/components/FloatingEditToolbar"));
 const BookingAssistant = lazy(() => import("@/components/BookingAssistant"));
 const CMSAssistant = lazy(() => import("@/components/CMSAssistant"));
-const PromotionalPopup = lazy(() => import("@/components/PromotionalPopup"));
 
 function LazyFallback() {
   return (
@@ -200,11 +200,7 @@ function PromotionalPopupWrapper() {
   const [location] = useLocation();
   const isAdminOrCMS = location.startsWith("/admin") || location.startsWith("/controlpanal");
   if (isAdminOrCMS) return null;
-  return (
-    <Suspense fallback={null}>
-      <PromotionalPopup />
-    </Suspense>
-  );
+  return <PromotionalPopup />;
 }
 
 function CMSAssistantWrapper() {

@@ -45,7 +45,7 @@ const DEFAULT: PopupConfig = {
   secondaryButtonText: "Maybe Later",
   backgroundImage: "",
   discountBadge: "",
-  delaySeconds: 4,
+  delaySeconds: 1,
   autoCloseSecs: 0,
   showOnce: true,
   daysBeforeRepeat: 7,
