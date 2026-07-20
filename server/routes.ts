@@ -332,7 +332,7 @@ Sitemap: https://protels.com/sitemap.xml
 
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: 20,
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: "Too many login attempts, please try again in 15 minutes." },
@@ -828,28 +828,36 @@ Sitemap: https://protels.com/sitemap.xml
     try {
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-      const objService = new ObjectStorageService();
-      const searchPaths = objService.getPublicObjectSearchPaths();
-      const publicPath = searchPaths[0];
       const sanitizedName = req.file.originalname
         .replace(/[^a-zA-Z0-9._-]/g, "_")
         .replace(/_+/g, "_");
       const fileName = `company-profile-${Date.now()}-${sanitizedName}`;
-      const fullObjectPath = `${publicPath}/${fileName}`;
+      let serveUrl = `/uploads/${fileName}`;
 
-      const parts = fullObjectPath.split("/").filter(Boolean);
-      const bucketName = parts[0];
-      const objectName = parts.slice(1).join("/");
+      try {
+        const objService = new ObjectStorageService();
+        const searchPaths = objService.getPublicObjectSearchPaths();
+        if (searchPaths.length > 0) {
+          const publicPath = searchPaths[0];
+          const fullObjectPath = `${publicPath}/${fileName}`;
+          const parts = fullObjectPath.split("/").filter(Boolean);
+          const bucketName = parts[0];
+          const objectName = parts.slice(1).join("/");
+          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+          const bucket = objectStorageClient.bucket(bucketName);
+          const file = bucket.file(objectName);
+          await file.save(req.file.buffer, { metadata: { contentType: "application/pdf" } });
+          serveUrl = `/public/uploads/${encodeURIComponent(fileName)}`;
+          console.log(`[pdf-upload] Uploaded to Object Storage: ${fileName}`);
+        } else {
+          fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
+          console.log(`[pdf-upload] Saved locally (no Object Storage): ${fileName}`);
+        }
+      } catch (objErr: any) {
+        console.warn(`[pdf-upload] Object Storage unavailable, saving locally: ${objErr.message}`);
+        fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
+      }
 
-      const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-
-      await file.save(req.file.buffer, {
-        metadata: { contentType: "application/pdf" },
-      });
-
-      const serveUrl = `/public/uploads/${encodeURIComponent(fileName)}`;
       await storage.upsertSetting("company_profile_pdf", serveUrl);
       res.json({ url: serveUrl });
     } catch (e: any) {
@@ -877,35 +885,44 @@ Sitemap: https://protels.com/sitemap.xml
     try {
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-      const objService = new ObjectStorageService();
-      const searchPaths = objService.getPublicObjectSearchPaths();
-      const publicPath = searchPaths[0];
       const ext = path.extname(req.file.originalname).toLowerCase();
       const sanitizedName = req.file.originalname
         .replace(/[^a-zA-Z0-9._-]/g, "_")
         .replace(/_+/g, "_");
       const fileName = `font-${Date.now()}-${sanitizedName}`;
-      const fullObjectPath = `${publicPath}/fonts/${fileName}`;
-
-      const parts = fullObjectPath.split("/").filter(Boolean);
-      const bucketName = parts[0];
-      const objectName = parts.slice(1).join("/");
-
-      const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-
       const mimeMap: Record<string, string> = {
         ".ttf": "font/ttf",
         ".woff": "font/woff",
         ".woff2": "font/woff2",
       };
-      await file.save(req.file.buffer, {
-        metadata: { contentType: mimeMap[ext] || "application/octet-stream" },
-      });
-
       const fontName = req.body.fontName || sanitizedName.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
-      const serveUrl = `/public/uploads/fonts/${encodeURIComponent(fileName)}`;
+      let serveUrl = `/uploads/${fileName}`;
+
+      try {
+        const objService = new ObjectStorageService();
+        const searchPaths = objService.getPublicObjectSearchPaths();
+        if (searchPaths.length > 0) {
+          const publicPath = searchPaths[0];
+          const fullObjectPath = `${publicPath}/fonts/${fileName}`;
+          const parts = fullObjectPath.split("/").filter(Boolean);
+          const bucketName = parts[0];
+          const objectName = parts.slice(1).join("/");
+          const { objectStorageClient } = await import("./replit_integrations/object_storage/objectStorage");
+          const bucket = objectStorageClient.bucket(bucketName);
+          const file = bucket.file(objectName);
+          await file.save(req.file.buffer, {
+            metadata: { contentType: mimeMap[ext] || "application/octet-stream" },
+          });
+          serveUrl = `/public/uploads/fonts/${encodeURIComponent(fileName)}`;
+          console.log(`[font-upload] Uploaded to Object Storage: ${fileName}`);
+        } else {
+          fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
+          console.log(`[font-upload] Saved locally (no Object Storage): ${fileName}`);
+        }
+      } catch (objErr: any) {
+        console.warn(`[font-upload] Object Storage unavailable, saving locally: ${objErr.message}`);
+        fs.writeFileSync(path.join(uploadDir, fileName), req.file.buffer);
+      }
 
       await storage.upsertSetting("company_profile_custom_font_url", serveUrl);
       await storage.upsertSetting("company_profile_custom_font_name", fontName);
