@@ -4,7 +4,7 @@ module.exports = {
       name: "protels",
       script: "dist/index.cjs",
       cwd: "/var/www/protels",
-      env_file: ".env",
+      node_args: "--env-file=.env",
       instances: 1,
       autorestart: true,
       watch: false,
