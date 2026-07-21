@@ -137,6 +137,7 @@ function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
     address: cmsHotel.address || staticHotel.address,
     ratings: cmsHotel.ratings || staticHotel.ratings,
     tripAdvisorRank: cmsHotel.tripAdvisorRank ?? undefined,
+    facilitySections: cmsHotel.facilitySections ?? staticHotel.facilitySections,
   };
 }
 
@@ -181,6 +182,7 @@ export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean }
       mapShareUrl: ch.mapShareUrl,
       ratings: ch.ratings,
       tripAdvisorRank: ch.tripAdvisorRank,
+      facilitySections: ch.facilitySections,
     }));
 
   return { hotels: [...merged, ...newCMSHotels], isLoading };
@@ -240,6 +242,7 @@ export function useMergedHotel(hotelId: string): { hotel: StaticHotel | null; is
         address: cmsHotel.address,
         ratings: cmsHotel.ratings,
         tripAdvisorRank: cmsHotel.tripAdvisorRank ?? undefined,
+        facilitySections: cmsHotel.facilitySections,
       },
       isLoading,
     };
@@ -298,5 +301,8 @@ export function useFooterContent(language: string) {
     socialLinks: settings?.social_links || {},
     description: settings?.footer_description?.[language] || settings?.footer_description?.en || "",
     siteName: settings?.site_name || "PROTELS Hotels & Resorts",
+    connectTitle: settings?.footer_connect_title || "Connect",
+    copyright: settings?.footer_copyright?.[language] || settings?.footer_copyright?.en || "All Rights Reserved",
+    quickLinks: Array.isArray(settings?.footer_quick_links) ? settings.footer_quick_links : [],
   };
 }

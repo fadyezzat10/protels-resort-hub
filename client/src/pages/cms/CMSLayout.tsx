@@ -24,6 +24,7 @@ import {
   ImagePlus,
   Mail,
   Megaphone,
+  Layout,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,8 @@ const navItems = [
   { href: "/controlpanal/image-optimization", label: "Image Optimization", icon: Zap },
   { href: "/controlpanal/performance", label: "Performance", icon: Gauge },
   { href: "/controlpanal/promotional-popup", label: "Promotional Popup", icon: Megaphone },
+  { href: "/controlpanal/navigation", label: "Navigation Menu", icon: Menu },
+  { href: "/controlpanal/footer", label: "Footer", icon: Layout },
   { href: "/controlpanal/ai-assistant", label: "AI Assistant", icon: Bot },
 ];
 

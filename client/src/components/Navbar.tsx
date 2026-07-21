@@ -48,9 +48,13 @@ export default function Navbar() {
       return config
         .filter((item: any) => item.visible !== false)
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-        .map((item: any) => ({ href: item.href, label: item.label }));
+        .map((item: any) => ({
+          href: item.href,
+          label: item.label,
+          customLabel: item.customLabel,
+        }));
     }
-    return defaultNavLinks.map((item) => ({ href: item.href, label: item.label }));
+    return defaultNavLinks.map((item) => ({ href: item.href, label: item.label, customLabel: undefined }));
   }, [allSettings]);
 
   const languages: { code: Language; label: string }[] = [
@@ -94,7 +98,7 @@ export default function Navbar() {
                 location === link.href ? "text-brand-gold" : isScrolled ? "text-brand-blue" : "text-white/90"
               )}
             >
-              {t(link.label)}
+              {(link as any).customLabel?.[language] || (link as any).customLabel?.en || t(link.label)}
             </Link>
           ))}
         </div>
@@ -164,7 +168,7 @@ export default function Navbar() {
               className="text-brand-blue font-medium text-lg py-2 border-b border-gray-100 uppercase tracking-widest text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t(link.label)}
+              {(link as any).customLabel?.[language] || (link as any).customLabel?.en || t(link.label)}
             </Link>
           ))}
           

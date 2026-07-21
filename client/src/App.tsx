@@ -110,6 +110,8 @@ const CMSImageOptimization = lazy(() => import("./pages/cms/CMSImageOptimization
 const CMSPerformance = lazy(() => import("./pages/cms/CMSPerformance"));
 const CMSMessages = lazy(() => import("./pages/cms/CMSMessages"));
 const CMSPromotionalPopup = lazy(() => import("./pages/cms/CMSPromotionalPopup"));
+const CMSNavigation = lazy(() => import("./pages/cms/CMSNavigation"));
+const CMSFooter = lazy(() => import("./pages/cms/CMSFooter"));
 
 const AdminToolbar = lazy(() => import("@/components/AdminToolbar"));
 const FloatingEditToolbar = lazy(() => import("@/components/FloatingEditToolbar"));
@@ -165,6 +167,8 @@ function Router() {
         <Route path="/controlpanal/ai-assistant" component={CMSAIAssistant} />
         <Route path="/controlpanal/messages" component={CMSMessages} />
         <Route path="/controlpanal/promotional-popup" component={CMSPromotionalPopup} />
+        <Route path="/controlpanal/navigation" component={CMSNavigation} />
+        <Route path="/controlpanal/footer" component={CMSFooter} />
         
         <Route path="/hotels/:hotelId" component={HotelDetails} />
         <Route path="/hotels/:hotelId/:section" component={HotelDetails} />
