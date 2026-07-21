@@ -7,7 +7,7 @@ import defaultLogo from "@assets/سش.pngش_1770193463633.webp";
 export default function Footer() {
   const { t, language } = useI18n();
   const currentYear = new Date().getFullYear();
-  const { address, phone, email, socialLinks, description, siteName } = useFooterContent(language);
+  const { address, phone, email, socialLinks, description, siteName, connectTitle, copyright, quickLinks } = useFooterContent(language);
   const { hotels } = useMergedHotels();
   const cmsLogo = useHeaderLogo();
   const logoSrc = cmsLogo || defaultLogo;
@@ -59,7 +59,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">Connect</h3>
+            <h3 className="font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6 text-brand-gold">{connectTitle}</h3>
             <div className="flex gap-6">
               {socialIconList.map(({ key, Icon, fallbackUrl, label }) => {
                 const url = (socialLinks as Record<string, string>)[key] || fallbackUrl;
@@ -70,6 +70,17 @@ export default function Footer() {
                 );
               })}
             </div>
+            {quickLinks.length > 0 && (
+              <ul className="mt-6 space-y-3">
+                {quickLinks.map((ql: any, i: number) => (
+                  <li key={i}>
+                    <Link href={ql.href} className="text-white/60 hover:text-brand-gold transition-colors text-sm tracking-wide">
+                      {ql.label?.[language] || ql.label?.en || ql.href}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="mt-8 bg-white/5 p-6 rounded-none border border-white/10">
               <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/40 leading-relaxed">
                 {description || "Experience the pinnacle of coastal luxury across our exclusive portfolio."}
@@ -79,7 +90,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center text-white/50 text-[0.65rem] uppercase tracking-[0.3em] gap-4">
-          <p>&copy; {currentYear} {siteName}. {t("footer.rights")}.</p>
+          <p>&copy; {currentYear} {siteName}. {copyright || t("footer.rights")}.</p>
         </div>
       </div>
     </footer>

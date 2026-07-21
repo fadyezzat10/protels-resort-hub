@@ -301,5 +301,8 @@ export function useFooterContent(language: string) {
     socialLinks: settings?.social_links || {},
     description: settings?.footer_description?.[language] || settings?.footer_description?.en || "",
     siteName: settings?.site_name || "PROTELS Hotels & Resorts",
+    connectTitle: settings?.footer_connect_title || "Connect",
+    copyright: settings?.footer_copyright?.[language] || settings?.footer_copyright?.en || "All Rights Reserved",
+    quickLinks: Array.isArray(settings?.footer_quick_links) ? settings.footer_quick_links : [],
   };
 }
