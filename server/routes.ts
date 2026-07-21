@@ -1424,6 +1424,7 @@ Sitemap: https://protels.com/sitemap.xml
   // ──────── BOOKING ASSISTANT CHATBOT ────────
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY || 'not-configured',
+    ...(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL ? { baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL } : {}),
   });
 
   const hotelKnowledgeMap: Record<string, string> = {
