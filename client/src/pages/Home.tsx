@@ -209,12 +209,12 @@ export default function Home() {
                 <EditableText
                   contentKey="home.stats.resorts"
                   defaultValue={String(hotels.length)}
-                  as="h3"
+                  as="div"
                   className="text-3xl font-serif text-brand-gold mb-2"
                 />
                 <EditableText
                   contentKey="home.stats.resorts.label"
-                  defaultValue="Luxury Resorts"
+                  defaultValue="Resorts Worldwide"
                   as="p"
                   className="text-sm uppercase tracking-wider"
                 />
@@ -223,7 +223,7 @@ export default function Home() {
                 <EditableText
                   contentKey="home.stats.destinations"
                   defaultValue="2"
-                  as="h3"
+                  as="div"
                   className="text-3xl font-serif text-brand-gold mb-2"
                 />
                 <EditableText
