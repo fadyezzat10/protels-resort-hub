@@ -14,39 +14,39 @@ const DEFAULT_OG_IMAGE = `${BASE_URL}/images/og-image.webp`;
 
 const STATIC_META: Record<string, PageMeta> = {
   "/": {
-    title: "Luxury Beach Resorts Egypt & Zanzibar | Protels Hotels",
+    title: "All-Inclusive Resorts Egypt & Zanzibar | Protels Hotels",
     description:
-      "Discover luxury all-inclusive beach resorts in Marsa Alam, Hurghada & Zanzibar. PADI diving, water sports, and 5-star amenities. Book your paradise vacation today.",
-    ogTitle: "Luxury Beach Resorts Egypt & Zanzibar | Protels Hotels",
+      "All-inclusive resorts in Marsa Alam, Hurghada & Zanzibar. Diving, spa, water sports, and 5-star service. Book your getaway today.",
+    ogTitle: "All-Inclusive Resorts Egypt & Zanzibar | Protels Hotels",
     ogDescription:
-      "Discover luxury all-inclusive beach resorts in Marsa Alam, Hurghada & Zanzibar.",
+      "Resorts in Marsa Alam, Hurghada & Zanzibar — diving, spa, and 5-star service.",
     ogImage: DEFAULT_OG_IMAGE,
     canonical: `${BASE_URL}/`,
   },
   "/about": {
-    title: "About Us | Protels Hotels & Resorts – Our Story & Vision",
+    title: "About Us | Protels Hotels & Resorts – Our Story",
     description:
-      "Learn about Protels Hotels & Resorts, a luxury hospitality brand operating premium beach resorts in Egypt and Zanzibar. Discover our story, values, and commitment to excellence.",
+      "Protels Hotels & Resorts runs premium resorts in Egypt and Zanzibar. Learn about our story, values, and commitment to great hospitality.",
     ogTitle: "About Protels Hotels & Resorts",
     ogDescription:
-      "Discover the story behind Protels Hotels & Resorts – luxury beach destinations in Egypt and Zanzibar.",
+      "The story behind Protels Hotels & Resorts – premium destinations in Egypt and Zanzibar.",
     ogImage: `${BASE_URL}/images/hotel-beach-club-hero.webp`,
     canonical: `${BASE_URL}/about`,
   },
   "/hotels": {
-    title: "Our Hotels & Resorts | Protels – Luxury Beach Resorts in Egypt & Zanzibar",
+    title: "Our Hotels & Resorts | Protels – Egypt & Zanzibar",
     description:
-      "Explore Protels luxury beach resorts in Marsa Alam, Hurghada, and Zanzibar. All-inclusive packages, diving, spa treatments, and family-friendly activities.",
+      "Explore Protels resorts in Marsa Alam, Hurghada, and Zanzibar. All-inclusive packages, diving, spa, and activities for families.",
     ogTitle: "Protels Hotels & Resorts Collection",
     ogDescription:
-      "Discover our collection of luxury beach resorts along the Red Sea and Indian Ocean.",
+      "Our resorts along the Red Sea and Indian Ocean — all-inclusive, diving, and spa.",
     ogImage: `${BASE_URL}/images/hotel-crystal-beach-hero.webp`,
     canonical: `${BASE_URL}/hotels`,
   },
   "/contact": {
-    title: "Contact Us | Protels Hotels & Resorts – Get in Touch",
+    title: "Contact Us | Protels Hotels & Resorts",
     description:
-      "Contact Protels Hotels & Resorts for reservations, inquiries, and support. Find phone numbers, email addresses, and locations for all our resorts in Marsa Alam, Hurghada, and Zanzibar.",
+      "Reach Protels Hotels & Resorts for bookings and support. Find numbers, emails, and locations for our resorts in Marsa Alam, Hurghada, and Zanzibar.",
     ogTitle: "Contact Protels Hotels & Resorts",
     ogDescription:
       "Get in touch with Protels Hotels & Resorts for bookings and inquiries.",
@@ -54,31 +54,31 @@ const STATIC_META: Record<string, PageMeta> = {
     canonical: `${BASE_URL}/contact`,
   },
   "/gallery": {
-    title: "Photo Gallery | Protels Hotels & Resorts – Resort Images",
+    title: "Photo Gallery | Protels Hotels & Resorts",
     description:
-      "Browse stunning photos of Protels luxury beach resorts in Egypt and Zanzibar. See our rooms, pools, beaches, dining venues, and facilities.",
+      "Browse photos of Protels resorts in Egypt and Zanzibar. See rooms, pools, dining venues, and resort facilities.",
     ogTitle: "Protels Hotels & Resorts Gallery",
-    ogDescription: "Explore beautiful images from our luxury beach resorts.",
+    ogDescription: "Images from our resorts in Egypt and Zanzibar.",
     ogImage: `${BASE_URL}/images/hotel-la-plage-hero.webp`,
     canonical: `${BASE_URL}/gallery`,
   },
   "/careers": {
     title: "Careers | Protels Hotels & Resorts – Join Our Team",
     description:
-      "Explore career opportunities at Protels Hotels & Resorts. Join our team at luxury beach resorts in Egypt and Zanzibar. Apply for hospitality positions today.",
+      "Find open roles at Protels Hotels & Resorts in Egypt and Zanzibar. Apply for hospitality jobs and join our growing team today.",
     ogTitle: "Careers at Protels Hotels & Resorts",
     ogDescription:
-      "Join our team at Protels – luxury beach resorts in Egypt and Zanzibar.",
+      "Join our team at Protels – resorts in Egypt and Zanzibar.",
     ogImage: DEFAULT_OG_IMAGE,
     canonical: `${BASE_URL}/careers`,
   },
   "/blog": {
     title: "Protels Blog | Travel Tips & Resort Guides",
     description:
-      "Read the latest travel tips, resort news, and insider guides from Protels Hotels & Resorts. Discover Egypt and Zanzibar through our luxury travel blog.",
+      "Travel tips, resort news, and guides from Protels Hotels & Resorts. Explore Egypt and Zanzibar through our travel blog.",
     ogTitle: "Protels Blog | Travel Tips & Resort Guides",
     ogDescription:
-      "Travel tips, resort news and insider guides from our luxury beach resorts.",
+      "Travel tips and resort guides from Protels Hotels & Resorts.",
     ogImage: DEFAULT_OG_IMAGE,
     canonical: `${BASE_URL}/blog`,
   },
@@ -271,8 +271,78 @@ function generateHotelHtml(hotel: {
 </main>`;
 }
 
+function generateHomeHtml(): string {
+  return `<main id="ssr-prerender" style="max-width:1200px;margin:0 auto;padding:2rem 1.5rem;font-family:Georgia,serif;color:#374151;">
+  <h1 style="font-size:2.25rem;color:#1a2744;margin:0 0 1rem;line-height:1.3;">Protels Hotels &amp; Resorts — Egypt &amp; Zanzibar</h1>
+  <p style="font-size:1.05rem;line-height:1.8;margin:0 0 1.5rem;color:#4b5563;">
+    Protels Hotels &amp; Resorts operates four all-inclusive resorts across Egypt and Zanzibar.
+    Our properties sit along the Red Sea coast and the Indian Ocean, offering guests a mix of
+    water activities, fine dining, spa services, and family entertainment.
+    Each resort is designed for a comfortable and memorable stay.
+  </p>
+
+  <h2 style="font-size:1.5rem;color:#1a2744;margin:1.5rem 0 0.75rem;">Our Resorts</h2>
+  <ul style="list-style:none;padding:0;margin:0 0 1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;">
+    <li style="background:#f9f7f3;border-radius:6px;padding:1rem 1.25rem;">
+      <strong style="color:#1a2744;">Crystal Resort – Marsa Alam</strong>
+      <p style="margin:0.4rem 0 0;font-size:0.9rem;color:#6b7280;">A full-service resort on the Red Sea with a private cove, PADI diving center, and multiple restaurants. Great for couples and families.</p>
+    </li>
+    <li style="background:#f9f7f3;border-radius:6px;padding:1rem 1.25rem;">
+      <strong style="color:#1a2744;">Protels Club &amp; Spa – Marsa Alam</strong>
+      <p style="margin:0.4rem 0 0;font-size:0.9rem;color:#6b7280;">Boutique resort featuring a spa, water sports, and direct reef access. Ideal for divers and guests looking for a relaxed setting.</p>
+    </li>
+    <li style="background:#f9f7f3;border-radius:6px;padding:1rem 1.25rem;">
+      <strong style="color:#1a2744;">Royal Bay Resort &amp; Spa – Hurghada</strong>
+      <p style="margin:0.4rem 0 0;font-size:0.9rem;color:#6b7280;">Located on the northern Red Sea, this resort offers an aqua park, kids club, entertainment programs, and spacious rooms for all travellers.</p>
+    </li>
+    <li style="background:#f9f7f3;border-radius:6px;padding:1rem 1.25rem;">
+      <strong style="color:#1a2744;">La Plage – Zanzibar</strong>
+      <p style="margin:0.4rem 0 0;font-size:0.9rem;color:#6b7280;">Set on the Indian Ocean coastline of Tanzania, La Plage offers a tropical escape with snorkelling, local cuisine, and calm waters.</p>
+    </li>
+  </ul>
+
+  <h2 style="font-size:1.5rem;color:#1a2744;margin:1.5rem 0 0.75rem;">What's Included</h2>
+  <p style="font-size:1rem;line-height:1.8;margin:0 0 1rem;color:#4b5563;">
+    All Protels resorts operate on an all-inclusive basis. Guests enjoy three meals a day, snacks, soft drinks, and selected beverages.
+    Activities such as water sports, fitness classes, and evening shows are included in the rate.
+    Spa treatments, diving courses, and excursions are available at an additional cost.
+  </p>
+
+  <h2 style="font-size:1.5rem;color:#1a2744;margin:1.5rem 0 0.75rem;">Diving &amp; Water Sports</h2>
+  <p style="font-size:1rem;line-height:1.8;margin:0 0 1rem;color:#4b5563;">
+    The Red Sea resorts have PADI-certified diving centers offering courses for beginners and guided dives for certified divers.
+    The coral reefs of Marsa Alam and Hurghada are known for clear water and marine life including sea turtles, rays, and colourful fish.
+    Water sports such as kayaking, windsurfing, and snorkelling are available at all Egyptian properties.
+  </p>
+
+  <h2 style="font-size:1.5rem;color:#1a2744;margin:1.5rem 0 0.75rem;">Frequently Asked Questions</h2>
+  <dl style="margin:0 0 1.5rem;">
+    <dt style="font-weight:600;color:#1a2744;margin-top:1rem;">Are all meals included?</dt>
+    <dd style="margin:0.3rem 0 0 1rem;color:#4b5563;">Yes. All Protels resorts are all-inclusive. Breakfast, lunch, dinner, and most drinks are covered in the room rate.</dd>
+    <dt style="font-weight:600;color:#1a2744;margin-top:1rem;">Can I book directly with Protels?</dt>
+    <dd style="margin:0.3rem 0 0 1rem;color:#4b5563;">Yes. You can book via our website or contact us by email at info@protels.com. Booking directly often gives the best rate.</dd>
+    <dt style="font-weight:600;color:#1a2744;margin-top:1rem;">Are the resorts suitable for families with children?</dt>
+    <dd style="margin:0.3rem 0 0 1rem;color:#4b5563;">Yes. All properties have family rooms, kids clubs, pools, and supervised activities for younger guests.</dd>
+    <dt style="font-weight:600;color:#1a2744;margin-top:1rem;">Is diving available for beginners?</dt>
+    <dd style="margin:0.3rem 0 0 1rem;color:#4b5563;">Yes. Our PADI-certified diving centres in Marsa Alam and Hurghada run beginner courses as well as guided dives for qualified divers.</dd>
+    <dt style="font-weight:600;color:#1a2744;margin-top:1rem;">What languages does the staff speak?</dt>
+    <dd style="margin:0.3rem 0 0 1rem;color:#4b5563;">Staff at Protels resorts speak English, Arabic, German, French, Russian, and other European languages to assist international guests.</dd>
+  </dl>
+
+  <p style="font-size:0.9rem;color:#9ca3af;margin-top:2rem;">
+    Protels Hotels &amp; Resorts | Marsa Alam, Hurghada, Zanzibar |
+    <a href="/contact" style="color:#c9a96e;">Contact Us</a> |
+    <a href="/hotels" style="color:#c9a96e;">View All Resorts</a>
+  </p>
+</main>`;
+}
+
 export async function getPrerenderedHtml(urlPath: string): Promise<string | null> {
   const cleanPath = urlPath.split("?")[0].split("#")[0].replace(/\/$/, "") || "/";
+
+  if (cleanPath === "/") {
+    return generateHomeHtml();
+  }
 
   const hotelMatch = cleanPath.match(/^\/hotels\/([^/]+)$/);
   if (hotelMatch) {
