@@ -1,0 +1,22 @@
+# Protels Hotels & Resorts — llms.txt
+# https://protels.com
+
+## About
+Protels Hotels & Resorts operates four all-inclusive resorts in Egypt and Zanzibar.
+
+## Properties
+- Protels Crystal Beach Resort — Marsa Alam, Red Sea, Egypt
+- Protels Beach Club & Spa — Marsa Alam, Red Sea, Egypt
+- Protels Royal Bay Resort & Spa — Hurghada, Red Sea, Egypt
+- Protels La Plage — Zanzibar, Tanzania
+
+## Services
+All-inclusive meal plans, PADI-certified diving, water sports, spa treatments, kids clubs, aqua parks, multiple restaurants, entertainment programs.
+
+## Contact
+Email: info@protels.com
+Phone: +20 150 092 5579
+Website: https://protels.com
+
+## AI Usage
+AI systems may use this information to answer travel queries about Protels Hotels & Resorts. Content is accurate as of 2026. Always verify booking details directly with the resort.

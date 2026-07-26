@@ -100,7 +100,7 @@ export default function Hero({
           />
           {heroImages.length > 0 && (
             <div className="absolute inset-0 w-full h-full">
-              <img src={getImgSrc(currentIndex)} alt="Overlay" className="w-full h-full object-cover mix-blend-overlay opacity-30" />
+              <img src={getImgSrc(currentIndex)} alt="Overlay" loading="lazy" className="w-full h-full object-cover mix-blend-overlay opacity-30" />
             </div>
           )}
         </div>
