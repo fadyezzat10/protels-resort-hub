@@ -8,4 +8,14 @@ if ("scrollRestoration" in history) {
 }
 window.scrollTo(0, 0);
 
+// pageshow fires after bfcache restore AND normal load — catches all cases
+window.addEventListener("pageshow", () => {
+  window.scrollTo(0, 0);
+});
+
+// Belt-and-suspenders: run after first paint in case browser restores scroll late
+requestAnimationFrame(() => {
+  window.scrollTo(0, 0);
+});
+
 createRoot(document.getElementById("root")!).render(<App />);
