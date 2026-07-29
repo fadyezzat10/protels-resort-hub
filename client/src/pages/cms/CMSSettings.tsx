@@ -131,6 +131,57 @@ function HeroImageUploader({ settingKey, label, currentValue, isSlider, onSave, 
   );
 }
 
+function FaviconUploader({ currentUrl, onSave, isPending }: {
+  currentUrl: string;
+  onSave: (url: string) => Promise<void>;
+  isPending: boolean;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+
+  const handleUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/cms/media", { method: "POST", body: formData, credentials: "include" });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || "Upload failed");
+      const data = await res.json();
+      await onSave(data.url);
+      toast({ title: "Favicon uploaded and saved!" });
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }, [onSave, toast]);
+
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div className="flex items-center gap-4">
+        {currentUrl ? (
+          <img src={currentUrl} alt="Favicon preview" className="w-12 h-12 object-contain rounded border bg-gray-50 p-1" />
+        ) : (
+          <div className="w-12 h-12 rounded border bg-gray-100 flex items-center justify-center text-gray-400 text-xs">No icon</div>
+        )}
+        <div className="flex-1">
+          <p className="text-sm font-medium">Upload Favicon</p>
+          <p className="text-xs text-gray-400">PNG, ICO, SVG — recommended 512×512px</p>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading || isPending} className="gap-2">
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          {uploading ? "Uploading…" : "Upload"}
+        </Button>
+        <input ref={fileRef} type="file" accept="image/*,.ico" className="hidden" onChange={handleUpload} />
+      </div>
+    </div>
+  );
+}
+
 export default function CMSSettings() {
   const { toast } = useToast();
 
@@ -736,9 +787,19 @@ export default function CMSSettings() {
                 <Image className="w-5 h-5 text-brand-blue" /> Favicon
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {/* Upload direct */}
+              <FaviconUploader
+                currentUrl={faviconUrl}
+                onSave={async (url) => {
+                  setFaviconUrl(url);
+                  await saveSetting("favicon_url", url);
+                }}
+                isPending={saveMutation.isPending}
+              />
+              {/* Or paste URL manually */}
               <div>
-                <label className="text-sm font-medium mb-1 block">Favicon URL</label>
+                <label className="text-sm font-medium mb-1 block text-gray-500">Or paste URL manually</label>
                 <div className="flex gap-2">
                   <Input data-testid="input-setting-favicon-url" value={faviconUrl} onChange={(e) => setFaviconUrl(e.target.value)} placeholder="https://example.com/favicon.ico" />
                   <Button data-testid="button-save-favicon-url" size="sm" onClick={() => saveSetting("favicon_url", faviconUrl)} disabled={saveMutation.isPending}><Save className="w-4 h-4" /></Button>
