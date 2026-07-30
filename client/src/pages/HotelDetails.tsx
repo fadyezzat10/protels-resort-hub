@@ -325,11 +325,11 @@ export default function HotelDetails() {
                 {/* All-Inclusive Plan Section */}
                 {(isLaPlage || (hotel as any).allInclusivePlan) && (() => {
                   const DEFAULT_PLAN = {
-                    description: "Indulge in a carefree escape where every detail is taken care of. Our comprehensive all-inclusive plan is designed to let you fully immerse yourself in the island's rhythm without a worry.",
+                    description: "Indulge in a carefree escape where every detail is taken care of. Our All-Inclusive package is designed to help you relax and enjoy the beauty of Zanzibar from the moment you arrive.",
                     columns: [
-                      { title: t("hotel.diningDrinks"), items: ["Breakfast, Lunch, and Dinner at La Cabana", "Afternoon tea and snacks at The Lounge", "Unlimited soft drinks, juices, and local spirits (10:00 - 23:00)", "Daily replenished minibar"] },
-                      { title: t("hotel.activitiesLeisure"), items: ["Daily yoga and stretching sessions", "Access to the fitness center", "Kayaks & Paddleboards", "Evening cultural shows"] },
-                      { title: t("hotel.comfortService"), items: ["Complimentary High-Speed Wi-Fi", "Kids Club (Ages 4-12)", "24-Hour Concierge", "Beach Towel Service"] },
+                      { title: "Dining & Drinks", items: ["Breakfast, Lunch & Dinner at La Cabana Restaurant", "Afternoon tea and snacks at The Lounge", "Unlimited soft drinks, juices, and local spirits (10:00 AM – 11:00 PM)", "Daily replenished minibar"] },
+                      { title: "Resort Facilities", items: ["Access to the private sandy beach", "Access to the swimming pools", "Selected entertainment activities during your stay"] },
+                      { title: "Comfort & Services", items: ["Complimentary high-speed Wi-Fi", "24-hour Concierge Service", "Beach towel service", "Daily housekeeping service"] },
                     ],
                   };
                   const plan = (hotel as any).allInclusivePlan || DEFAULT_PLAN;
