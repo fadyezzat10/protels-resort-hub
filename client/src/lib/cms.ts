@@ -138,6 +138,7 @@ function mergeCMSHotel(staticHotel: StaticHotel, cmsHotel: any): StaticHotel {
     ratings: cmsHotel.ratings || staticHotel.ratings,
     tripAdvisorRank: cmsHotel.tripAdvisorRank ?? undefined,
     facilitySections: cmsHotel.facilitySections ?? staticHotel.facilitySections,
+    allInclusivePlan: cmsHotel.allInclusivePlan ?? (staticHotel as any).allInclusivePlan,
   };
 }
 
@@ -183,6 +184,7 @@ export function useMergedHotels(): { hotels: StaticHotel[]; isLoading: boolean }
       ratings: ch.ratings,
       tripAdvisorRank: ch.tripAdvisorRank,
       facilitySections: ch.facilitySections,
+      allInclusivePlan: ch.allInclusivePlan,
     }));
 
   return { hotels: [...merged, ...newCMSHotels], isLoading };
@@ -243,6 +245,7 @@ export function useMergedHotel(hotelId: string): { hotel: StaticHotel | null; is
         ratings: cmsHotel.ratings,
         tripAdvisorRank: cmsHotel.tripAdvisorRank ?? undefined,
         facilitySections: cmsHotel.facilitySections,
+        allInclusivePlan: cmsHotel.allInclusivePlan,
       },
       isLoading,
     };

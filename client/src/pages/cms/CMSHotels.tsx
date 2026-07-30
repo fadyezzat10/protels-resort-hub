@@ -137,6 +137,10 @@ interface HotelForm {
   ratings: { platform: string; rating: number; maxRating: number; reviewCount: number; reviewUrl: string }[];
   tripAdvisorRank: string;
   facilitySections: FacilitySection[];
+  allInclusivePlan: {
+    description: string;
+    columns: { title: string; items: string[] }[];
+  };
 }
 
 const emptyForm: HotelForm = {
@@ -181,6 +185,14 @@ const emptyForm: HotelForm = {
   ratings: [],
   tripAdvisorRank: "",
   facilitySections: [],
+  allInclusivePlan: {
+    description: "",
+    columns: [
+      { title: "Dining & Drinks", items: [""] },
+      { title: "Activities & Leisure", items: [""] },
+      { title: "Comfort & Service", items: [""] },
+    ],
+  },
 };
 
 const FEATURE_SUGGESTIONS = [
@@ -394,6 +406,9 @@ export default function CMSHotels() {
     ratings: form.ratings.length > 0 ? form.ratings : null,
     tripAdvisorRank: form.tripAdvisorRank || null,
     facilitySections: form.facilitySections.length > 0 ? form.facilitySections : null,
+    allInclusivePlan: form.allInclusivePlan.description || form.allInclusivePlan.columns.some(c => c.items.some(i => i.trim()))
+      ? form.allInclusivePlan
+      : null,
   });
 
   const handleSubmit = () => {
@@ -457,6 +472,14 @@ export default function CMSHotels() {
       ratings: hotel.ratings || [],
       tripAdvisorRank: (hotel as any).tripAdvisorRank || "",
       facilitySections: hotel.facilitySections || [],
+      allInclusivePlan: hotel.allInclusivePlan || {
+        description: "",
+        columns: [
+          { title: "Dining & Drinks", items: [""] },
+          { title: "Activities & Leisure", items: [""] },
+          { title: "Comfort & Service", items: [""] },
+        ],
+      },
     });
     setExpandedRooms(new Set());
     setView("editor");
@@ -726,6 +749,10 @@ export default function CMSHotels() {
             <TabsTrigger data-testid="tab-contact" value="contact" className="flex items-center gap-1.5 text-xs sm:text-sm">
               <Phone className="w-3.5 h-3.5" />
               التواصل
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-allinclusive" value="allinclusive" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <Star className="w-3.5 h-3.5" />
+              الخطة الشاملة
             </TabsTrigger>
           </TabsList>
 
@@ -2046,6 +2073,62 @@ export default function CMSHotels() {
               })()}
             </div>
           </TabsContent>
+
+          {/* Tab: All-Inclusive Plan */}
+          <TabsContent value="allinclusive">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <h3 className="text-lg font-semibold text-brand-blue border-b pb-3">الخطة الشاملة (All-Inclusive)</h3>
+              <p className="text-sm text-gray-500">يظهر هذا القسم في صفحة الفندق تحت التقييمات. عدّل الوصف والأعمدة الثلاثة.</p>
+
+              {/* Description */}
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">الوصف التمهيدي</label>
+                <Textarea
+                  value={form.allInclusivePlan.description}
+                  onChange={(e) => setForm({ ...form, allInclusivePlan: { ...form.allInclusivePlan, description: e.target.value } })}
+                  placeholder="Indulge in a carefree escape where every detail is taken care of..."
+                  rows={3}
+                  dir="ltr"
+                />
+              </div>
+
+              {/* 3 Columns */}
+              {form.allInclusivePlan.columns.map((col, ci) => (
+                <div key={ci} className="border rounded-lg p-4 space-y-3 bg-gray-50">
+                  <span className="text-sm font-semibold text-brand-blue">العمود {ci + 1}</span>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block text-gray-600">العنوان</label>
+                    <Input
+                      value={col.title}
+                      dir="ltr"
+                      onChange={(e) => {
+                        const cols = [...form.allInclusivePlan.columns];
+                        cols[ci] = { ...cols[ci], title: e.target.value };
+                        setForm({ ...form, allInclusivePlan: { ...form.allInclusivePlan, columns: cols } });
+                      }}
+                      placeholder={["Dining & Drinks", "Activities & Leisure", "Comfort & Service"][ci] ?? "Column title"}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block text-gray-600">البنود — كل سطر = بند واحد</label>
+                    <Textarea
+                      value={col.items.join("\n")}
+                      dir="ltr"
+                      rows={5}
+                      onChange={(e) => {
+                        const cols = [...form.allInclusivePlan.columns];
+                        cols[ci] = { ...cols[ci], items: e.target.value.split("\n") };
+                        setForm({ ...form, allInclusivePlan: { ...form.allInclusivePlan, columns: cols } });
+                      }}
+                      placeholder={"Breakfast, Lunch, and Dinner\nAfternoon tea and snacks\n..."}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">كل سطر سيظهر كبند منفصل في الصفحة</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
         </Tabs>
 
         {/* Media Picker Dialog */}

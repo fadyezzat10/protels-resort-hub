@@ -101,6 +101,7 @@ export interface Hotel {
   ratings?: { platform: string; rating: number; maxRating: number; reviewCount?: number; reviewUrl: string }[];
   tripAdvisorRank?: string;
   facilitySections?: { id: string; title: string; subtitle: string; description: string; bulletPoints: string[]; heroImage: string; galleryImages: string[]; visible: boolean }[];
+  allInclusivePlan?: { description: string; columns: { title: string; items: string[] }[] };
 }
 
 export const hotels: Hotel[] = [
