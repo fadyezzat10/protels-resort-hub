@@ -228,8 +228,12 @@ const generateSlug = (name: string) =>
     .trim();
 
 function toEmbedUrl(url: string): { embed: string; warning: string | null } {
-  const trimmed = url.trim();
+  let trimmed = url.trim();
   if (!trimmed) return { embed: "", warning: null };
+
+  // Auto-extract src from a full <iframe> tag
+  const iframeSrcMatch = trimmed.match(/src=["']([^"']+)["']/);
+  if (iframeSrcMatch) trimmed = iframeSrcMatch[1].trim();
 
   if (trimmed.includes("maps.app.goo.gl") || trimmed.includes("goo.gl/maps")) {
     return {
