@@ -238,6 +238,15 @@ function toEmbedUrl(url: string): { embed: string; warning: string | null } {
     };
   }
 
+  // Handle case where user pastes only the pb=... part without the base URL
+  if (trimmed.startsWith("pb=")) {
+    return { embed: `https://www.google.com/maps/embed?${trimmed}`, warning: null };
+  }
+
+  if (trimmed.includes("google.com/maps/embed")) {
+    return { embed: trimmed, warning: null };
+  }
+
   if (trimmed.includes("output=embed")) {
     return { embed: trimmed, warning: null };
   }
