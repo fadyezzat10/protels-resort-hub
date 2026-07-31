@@ -61,7 +61,7 @@ app.use((_req, res, next) => {
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https: http:",
       "media-src 'self' https: blob:",
-      "frame-src 'self' https://www.youtube.com https://www.googletagmanager.com",
+      "frame-src 'self' https://www.youtube.com https://www.googletagmanager.com https://www.google.com https://maps.google.com https://maps.googleapis.com",
       "connect-src 'self' https: wss:",
       "object-src 'none'",
       "base-uri 'self'",
