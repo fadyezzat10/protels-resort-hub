@@ -18,6 +18,7 @@ import {
   Hotel,
   UtensilsCrossed,
   Star,
+  Gift,
   Link2,
   Languages,
   BedDouble,
@@ -751,7 +752,7 @@ export default function CMSHotels() {
               التواصل
             </TabsTrigger>
             <TabsTrigger data-testid="tab-allinclusive" value="allinclusive" className="flex items-center gap-1.5 text-xs sm:text-sm">
-              <Star className="w-3.5 h-3.5" />
+              <Gift className="w-3.5 h-3.5" />
               الخطة الشاملة
             </TabsTrigger>
           </TabsList>
