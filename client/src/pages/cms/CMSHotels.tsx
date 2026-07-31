@@ -752,7 +752,7 @@ export default function CMSHotels() {
               التواصل
             </TabsTrigger>
             <TabsTrigger data-testid="tab-allinclusive" value="allinclusive" className="flex items-center gap-1.5 text-xs sm:text-sm">
-              <Gift className="w-3.5 h-3.5" />
+              <img src="/images/protels-logo.png" className="w-3.5 h-3.5 rounded-full object-cover" alt="" />
               الخطة الشاملة
             </TabsTrigger>
           </TabsList>
