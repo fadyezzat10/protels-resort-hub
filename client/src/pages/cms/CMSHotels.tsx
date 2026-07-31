@@ -409,7 +409,7 @@ export default function CMSHotels() {
     email: form.email || null,
     emailReservations: form.emailReservations || null,
     emailSales: form.emailSales || null,
-    mapEmbed: form.mapEmbed || null,
+    mapEmbed: form.mapEmbed ? toEmbedUrl(form.mapEmbed).embed || form.mapEmbed : null,
     mapShareUrl: form.mapShareUrl || null,
     address: form.address || null,
     status: form.status,
@@ -2059,7 +2059,7 @@ export default function CMSHotels() {
               </div>
 
               {form.mapEmbed && (() => {
-                const { warning } = toEmbedUrl(form.mapEmbed);
+                const { warning, embed: resolvedEmbed } = toEmbedUrl(form.mapEmbed);
                 return (
                   <div>
                     <p className="text-sm font-medium mb-2 text-gray-600">معاينة الخريطة:</p>
@@ -2072,7 +2072,7 @@ export default function CMSHotels() {
                     ) : (
                       <div className="h-48 w-full bg-gray-100 overflow-hidden rounded border">
                         <iframe
-                          src={form.mapEmbed}
+                          src={resolvedEmbed}
                           width="100%"
                           height="100%"
                           style={{ border: 0 }}
