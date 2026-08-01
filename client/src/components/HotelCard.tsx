@@ -3,6 +3,7 @@ import { useBookingLink } from "@/lib/cms";
 import { useI18n } from "@/lib/i18n";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { fireBookingConversion } from "@/lib/conversions";
 import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import EditableImage from "@/components/EditableImage";
@@ -111,7 +112,7 @@ export default function HotelCard({ hotel, featured = false, index = 0 }: HotelC
                 </Button>
               ) : (
                 <Button asChild className="flex-1 bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold rounded-none">
-                  <a href={bookingLink} target="_blank" rel="noopener noreferrer">
+                  <a href={bookingLink} target="_blank" rel="noopener noreferrer" onClick={fireBookingConversion}>
                     {t("nav.book")}
                   </a>
                 </Button>

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useI18n, type Language } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { fireBookingConversion } from "@/lib/conversions";
 import { useBookingLink, useHeaderLogo, useCMSAllSettings } from "@/lib/cms";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -145,7 +146,7 @@ export default function Navbar() {
             asChild 
             className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold px-6 rounded-none text-xs uppercase tracking-widest"
           >
-            <a href={bookingLink} target="_blank" rel="noopener noreferrer">
+            <a href={bookingLink} target="_blank" rel="noopener noreferrer" onClick={fireBookingConversion}>
               {t("nav.book")}
             </a>
           </Button>
@@ -205,7 +206,7 @@ export default function Navbar() {
               asChild 
               className="bg-brand-gold hover:bg-brand-gold/90 text-brand-blue w-full rounded-none uppercase tracking-widest text-xs h-10"
             >
-              <a href={bookingLink} target="_blank" rel="noopener noreferrer">
+              <a href={bookingLink} target="_blank" rel="noopener noreferrer" onClick={fireBookingConversion}>
                 {t("nav.book")}
               </a>
             </Button>

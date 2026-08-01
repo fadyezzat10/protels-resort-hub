@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { fireBookingConversion } from "@/lib/conversions";
 import { ChevronLeft, ChevronRight, X, Maximize2, Bed, Mountain, Wind, Tv, Wifi, Coffee, Shirt, Ban, Bath, ShowerHead, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import { RoomDetail } from "@/lib/data";
@@ -167,7 +168,7 @@ export default function RoomModal({ room, isOpen, onClose }: RoomModalProps) {
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex gap-4">
               <Button asChild className="flex-1 bg-brand-gold hover:bg-brand-gold/90 text-brand-blue font-bold py-6 text-base tracking-wide shadow-md">
-                <a href={bookingLink} target="_blank">Check Rates</a>
+                <a href={bookingLink} target="_blank" onClick={fireBookingConversion}>Check Rates</a>
               </Button>
               <Button variant="outline" className="flex-1 border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white py-6 text-base tracking-wide">
                 View More Photos

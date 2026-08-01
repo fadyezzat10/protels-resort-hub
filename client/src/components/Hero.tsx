@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { fireBookingConversion } from "@/lib/conversions";
 import { useI18n } from "@/lib/i18n";
 import { useBookingLink } from "@/lib/cms";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -190,7 +191,7 @@ export default function Hero({
                 size="lg"
                 className="bg-[#C8A97E] hover:bg-[#b8966c] text-white font-bold px-8 py-3 text-lg rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 transform"
               >
-                <a href={finalBookingLink} target="_blank" rel="noopener noreferrer">
+                <a href={finalBookingLink} target="_blank" rel="noopener noreferrer" onClick={fireBookingConversion}>
                   {t("nav.book")}
                 </a>
               </Button>
