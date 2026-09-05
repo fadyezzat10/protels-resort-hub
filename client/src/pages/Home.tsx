@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HotelCard from "@/components/HotelCard";
 import Footer from "@/components/Footer";
+import ProfitroomBooking from "@/components/ProfitroomBooking";
 import EditableText from "@/components/EditableText";
 import EditableImage from "@/components/EditableImage";
 import SEOHead, { getOrganizationJsonLd, getHotelJsonLd, getBreadcrumbJsonLd, getFAQJsonLd } from "@/components/SEOHead";
@@ -155,6 +156,8 @@ export default function Home() {
         bookingLink={bookingLink}
         editPrefix="home.hero"
       />
+
+      <ProfitroomBooking />
 
       {royalBay.visible && royalBay.videoUrl && (
         <RoyalBayVideoSection
