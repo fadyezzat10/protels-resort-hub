@@ -192,6 +192,8 @@ export default function CMSSettings() {
   const [contactPhone, setContactPhone] = useState("");
   const [contactAddress, setContactAddress] = useState("");
   const [bookingLink, setBookingLink] = useState("");
+  const [profitroomScriptUrl, setProfitroomScriptUrl] = useState("https://wis.upperbooking.com/1223/be-panel?locale=en");
+  const [profitroomEnabled, setProfitroomEnabled] = useState(true);
   const [headerLogo, setHeaderLogo] = useState("");
   const [heroTitleEn, setHeroTitleEn] = useState("");
   const [heroTitleAr, setHeroTitleAr] = useState("");
@@ -251,6 +253,9 @@ export default function CMSSettings() {
       setContactPhone(findSetting("contact_phone"));
       setContactAddress(findSetting("contact_address"));
       setBookingLink(findSetting("booking_link"));
+      setProfitroomScriptUrl(findSetting("profitroom_script_url") || "https://wis.upperbooking.com/1223/be-panel?locale=en");
+      const profitroomEnabledSetting = findSetting("profitroom_enabled");
+      setProfitroomEnabled(profitroomEnabledSetting !== false && profitroomEnabledSetting !== "false");
       setHeaderLogo(findSetting("header_logo"));
 
       const heroTitle = findSetting("hero_title");
@@ -627,6 +632,32 @@ export default function CMSSettings() {
                 </div>
                 <p className="text-xs text-gray-400 mt-1">The URL for the "Book Now" button across the website</p>
               </div>
+              <div className="border-t pt-4 space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm">Profitroom Booking Engine</h4>
+                  <p className="text-xs text-gray-400 mt-1">Manage the booking panel shown on the homepage. Use the live script URL supplied by Profitroom.</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Profitroom Multisite Script URL</label>
+                  <Input data-testid="input-setting-profitroom-script-url" value={profitroomScriptUrl} onChange={(e) => setProfitroomScriptUrl(e.target.value)} placeholder="https://wis.upperbooking.com/..." />
+                </div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input data-testid="checkbox-setting-profitroom-enabled" type="checkbox" checked={profitroomEnabled} onChange={(e) => setProfitroomEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-gold" />
+                  <span>Show Profitroom booking panel on the homepage</span>
+                </label>
+                <Button data-testid="button-save-profitroom-settings" onClick={async () => {
+                  try {
+                    await saveSettingAsync("profitroom_script_url", profitroomScriptUrl.trim());
+                    await saveSettingAsync("profitroom_enabled", profitroomEnabled);
+                    toast({ title: "Profitroom settings saved" });
+                  } catch (err: any) {
+                    toast({ title: "Failed to save Profitroom settings", description: err.message, variant: "destructive" });
+                  }
+                }} disabled={saveMutation.isPending} className="w-full">
+                  <Save className="w-4 h-4 mr-2" /> Save Profitroom Settings
+                </Button>
+              </div>
+
               <div>
                 <label className="text-sm font-medium mb-1 block">Header Logo URL</label>
                 <div className="flex gap-2">
