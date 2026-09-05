@@ -38,16 +38,8 @@ import { useEffect } from "react";
         data-testid="profitroom-booking-section"
       >
         <div className="container-padding">
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-white p-4 shadow-xl ring-1 ring-brand-gold/20 md:p-6">
-            <div className="mb-5 text-center">
-              <span className="mb-2 block text-sm font-medium uppercase tracking-widest text-brand-gold">
-                Book online
-              </span>
-              <h2 className="font-serif text-3xl font-medium text-brand-blue md:text-4xl">
-                Find your perfect stay
-              </h2>
-            </div>
-            <div className="be-panel min-h-24" />
+          <div className="mx-auto max-w-6xl">
+            <div className="be-panel w-full" />
           </div>
         </div>
       </section>
