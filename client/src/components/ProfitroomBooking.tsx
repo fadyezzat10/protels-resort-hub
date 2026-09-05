@@ -1,22 +1,36 @@
 import { useEffect } from "react";
+    import { useCMSSetting } from "@/lib/cms";
 
-    const PROFITROOM_SCRIPT_SRC =
+    const DEFAULT_PROFITROOM_SCRIPT_SRC =
     "https://wis.upperbooking.com/1223/be-panel?locale=en";
 
     export default function ProfitroomBooking() {
+    const { data: configuredScriptUrl } = useCMSSetting("profitroom_script_url");
+    const { data: enabledSetting } = useCMSSetting("profitroom_enabled");
+
+    const scriptSrc =
+      typeof configuredScriptUrl === "string" && configuredScriptUrl.trim()
+        ? configuredScriptUrl.trim()
+        : DEFAULT_PROFITROOM_SCRIPT_SRC;
+    const isEnabled = enabledSetting !== false && enabledSetting !== "false";
+
     useEffect(() => {
-      const existingScript = document.querySelector(
-        `script[src="${PROFITROOM_SCRIPT_SRC}"]`,
-      );
+      if (!isEnabled || !scriptSrc) return;
+
+      const existingScript = Array.from(
+        document.querySelectorAll<HTMLScriptElement>("script[data-profitroom]")
+      ).some((script) => script.src === scriptSrc);
 
       if (existingScript) return;
 
       const script = document.createElement("script");
-      script.src = PROFITROOM_SCRIPT_SRC;
+      script.src = scriptSrc;
       script.async = true;
       script.dataset.profitroom = "booking-engine";
       document.body.appendChild(script);
-    }, []);
+    }, [isEnabled, scriptSrc]);
+
+    if (!isEnabled) return null;
 
     return (
       <section
