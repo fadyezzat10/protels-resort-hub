@@ -3,12 +3,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CMSLayout from "./CMSLayout";
 import { getYouTubeId } from "@/pages/Home";
-import { Save, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns, Upload, Loader2, X, ImageIcon, Video } from "lucide-react";
+import { Save, Plus, Trash2, Globe, Mail, Phone, Share2, Tag, Image, Layout, Link2, MapPin, Type, Menu, Eye, EyeOff, ChevronUp, ChevronDown, Columns, Upload, Loader2, X, ImageIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { DEFAULT_PROFITROOM_BOOKING_CONFIG, normalizeProfitroomBookingConfig, type ProfitroomBookingConfig } from "@/lib/profitroom";
 
 const PAGE_HEROES = [
   { key: "page_hero_home", label: "Home Page (Slider)", isSlider: true },
@@ -192,8 +193,7 @@ export default function CMSSettings() {
   const [contactPhone, setContactPhone] = useState("");
   const [contactAddress, setContactAddress] = useState("");
   const [bookingLink, setBookingLink] = useState("");
-  const [profitroomScriptUrl, setProfitroomScriptUrl] = useState("https://wis.upperbooking.com/1223/be-panel?locale=en");
-  const [profitroomEnabled, setProfitroomEnabled] = useState(true);
+  const [profitroomConfig, setProfitroomConfig] = useState<ProfitroomBookingConfig>(DEFAULT_PROFITROOM_BOOKING_CONFIG);
   const [headerLogo, setHeaderLogo] = useState("");
   const [heroTitleEn, setHeroTitleEn] = useState("");
   const [heroTitleAr, setHeroTitleAr] = useState("");
@@ -253,9 +253,7 @@ export default function CMSSettings() {
       setContactPhone(findSetting("contact_phone"));
       setContactAddress(findSetting("contact_address"));
       setBookingLink(findSetting("booking_link"));
-      setProfitroomScriptUrl(findSetting("profitroom_script_url") || "https://wis.upperbooking.com/1223/be-panel?locale=en");
-      const profitroomEnabledSetting = findSetting("profitroom_enabled");
-      setProfitroomEnabled(profitroomEnabledSetting !== false && profitroomEnabledSetting !== "false");
+      setProfitroomConfig(normalizeProfitroomBookingConfig(findSetting("profitroom_booking_config")));
       setHeaderLogo(findSetting("header_logo"));
 
       const heroTitle = findSetting("hero_title");
@@ -632,33 +630,64 @@ export default function CMSSettings() {
                 </div>
                 <p className="text-xs text-gray-400 mt-1">The URL for the "Book Now" button across the website</p>
               </div>
-              <div className="border-t pt-4 space-y-3">
-                <div>
-                  <h4 className="font-medium text-sm">Profitroom Booking Engine</h4>
-                  <p className="text-xs text-gray-400 mt-1">Manage the booking panel shown on the homepage. Use the live script URL supplied by Profitroom.</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Profitroom Multisite Script URL</label>
-                  <Input data-testid="input-setting-profitroom-script-url" value={profitroomScriptUrl} onChange={(e) => setProfitroomScriptUrl(e.target.value)} placeholder="https://wis.upperbooking.com/..." />
-                </div>
-                <label className="flex items-center gap-2 text-sm">
-                  <input data-testid="checkbox-setting-profitroom-enabled" type="checkbox" checked={profitroomEnabled} onChange={(e) => setProfitroomEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-gold" />
-                  <span>Show Profitroom booking panel on the homepage</span>
-                </label>
-                <Button data-testid="button-save-profitroom-settings" onClick={async () => {
-                  try {
-                    await saveSettingAsync("profitroom_script_url", profitroomScriptUrl.trim());
-                    await saveSettingAsync("profitroom_enabled", profitroomEnabled);
-                    toast({ title: "Profitroom settings saved" });
-                  } catch (err: any) {
-                    toast({ title: "Failed to save Profitroom settings", description: err.message, variant: "destructive" });
-                  }
-                }} disabled={saveMutation.isPending} className="w-full">
-                  <Save className="w-4 h-4 mr-2" /> Save Profitroom Settings
-                </Button>
-              </div>
+              <div className="border-t pt-5 space-y-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h4 className="font-medium text-sm">Profitroom Booking Panel</h4>
+                      <p className="text-xs text-gray-400 mt-1">Control the panel shape, labels, hotel names, and booking link for every hotel shown on the homepage.</p>
+                    </div>
+                    <label className="flex shrink-0 items-center gap-2 text-sm">
+                      <input data-testid="checkbox-setting-profitroom-enabled" type="checkbox" checked={profitroomConfig.enabled} onChange={(e) => setProfitroomConfig((current) => ({ ...current, enabled: e.target.checked }))} className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-gold" />
+                      <span>Show panel</span>
+                    </label>
+                  </div>
 
-              <div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div><label className="text-sm font-medium mb-1 block">Main label</label><Input data-testid="input-setting-profitroom-heading" value={profitroomConfig.heading} onChange={(e) => setProfitroomConfig((current) => ({ ...current, heading: e.target.value }))} placeholder="BOOK ONLINE" /></div>
+                    <div><label className="text-sm font-medium mb-1 block">Hotel label (optional)</label><Input data-testid="input-setting-profitroom-property-label" value={profitroomConfig.propertyLabel} onChange={(e) => setProfitroomConfig((current) => ({ ...current, propertyLabel: e.target.value }))} placeholder="Leave blank for a clean dropdown" /></div>
+                    <div><label className="text-sm font-medium mb-1 block">Check-in label</label><Input data-testid="input-setting-profitroom-checkin-label" value={profitroomConfig.checkInLabel} onChange={(e) => setProfitroomConfig((current) => ({ ...current, checkInLabel: e.target.value }))} placeholder="Check-in" /></div>
+                    <div><label className="text-sm font-medium mb-1 block">Check-out label</label><Input data-testid="input-setting-profitroom-checkout-label" value={profitroomConfig.checkOutLabel} onChange={(e) => setProfitroomConfig((current) => ({ ...current, checkOutLabel: e.target.value }))} placeholder="Check-out" /></div>
+                    <div className="sm:col-span-2"><label className="text-sm font-medium mb-1 block">Availability button text</label><Input data-testid="input-setting-profitroom-submit-label" value={profitroomConfig.submitLabel} onChange={(e) => setProfitroomConfig((current) => ({ ...current, submitLabel: e.target.value }))} placeholder="CHECK AVAILABILITY" /></div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3"><div><h5 className="text-sm font-medium">Hotels and booking links</h5><p className="text-xs text-gray-400">Each dropdown option opens its own booking link.</p></div><Button type="button" variant="outline" size="sm" data-testid="button-add-profitroom-property" onClick={() => setProfitroomConfig((current) => ({ ...current, properties: [...current.properties, { id: "property-" + Date.now(), name: "New hotel", bookingUrl: "" }] }))}><Plus className="mr-1 h-4 w-4" /> Add hotel</Button></div>
+                    <div className="space-y-3">
+                      {profitroomConfig.properties.map((property, index) => (
+                        <div key={property.id || index} className="grid gap-2 rounded-lg border bg-gray-50 p-3 sm:grid-cols-[1fr_1.35fr_auto] sm:items-center">
+                          <Input data-testid={"input-profitroom-property-name-" + index} value={property.name} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, name: e.target.value } : item) }))} placeholder="Hotel name" />
+                          <Input data-testid={"input-profitroom-property-url-" + index} value={property.bookingUrl} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, bookingUrl: e.target.value } : item) }))} placeholder="https://booking-link-for-this-hotel.com" />
+                          <Button type="button" variant="ghost" size="sm" data-testid={"button-remove-profitroom-property-" + index} onClick={() => setProfitroomConfig((current) => ({ ...current, properties: current.properties.filter((_, itemIndex) => itemIndex !== index) }))} className="h-10 w-10 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      ))}
+                      {profitroomConfig.properties.length === 0 && <p className="rounded-lg border border-dashed p-4 text-center text-sm text-gray-400">Add at least one hotel to show the booking panel.</p>}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h5 className="text-sm font-medium">Panel appearance</h5>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div><label className="text-xs font-medium mb-1 block">Panel background</label><div className="flex gap-2"><input type="color" value={profitroomConfig.panelBackground} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBackground: e.target.value }))} className="h-10 w-12 cursor-pointer rounded border bg-white p-1" /><Input value={profitroomConfig.panelBackground} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBackground: e.target.value }))} /></div></div>
+                      <div><label className="text-xs font-medium mb-1 block">Panel border</label><div className="flex gap-2"><input type="color" value={profitroomConfig.panelBorderColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBorderColor: e.target.value }))} className="h-10 w-12 cursor-pointer rounded border bg-white p-1" /><Input value={profitroomConfig.panelBorderColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBorderColor: e.target.value }))} /></div></div>
+                      <div><label className="text-xs font-medium mb-1 block">Button and icon color</label><div className="flex gap-2"><input type="color" value={profitroomConfig.accentColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, accentColor: e.target.value }))} className="h-10 w-12 cursor-pointer rounded border bg-white p-1" /><Input value={profitroomConfig.accentColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, accentColor: e.target.value }))} /></div></div>
+                      <div><label className="text-xs font-medium mb-1 block">Button and icon text</label><div className="flex gap-2"><input type="color" value={profitroomConfig.accentTextColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, accentTextColor: e.target.value }))} className="h-10 w-12 cursor-pointer rounded border bg-white p-1" /><Input value={profitroomConfig.accentTextColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, accentTextColor: e.target.value }))} /></div></div>
+                      <div><label className="text-xs font-medium mb-1 block">Panel corner radius (px)</label><Input type="number" min="0" max="32" value={profitroomConfig.panelRadius} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelRadius: Number(e.target.value) }))} /></div>
+                      <div><label className="text-xs font-medium mb-1 block">Control corner radius (px)</label><Input type="number" min="0" max="20" value={profitroomConfig.controlRadius} onChange={(e) => setProfitroomConfig((current) => ({ ...current, controlRadius: Number(e.target.value) }))} /></div>
+                    </div>
+                    <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={profitroomConfig.shadow} onChange={(e) => setProfitroomConfig((current) => ({ ...current, shadow: e.target.checked }))} className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-gold" /> Add panel shadow</label>
+                  </div>
+
+                  <Button data-testid="button-save-profitroom-settings" onClick={async () => {
+                    try {
+                      await saveSettingAsync("profitroom_booking_config", normalizeProfitroomBookingConfig(profitroomConfig));
+                      toast({ title: "Booking panel settings saved" });
+                    } catch (err: any) {
+                      toast({ title: "Failed to save booking panel settings", description: err.message, variant: "destructive" });
+                    }
+                  }} disabled={saveMutation.isPending} className="w-full"><Save className="mr-2 h-4 w-4" /> Save Booking Panel Settings</Button>
+                </div>
+
+                  <div>
                 <label className="text-sm font-medium mb-1 block">Header Logo URL</label>
                 <div className="flex gap-2">
                   <Input data-testid="input-setting-header-logo" value={headerLogo} onChange={(e) => setHeaderLogo(e.target.value)} placeholder="https://example.com/logo.png" />
