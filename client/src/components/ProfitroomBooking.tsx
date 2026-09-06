@@ -1,7 +1,11 @@
 import { useState } from "react";
-    import { CalendarDays, ChevronDown, Search } from "lucide-react";
+    import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
     import { useCMSSetting } from "@/lib/cms";
-    import { normalizeProfitroomBookingConfig } from "@/lib/profitroom";
+    import { normalizeProfitroomBookingConfig, type ProfitroomBookingConfig } from "@/lib/profitroom";
+
+    type CalendarMode = "check-in" | "check-out";
+
+    const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
     function localDateValue(date: Date) {
     const pad = (value: number) => String(value).padStart(2, "0");
@@ -14,6 +18,99 @@ import { useState } from "react";
     return localDateValue(date);
     }
 
+    function parseDateValue(value: string) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day, 12);
+    }
+
+    function formatDateValue(value: string) {
+    if (!value) return "";
+    const date = parseDateValue(value);
+    const pad = (part: number) => String(part).padStart(2, "0");
+    return pad(date.getMonth() + 1) + "/" + pad(date.getDate()) + "/" + date.getFullYear();
+    }
+
+    function addMonths(date: Date, amount: number) {
+    return new Date(date.getFullYear(), date.getMonth() + amount, 1, 12);
+    }
+
+    function monthLabel(date: Date) {
+    return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(date).toUpperCase();
+    }
+
+    function monthDays(month: Date) {
+    const year = month.getFullYear();
+    const monthIndex = month.getMonth();
+    const firstDay = new Date(year, monthIndex, 1, 12);
+    const leadingDays = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, monthIndex + 1, 0, 12).getDate();
+    const cells: Array<Date | null> = Array.from({ length: leadingDays }, () => null);
+    for (let day = 1; day <= daysInMonth; day++) {
+      cells.push(new Date(year, monthIndex, day, 12));
+    }
+    while (cells.length % 7 !== 0) cells.push(null);
+    return cells;
+    }
+
+    type CalendarMonthProps = {
+    month: Date;
+    mode: CalendarMode;
+    checkIn: string;
+    checkOut: string;
+    draftDate: string;
+    config: ProfitroomBookingConfig;
+    onPick: (value: string) => void;
+    };
+
+    function CalendarMonth({ month, mode, checkIn, checkOut, draftDate, config, onPick }: CalendarMonthProps) {
+    const cells = monthDays(month);
+    const today = localDateValue(new Date());
+
+    return (
+      <div className="min-w-0">
+        <div className="mb-3 text-center text-sm font-bold tracking-wide" style={{ color: config.textColor }}>
+          {monthLabel(month)}
+        </div>
+        <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium" style={{ color: config.labelColor }}>
+          {WEEKDAYS.map((weekday) => <span key={weekday} className="py-1">{weekday}</span>)}
+        </div>
+        <div className="mt-1 grid grid-cols-7 gap-1 border-t pt-2" style={{ borderColor: config.panelBorderColor }}>
+          {cells.map((date, index) => {
+            if (!date) return <span key={"empty-" + index} className="h-9" />;
+            const value = localDateValue(date);
+            const isCheckIn = value === checkIn;
+            const isCheckOut = value === checkOut;
+            const isDraft = value === draftDate;
+            const isInRange = Boolean(checkIn && checkOut && value > checkIn && value < checkOut);
+            const isDisabled = mode === "check-out" && Boolean(checkIn) && value <= checkIn;
+            const isToday = value === today;
+            const isSelected = isDraft || (mode === "check-in" ? isCheckIn : isCheckOut);
+
+            return (
+              <button
+                key={value}
+                type="button"
+                disabled={isDisabled}
+                onClick={() => onPick(value)}
+                className="relative h-9 text-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-30"
+                style={{
+                  backgroundColor: isSelected ? config.accentColor : isInRange ? config.accentColor + "26" : "transparent",
+                  color: isSelected ? config.accentTextColor : config.textColor,
+                  borderRadius: Math.min(config.controlRadius + 2, 8) + "px",
+                  boxShadow: isToday && !isSelected ? "inset 0 0 0 1px " + config.accentColor : "none",
+                  fontWeight: isSelected ? 700 : 400,
+                }}
+                aria-label={new Intl.DateTimeFormat("en-US", { dateStyle: "full" }).format(date)}
+              >
+                {date.getDate()}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+    }
+
     export default function ProfitroomBooking() {
     const { data: rawConfig } = useCMSSetting("profitroom_booking_config");
     const { data: legacyEnabledSetting } = useCMSSetting("profitroom_enabled");
@@ -24,6 +121,13 @@ import { useState } from "react";
     const [selectedPropertyId, setSelectedPropertyId] = useState("");
     const [checkIn, setCheckIn] = useState(() => localDateValue(new Date()));
     const [checkOut, setCheckOut] = useState(() => tomorrowValue());
+    const [calendarMode, setCalendarMode] = useState<CalendarMode>("check-in");
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const [calendarMonth, setCalendarMonth] = useState(() => {
+      const date = new Date();
+      return new Date(date.getFullYear(), date.getMonth(), 1, 12);
+    });
+    const [draftDate, setDraftDate] = useState("");
 
     if (!isEnabled) return null;
 
@@ -41,19 +145,40 @@ import { useState } from "react";
       borderRadius: iconRadius + "px",
     };
 
+    const openCalendar = (mode: CalendarMode) => {
+      const value = mode === "check-in" ? checkIn : checkOut;
+      const baseDate = value ? parseDateValue(value) : new Date();
+      setCalendarMode(mode);
+      setDraftDate(value);
+      setCalendarMonth(new Date(baseDate.getFullYear(), baseDate.getMonth(), 1, 12));
+      setCalendarOpen(true);
+    };
+
+    const closeCalendar = () => setCalendarOpen(false);
+
+    const handleCalendarPick = (value: string) => {
+      setDraftDate(value);
+    };
+
+    const applyCalendarDate = () => {
+      if (!draftDate) return;
+      if (calendarMode === "check-in") {
+        setCheckIn(draftDate);
+        if (checkOut <= draftDate) {
+          const nextDate = parseDateValue(draftDate);
+          nextDate.setDate(nextDate.getDate() + 1);
+          setCheckOut(localDateValue(nextDate));
+        }
+      } else {
+        setCheckOut(draftDate);
+      }
+      closeCalendar();
+    };
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!selectedProperty?.bookingUrl.trim()) return;
       window.open(selectedProperty.bookingUrl.trim(), "_blank", "noopener,noreferrer");
-    };
-
-    const handleCheckInChange = (value: string) => {
-      setCheckIn(value);
-      if (value && checkOut <= value) {
-        const nextDate = new Date(value + "T00:00:00");
-        nextDate.setDate(nextDate.getDate() + 1);
-        setCheckOut(localDateValue(nextDate));
-      }
     };
 
     return (
@@ -76,19 +201,19 @@ import { useState } from "react";
               </div>
 
               <div className="flex items-center gap-2">
-                <label htmlFor="profitroom-check-in" className="shrink-0 text-xs font-medium" style={{ color: config.labelColor }}>{config.checkInLabel}</label>
-                <div className="relative min-w-0 flex-1">
-                  <input id="profitroom-check-in" data-testid="input-profitroom-check-in" type="date" value={checkIn} onChange={(event) => handleCheckInChange(event.target.value)} className="h-10 w-full appearance-none border px-3 pr-10 text-sm outline-none transition focus:ring-2 focus:ring-brand-gold/30" style={controlStyle} />
-                  <span className="pointer-events-none absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center" style={iconStyle}><CalendarDays className="h-3.5 w-3.5" /></span>
-                </div>
+                <span className="shrink-0 text-xs font-medium" style={{ color: config.labelColor }}>{config.checkInLabel}</span>
+                <button type="button" data-testid="button-profitroom-check-in" onClick={() => openCalendar("check-in")} className="relative flex h-10 min-w-0 flex-1 items-center justify-between gap-2 border px-3 text-left text-sm outline-none transition hover:brightness-95 focus:ring-2 focus:ring-brand-gold/30" style={controlStyle} aria-label="Choose check-in date">
+                  <span>{formatDateValue(checkIn)}</span>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center" style={iconStyle}><CalendarDays className="h-3.5 w-3.5" /></span>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
-                <label htmlFor="profitroom-check-out" className="shrink-0 text-xs font-medium" style={{ color: config.labelColor }}>{config.checkOutLabel}</label>
-                <div className="relative min-w-0 flex-1">
-                  <input id="profitroom-check-out" data-testid="input-profitroom-check-out" type="date" min={checkIn} value={checkOut} onChange={(event) => setCheckOut(event.target.value)} className="h-10 w-full appearance-none border px-3 pr-10 text-sm outline-none transition focus:ring-2 focus:ring-brand-gold/30" style={controlStyle} />
-                  <span className="pointer-events-none absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center" style={iconStyle}><CalendarDays className="h-3.5 w-3.5" /></span>
-                </div>
+                <span className="shrink-0 text-xs font-medium" style={{ color: config.labelColor }}>{config.checkOutLabel}</span>
+                <button type="button" data-testid="button-profitroom-check-out" onClick={() => openCalendar("check-out")} className="relative flex h-10 min-w-0 flex-1 items-center justify-between gap-2 border px-3 text-left text-sm outline-none transition hover:brightness-95 focus:ring-2 focus:ring-brand-gold/30" style={controlStyle} aria-label="Choose check-out date">
+                  <span>{formatDateValue(checkOut)}</span>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center" style={iconStyle}><CalendarDays className="h-3.5 w-3.5" /></span>
+                </button>
               </div>
             </div>
 
@@ -98,6 +223,28 @@ import { useState } from "react";
             </button>
           </form>
         </div>
+
+        {calendarOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={calendarMode === "check-in" ? "Choose check-in date" : "Choose check-out date"} onMouseDown={(event) => { if (event.target === event.currentTarget) closeCalendar(); }}>
+            <div className="w-full max-w-[800px] overflow-hidden bg-white shadow-2xl" style={{ borderRadius: config.panelRadius + "px" }} onMouseDown={(event) => event.stopPropagation()}>
+              <div className="flex items-center gap-3 border-b px-4 py-4 sm:px-5" style={{ borderColor: config.panelBorderColor }}>
+                <button type="button" onClick={() => setCalendarMonth((current) => addMonths(current, -1))} className="flex h-9 w-9 shrink-0 items-center justify-center transition hover:brightness-95" style={{ backgroundColor: "#e1e3e5", color: config.textColor, borderRadius: iconRadius + "px" }} aria-label="Previous months"><ChevronLeft className="h-5 w-5" /></button>
+                <div className="grid flex-1 grid-cols-2 gap-3 text-center text-sm font-bold tracking-wide" style={{ color: config.textColor }}><span>{monthLabel(calendarMonth)}</span><span>{monthLabel(addMonths(calendarMonth, 1))}</span></div>
+                <button type="button" onClick={() => setCalendarMonth((current) => addMonths(current, 1))} className="flex h-9 w-9 shrink-0 items-center justify-center transition hover:brightness-95" style={{ backgroundColor: config.accentColor, color: config.accentTextColor, borderRadius: iconRadius + "px" }} aria-label="Next months"><ChevronRight className="h-5 w-5" /></button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-7 p-5 sm:grid-cols-2 sm:gap-8 sm:px-7 sm:py-6">
+                <CalendarMonth month={calendarMonth} mode={calendarMode} checkIn={checkIn} checkOut={checkOut} draftDate={draftDate} config={config} onPick={handleCalendarPick} />
+                <CalendarMonth month={addMonths(calendarMonth, 1)} mode={calendarMode} checkIn={checkIn} checkOut={checkOut} draftDate={draftDate} config={config} onPick={handleCalendarPick} />
+              </div>
+
+              <div className="flex flex-col gap-3 border-t bg-gray-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5" style={{ borderColor: config.panelBorderColor }}>
+                <div className="border px-4 py-2 text-sm" style={{ borderColor: config.accentColor, backgroundColor: config.accentColor + "18", color: config.textColor }}>{calendarMode === "check-in" ? "Select check-in date." : "Select check-out date."}</div>
+                <button type="button" onClick={applyCalendarDate} disabled={!draftDate} className="h-10 min-w-[180px] px-6 text-sm font-semibold uppercase tracking-wide transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50" style={{ backgroundColor: config.accentColor, color: config.accentTextColor, borderRadius: config.controlRadius + "px" }}>SELECT</button>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     );
     }
