@@ -1,7 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
     import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
     import { useCMSSetting } from "@/lib/cms";
     import { normalizeProfitroomBookingConfig, type ProfitroomBookingConfig } from "@/lib/profitroom";
+
+    const DEFAULT_PROFITROOM_SCRIPT_SRC = "https://wis.upperbooking.com/1223/be-panel?locale=en";
+
+    declare global {
+    interface Window {
+    Booking?: {
+    OpenSite?: (siteKey: string) => void;
+    OpenBrowseSite?: (siteKey: string) => void;
+    };
+    }
+    }
 
     type CalendarMode = "check-in" | "check-out";
 
@@ -114,6 +125,8 @@ import { useState } from "react";
     export default function ProfitroomBooking() {
     const { data: rawConfig } = useCMSSetting("profitroom_booking_config");
     const { data: legacyEnabledSetting } = useCMSSetting("profitroom_enabled");
+    const { data: scriptUrlSetting } = useCMSSetting("profitroom_script_url");
+    const scriptSrc = typeof scriptUrlSetting === "string" && scriptUrlSetting.trim() ? scriptUrlSetting.trim() : DEFAULT_PROFITROOM_SCRIPT_SRC;
     const config = normalizeProfitroomBookingConfig(rawConfig);
     const isEnabled = rawConfig && typeof rawConfig === "object" && "enabled" in rawConfig
       ? config.enabled
@@ -128,6 +141,22 @@ import { useState } from "react";
       return new Date(date.getFullYear(), date.getMonth(), 1, 12);
     });
     const [draftDate, setDraftDate] = useState("");
+    const [bookingScriptReady, setBookingScriptReady] = useState(false);
+
+    useEffect(() => {
+    const existingScript = document.querySelector("script[data-profitroom]") as HTMLScriptElement | null;
+    if (existingScript) {
+    setBookingScriptReady(Boolean(window.Booking));
+    return;
+    }
+    const script = document.createElement("script");
+    script.src = scriptSrc;
+    script.async = true;
+    script.dataset.profitroom = "booking-engine";
+    script.onload = () => setBookingScriptReady(true);
+    script.onerror = () => setBookingScriptReady(false);
+    document.body.appendChild(script);
+    }, [scriptSrc]);
 
     if (!isEnabled) return null;
 
@@ -177,9 +206,17 @@ import { useState } from "react";
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      const booking = window.Booking;
+      if (selectedProperty?.siteKey && bookingScriptReady && booking) {
+      const openBooking = selectedProperty.openMode === "browse" ? booking.OpenBrowseSite : booking.OpenSite;
+      if (openBooking) {
+      openBooking(selectedProperty.siteKey);
+      return;
+      }
+      }
       if (!selectedProperty?.bookingUrl.trim()) return;
       window.open(selectedProperty.bookingUrl.trim(), "_blank", "noopener,noreferrer");
-    };
+      };
 
     return (
       <section className="bg-brand-white py-8 md:py-12" data-testid="profitroom-booking-section">

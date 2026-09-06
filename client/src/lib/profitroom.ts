@@ -2,6 +2,8 @@ export type ProfitroomBookingProperty = {
     id: string;
     name: string;
     bookingUrl: string;
+    siteKey: string;
+    openMode: "site" | "browse";
     };
 
     export type ProfitroomBookingConfig = {
@@ -31,10 +33,10 @@ export type ProfitroomBookingProperty = {
     checkOutLabel: "Check-out",
     submitLabel: "CHECK AVAILABILITY",
     properties: [
-      { id: "demo-1", name: "Demo 1", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo" },
-      { id: "demo-2", name: "Demo 2", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo2" },
-      { id: "demo-3", name: "Demo 3", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo3" },
-      { id: "demo-4", name: "Demo 4", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo4" },
+      { id: "demo-1", name: "Demo 1", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo", siteKey: "presalesdemo", openMode: "site" },
+      { id: "demo-2", name: "Demo 2", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo2", siteKey: "presalesdemo2", openMode: "site" },
+      { id: "demo-3", name: "Demo 3", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo3", siteKey: "presalesdemo3", openMode: "site" },
+      { id: "demo-4", name: "Demo 4", bookingUrl: "https://wis.upperbooking.com/1223/be-panel?locale=en&sitekey=presalesdemo4", siteKey: "presalesdemo4", openMode: "site" },
     ],
     panelBackground: "#ffffff",
     panelBorderColor: "#e2ded8",
@@ -63,6 +65,14 @@ export type ProfitroomBookingProperty = {
     return Math.min(max, Math.max(min, parsed));
     }
 
+    function inferSiteKey(bookingUrl: string) {
+    try {
+      return new URL(bookingUrl).searchParams.get("sitekey") || "";
+    } catch {
+      return "";
+    }
+    }
+
     export function normalizeProfitroomBookingConfig(value: unknown): ProfitroomBookingConfig {
     const raw = value && typeof value === "object" ? value as Partial<ProfitroomBookingConfig> : {};
     const rawProperties = Array.isArray(raw.properties) ? raw.properties : null;
@@ -71,10 +81,13 @@ export type ProfitroomBookingProperty = {
       : rawProperties.map((property, index) => {
           if (!property || typeof property !== "object") return null;
           const item = property as Partial<ProfitroomBookingProperty>;
+          const bookingUrl = typeof item.bookingUrl === "string" ? item.bookingUrl.trim() : "";
           return {
             id: readText(item.id, "property-" + (index + 1)),
             name: readText(item.name, "Hotel " + (index + 1)),
-            bookingUrl: typeof item.bookingUrl === "string" ? item.bookingUrl.trim() : "",
+            bookingUrl,
+            siteKey: readText(item.siteKey, inferSiteKey(bookingUrl), true),
+            openMode: item.openMode === "browse" ? "browse" : "site",
           };
         }).filter((property): property is ProfitroomBookingProperty => property !== null);
 

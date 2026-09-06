@@ -194,6 +194,7 @@ export default function CMSSettings() {
   const [contactAddress, setContactAddress] = useState("");
   const [bookingLink, setBookingLink] = useState("");
   const [profitroomConfig, setProfitroomConfig] = useState<ProfitroomBookingConfig>(DEFAULT_PROFITROOM_BOOKING_CONFIG);
+  const [profitroomScriptUrl, setProfitroomScriptUrl] = useState("https://wis.upperbooking.com/1223/be-panel?locale=en");
   const [headerLogo, setHeaderLogo] = useState("");
   const [heroTitleEn, setHeroTitleEn] = useState("");
   const [heroTitleAr, setHeroTitleAr] = useState("");
@@ -254,6 +255,7 @@ export default function CMSSettings() {
       setContactAddress(findSetting("contact_address"));
       setBookingLink(findSetting("booking_link"));
       setProfitroomConfig(normalizeProfitroomBookingConfig(findSetting("profitroom_booking_config")));
+      setProfitroomScriptUrl(findSetting("profitroom_script_url") || "https://wis.upperbooking.com/1223/be-panel?locale=en");
       setHeaderLogo(findSetting("header_logo"));
 
       const heroTitle = findSetting("hero_title");
@@ -654,11 +656,12 @@ export default function CMSSettings() {
                     <div className="flex items-center justify-between gap-3"><div><h5 className="text-sm font-medium">Hotels and booking links</h5><p className="text-xs text-gray-400">Each dropdown option opens its own booking link.</p></div><Button type="button" variant="outline" size="sm" data-testid="button-add-profitroom-property" onClick={() => setProfitroomConfig((current) => ({ ...current, properties: [...current.properties, { id: "property-" + Date.now(), name: "New hotel", bookingUrl: "" }] }))}><Plus className="mr-1 h-4 w-4" /> Add hotel</Button></div>
                     <div className="space-y-3">
                       {profitroomConfig.properties.map((property, index) => (
-                        <div key={property.id || index} className="grid gap-2 rounded-lg border bg-gray-50 p-3 sm:grid-cols-[1fr_1.35fr_auto] sm:items-center">
-                          <Input data-testid={"input-profitroom-property-name-" + index} value={property.name} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, name: e.target.value } : item) }))} placeholder="Hotel name" />
-                          <Input data-testid={"input-profitroom-property-url-" + index} value={property.bookingUrl} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, bookingUrl: e.target.value } : item) }))} placeholder="https://booking-link-for-this-hotel.com" />
-                          <Button type="button" variant="ghost" size="sm" data-testid={"button-remove-profitroom-property-" + index} onClick={() => setProfitroomConfig((current) => ({ ...current, properties: current.properties.filter((_, itemIndex) => itemIndex !== index) }))} className="h-10 w-10 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </div>
+                      <div key={property.id || index} className="grid gap-2 rounded-lg border bg-gray-50 p-3 sm:grid-cols-[1fr_1fr_160px_auto] sm:items-center">
+                        <Input data-testid={"input-profitroom-property-name-" + index} value={property.name} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, name: e.target.value } : item) }))} placeholder="Hotel name" />
+                        <Input data-testid={"input-profitroom-property-sitekey-" + index} value={property.siteKey} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, siteKey: e.target.value } : item) }))} placeholder="Sitekey e.g. presalesdemo" />
+                        <select data-testid={"select-profitroom-property-mode-" + index} value={property.openMode} onChange={(e) => setProfitroomConfig((current) => ({ ...current, properties: current.properties.map((item, itemIndex) => itemIndex === index ? { ...item, openMode: e.target.value === "browse" ? "browse" : "site" } : item) }))} className="h-10 rounded-md border bg-white px-3 text-sm"><option value="site">Open with calendar</option><option value="browse">Open without calendar</option></select>
+                        <Button type="button" variant="ghost" size="sm" data-testid={"button-remove-profitroom-property-" + index} onClick={() => setProfitroomConfig((current) => ({ ...current, properties: current.properties.filter((_, itemIndex) => itemIndex !== index) }))} className="h-10 w-10 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                      </div>
                       ))}
                       {profitroomConfig.properties.length === 0 && <p className="rounded-lg border border-dashed p-4 text-center text-sm text-gray-400">Add at least one hotel to show the booking panel.</p>}
                     </div>
@@ -666,6 +669,12 @@ export default function CMSSettings() {
 
                   <div className="space-y-3">
                     <h5 className="text-sm font-medium">Panel appearance</h5>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Profitroom multisite script URL</label>
+                      <Input data-testid="input-setting-profitroom-script-url" value={profitroomScriptUrl} onChange={(e) => setProfitroomScriptUrl(e.target.value)} placeholder="https://wis.upperbooking.com/..." />
+                      <p className="text-xs text-gray-400 mt-1">This is the script URL provided in the Profitroom integration guide.</p>
+                    </div>
+
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div><label className="text-xs font-medium mb-1 block">Panel background</label><div className="flex gap-2"><input type="color" value={profitroomConfig.panelBackground} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBackground: e.target.value }))} className="h-10 w-12 cursor-pointer rounded border bg-white p-1" /><Input value={profitroomConfig.panelBackground} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBackground: e.target.value }))} /></div></div>
                       <div><label className="text-xs font-medium mb-1 block">Panel border</label><div className="flex gap-2"><input type="color" value={profitroomConfig.panelBorderColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBorderColor: e.target.value }))} className="h-10 w-12 cursor-pointer rounded border bg-white p-1" /><Input value={profitroomConfig.panelBorderColor} onChange={(e) => setProfitroomConfig((current) => ({ ...current, panelBorderColor: e.target.value }))} /></div></div>
@@ -679,7 +688,8 @@ export default function CMSSettings() {
 
                   <Button data-testid="button-save-profitroom-settings" onClick={async () => {
                     try {
-                      await saveSettingAsync("profitroom_booking_config", normalizeProfitroomBookingConfig(profitroomConfig));
+                      await saveSettingAsync("profitroom_script_url", profitroomScriptUrl.trim());
+                    await saveSettingAsync("profitroom_booking_config", normalizeProfitroomBookingConfig(profitroomConfig));
                       toast({ title: "Booking panel settings saved" });
                     } catch (err: any) {
                       toast({ title: "Failed to save booking panel settings", description: err.message, variant: "destructive" });
