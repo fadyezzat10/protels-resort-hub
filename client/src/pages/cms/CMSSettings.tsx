@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { DEFAULT_PROFITROOM_BOOKING_CONFIG, normalizeProfitroomBookingConfig, type ProfitroomBookingConfig } from "@/lib/profitroom";
+import { DEFAULT_PROFITROOM_BOOKING_CONFIG, normalizeProfitroomBookingConfig, normalizeProfitroomScriptUrl, PROTELS_UPPERBOOKING_SCRIPT_URL, type ProfitroomBookingConfig } from "@/lib/profitroom";
 
 const PAGE_HEROES = [
   { key: "page_hero_home", label: "Home Page (Slider)", isSlider: true },
@@ -194,7 +194,7 @@ export default function CMSSettings() {
   const [contactAddress, setContactAddress] = useState("");
   const [bookingLink, setBookingLink] = useState("");
   const [profitroomConfig, setProfitroomConfig] = useState<ProfitroomBookingConfig>(DEFAULT_PROFITROOM_BOOKING_CONFIG);
-  const [profitroomScriptUrl, setProfitroomScriptUrl] = useState("https://wis.upperbooking.com/1223/be-panel?locale=en");
+  const [profitroomScriptUrl, setProfitroomScriptUrl] = useState(PROTELS_UPPERBOOKING_SCRIPT_URL);
   const [headerLogo, setHeaderLogo] = useState("");
   const [heroTitleEn, setHeroTitleEn] = useState("");
   const [heroTitleAr, setHeroTitleAr] = useState("");
@@ -255,7 +255,7 @@ export default function CMSSettings() {
       setContactAddress(findSetting("contact_address"));
       setBookingLink(findSetting("booking_link"));
       setProfitroomConfig(normalizeProfitroomBookingConfig(findSetting("profitroom_booking_config")));
-      setProfitroomScriptUrl(findSetting("profitroom_script_url") || "https://wis.upperbooking.com/1223/be-panel?locale=en");
+      setProfitroomScriptUrl(normalizeProfitroomScriptUrl(findSetting("profitroom_script_url")));
       setHeaderLogo(findSetting("header_logo"));
 
       const heroTitle = findSetting("hero_title");
@@ -653,7 +653,7 @@ export default function CMSSettings() {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-3"><div><h5 className="text-sm font-medium">Hotels and booking links</h5><p className="text-xs text-gray-400">Each dropdown option opens its own booking link.</p></div><Button type="button" variant="outline" size="sm" data-testid="button-add-profitroom-property" onClick={() => setProfitroomConfig((current) => ({ ...current, properties: [...current.properties, { id: "property-" + Date.now(), name: "New hotel", bookingUrl: "" }] }))}><Plus className="mr-1 h-4 w-4" /> Add hotel</Button></div>
+                    <div className="flex items-center justify-between gap-3"><div><h5 className="text-sm font-medium">Hotels and booking links</h5><p className="text-xs text-gray-400">Each dropdown option opens its own booking link.</p></div><Button type="button" variant="outline" size="sm" data-testid="button-add-profitroom-property" onClick={() => setProfitroomConfig((current) => ({ ...current, properties: [...current.properties, { id: "property-" + Date.now(), name: "New hotel", bookingUrl: "", siteKey: "", openMode: "site" }] }))}><Plus className="mr-1 h-4 w-4" /> Add hotel</Button></div>
                     <div className="space-y-3">
                       {profitroomConfig.properties.map((property, index) => (
                       <div key={property.id || index} className="grid gap-2 rounded-lg border bg-gray-50 p-3 sm:grid-cols-[1fr_1fr_160px_auto] sm:items-center">
@@ -688,7 +688,7 @@ export default function CMSSettings() {
 
                   <Button data-testid="button-save-profitroom-settings" onClick={async () => {
                     try {
-                      await saveSettingAsync("profitroom_script_url", profitroomScriptUrl.trim());
+                      await saveSettingAsync("profitroom_script_url", normalizeProfitroomScriptUrl(profitroomScriptUrl));
                     await saveSettingAsync("profitroom_booking_config", normalizeProfitroomBookingConfig(profitroomConfig));
                       toast({ title: "Booking panel settings saved" });
                     } catch (err: any) {
