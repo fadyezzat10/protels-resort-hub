@@ -1693,9 +1693,9 @@ Then ask: "إيه اللي في بالك؟" — keep it short and inviting.`;
   });
 
   const bookingLinkMap: Record<string, string | null> = {
-    "crystal-beach": "https://protels-crystal.book-onlinenow.net/",
-    "la-plage": "https://protels-laplage.book-onlinenow.net/",
-    "beach-club": "https://protels-beachclub.book-onlinenow.net/",
+    "crystal-beach": "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD",
+    "la-plage": "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD",
+    "beach-club": "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD",
     "royal-bay": null,
   };
 
