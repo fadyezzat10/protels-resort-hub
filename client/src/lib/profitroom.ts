@@ -37,10 +37,24 @@ export const DEFAULT_PROFITROOM_BOOKING_CONFIG: ProfitroomBookingConfig = {
   submitLabel: "CHECK AVAILABILITY",
   properties: [
     {
-      id: "protels-hotels-resorts",
-      name: "Protels Hotels & Resorts",
-      bookingUrl: PROTELS_BOOKING_URL,
-      siteKey: "protelshotelsresorts",
+      id: "crystal-beach",
+      name: "Protels Crystal Beach Resort",
+      bookingUrl: "https://booking.profitroom.com/en/protelscrystalbeachresortmarsaalam/pricelist/rooms/",
+      siteKey: "",
+      openMode: "site",
+    },
+    {
+      id: "beach-club",
+      name: "Protels Beach Club & SPA",
+      bookingUrl: "https://booking.profitroom.com/en/protelsbeachclubspamarsaalam/pricelist/rooms/",
+      siteKey: "",
+      openMode: "site",
+    },
+    {
+      id: "la-plage",
+      name: "Protels La Plage Resort",
+      bookingUrl: "https://booking.profitroom.com/en/protelslaplageresort/pricelist/rooms/",
+      siteKey: "",
       openMode: "site",
     },
   ],
