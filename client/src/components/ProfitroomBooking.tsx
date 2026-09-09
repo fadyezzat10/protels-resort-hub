@@ -26,15 +26,24 @@ export default function ProfitroomBooking() {
   useEffect(() => {
     if (!isEnabled) return;
 
-    const existingScript = document.querySelector(PROFITROOM_SCRIPT_SELECTOR);
-    if (existingScript) return;
+    const drawPanel = () => window._drawPanel?.(".be-panel", "prepend");
+    const existingScript = document.querySelector(PROFITROOM_SCRIPT_SELECTOR)
+      ?? Array.from(document.scripts).find((candidate) => candidate.src === scriptSrc);
+
+    if (existingScript) {
+      existingScript.addEventListener("load", drawPanel, { once: true });
+      drawPanel();
+      return () => existingScript.removeEventListener("load", drawPanel);
+    }
 
     const script = document.createElement("script");
     script.src = scriptSrc;
     script.async = true;
     script.dataset.profitroomBookingEngine = "true";
     script.dataset.profitroom = "booking-engine";
+    script.addEventListener("load", drawPanel, { once: true });
     document.body.appendChild(script);
+    return () => script.removeEventListener("load", drawPanel);
   }, [isEnabled, scriptSrc]);
 
   if (!isEnabled) return null;
