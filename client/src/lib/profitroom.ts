@@ -25,7 +25,7 @@ export type ProfitroomBookingConfig = {
   shadow: boolean;
 };
 
-const PROTELS_BOOKING_URL = "https://wis.upperbooking.com/protelshotelsresorts/be-panel?locale=en";
+const PROTELS_BOOKING_URL = "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD";
 
 export const DEFAULT_PROFITROOM_BOOKING_CONFIG: ProfitroomBookingConfig = {
   enabled: true,
