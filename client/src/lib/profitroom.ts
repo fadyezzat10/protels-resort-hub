@@ -25,7 +25,8 @@ export type ProfitroomBookingConfig = {
   shadow: boolean;
 };
 
-const PROTELS_BOOKING_URL = "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD";
+export const PROTELS_BOOKING_URL = "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD";
+export const PROTELS_UPPERBOOKING_SCRIPT_URL = "https://wis.upperbooking.com/protelshotelsresorts/be-panel?locale=en";
 
 export const DEFAULT_PROFITROOM_BOOKING_CONFIG: ProfitroomBookingConfig = {
   enabled: true,
@@ -58,6 +59,17 @@ function readText(value: unknown, fallback: string, allowEmpty = false) {
   if (typeof value !== "string") return fallback;
   if (!allowEmpty && value.trim() === "") return fallback;
   return value;
+}
+
+export function isLegacyProfitroomScript(value: unknown) {
+  return typeof value === "string" && (/upperbooking\.com\/1223\//i.test(value) || /presalesdemo/i.test(value));
+}
+
+export function normalizeProfitroomScriptUrl(value: unknown) {
+  const scriptUrl = typeof value === "string" ? value.trim() : "";
+  return scriptUrl && !isLegacyProfitroomScript(scriptUrl)
+    ? scriptUrl
+    : PROTELS_UPPERBOOKING_SCRIPT_URL;
 }
 
 function readColor(value: unknown, fallback: string) {
