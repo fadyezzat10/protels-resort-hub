@@ -1,39 +1,62 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCMSSetting } from "@/lib/cms";
-import { normalizeProfitroomBookingConfig } from "@/lib/profitroom";
+import {
+  normalizeProfitroomBookingConfig,
+  normalizeProfitroomScriptUrl,
+  PROTELS_BOOKING_URL,
+} from "@/lib/profitroom";
 
-const DEFAULT_PROFITROOM_SCRIPT_SRC = "https://wis.upperbooking.com/protelshotelsresorts/be-panel?locale=en";
 const PROFITROOM_SCRIPT_SELECTOR = "script[data-profitroom-booking-engine]";
 
-function isLegacyDemoScript(value: string) {
-  return /upperbooking\.com\/1223\//i.test(value) || /presalesdemo/i.test(value);
+declare global {
+  interface Window {
+    _drawPanel?: (selector: string, position: string) => void;
+  }
 }
 
 export default function ProfitroomBooking() {
   const { data: rawConfig } = useCMSSetting("profitroom_booking_config");
   const { data: legacyEnabledSetting } = useCMSSetting("profitroom_enabled");
   const { data: scriptUrlSetting } = useCMSSetting("profitroom_script_url");
+  const [panelError, setPanelError] = useState(false);
   const config = normalizeProfitroomBookingConfig(rawConfig);
   const isEnabled = rawConfig && typeof rawConfig === "object" && "enabled" in rawConfig
     ? config.enabled
     : legacyEnabledSetting !== false && legacyEnabledSetting !== "false";
 
-  const configuredScript = typeof scriptUrlSetting === "string" ? scriptUrlSetting.trim() : "";
-  const scriptSrc = configuredScript && !isLegacyDemoScript(configuredScript)
-    ? configuredScript
-    : DEFAULT_PROFITROOM_SCRIPT_SRC;
+  const scriptSrc = normalizeProfitroomScriptUrl(scriptUrlSetting);
 
   useEffect(() => {
-    if (!isEnabled) return;
+    if (!isEnabled) {
+      setPanelError(false);
+      return;
+    }
 
-    const drawPanel = () => window._drawPanel?.(".be-panel", "prepend");
+    setPanelError(false);
+    let active = true;
+    const drawPanel = () => {
+      if (!active) return;
+      if (typeof window._drawPanel !== "function") {
+        setPanelError(true);
+        return;
+      }
+      window._drawPanel(".be-panel", "prepend");
+    };
+    const handleScriptError = () => {
+      if (active) setPanelError(true);
+    };
     const existingScript = document.querySelector(PROFITROOM_SCRIPT_SELECTOR)
       ?? Array.from(document.scripts).find((candidate) => candidate.src === scriptSrc);
 
     if (existingScript) {
       existingScript.addEventListener("load", drawPanel, { once: true });
-      drawPanel();
-      return () => existingScript.removeEventListener("load", drawPanel);
+      existingScript.addEventListener("error", handleScriptError, { once: true });
+      if (typeof window._drawPanel === "function") drawPanel();
+      return () => {
+        active = false;
+        existingScript.removeEventListener("load", drawPanel);
+        existingScript.removeEventListener("error", handleScriptError);
+      };
     }
 
     const script = document.createElement("script");
@@ -42,8 +65,13 @@ export default function ProfitroomBooking() {
     script.dataset.profitroomBookingEngine = "true";
     script.dataset.profitroom = "booking-engine";
     script.addEventListener("load", drawPanel, { once: true });
+    script.addEventListener("error", handleScriptError, { once: true });
     document.body.appendChild(script);
-    return () => script.removeEventListener("load", drawPanel);
+    return () => {
+      active = false;
+      script.removeEventListener("load", drawPanel);
+      script.removeEventListener("error", handleScriptError);
+    };
   }, [isEnabled, scriptSrc]);
 
   if (!isEnabled) return null;
@@ -65,6 +93,14 @@ export default function ProfitroomBooking() {
           }}
         >
           <div className="be-panel" data-testid="profitroom-booking-panel" />
+          {panelError && (
+            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="alert">
+              <span>Booking panel is temporarily unavailable. </span>
+              <a href={PROTELS_BOOKING_URL} target="_blank" rel="noreferrer" className="font-semibold underline underline-offset-2">
+                Open the official booking portal
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </section>
