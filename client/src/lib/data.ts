@@ -408,4 +408,4 @@ export const hotels: Hotel[] = [
   }
 ];
 
-export const bookingLink = "https://protels.book-onlinenow.net/index.aspx?Page=22&portal=259";
+export const bookingLink = "https://booking.profitroom.com/en/protelshotelsresorts/locations?currency=USD";
