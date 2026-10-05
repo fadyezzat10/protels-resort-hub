@@ -7,6 +7,12 @@ import {
   PROTELS_BOOKING_URL,
   type ProfitroomBookingProperty,
 } from "@/lib/profitroom";
+declare global {
+  interface Window {
+    oaiq?: (...args: unknown[]) => void;
+  }
+}
+
 
 function toLocalDateString(date: Date) {
   const year = date.getFullYear();
@@ -73,6 +79,18 @@ export default function ProfitroomBooking() {
 
   const handleSubmit = () => {
     if (!selectedProperty || !checkIn || !checkOut || checkOut <= checkIn) return;
+
+    const eventId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    window.oaiq?.("measure", "checkout_started", { type: "contents" }, { event_id: eventId });
+    void fetch("/api/ads/openai-checkout-started", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: eventId,
+        source_url: `${window.location.origin}${window.location.pathname}`,
+      }),
+    }).catch(() => undefined);
+
     window.open(buildBookingUrl(selectedProperty, checkIn, checkOut), "_blank", "noopener,noreferrer");
   };
 

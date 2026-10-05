@@ -93,6 +93,67 @@ export async function registerRoutes(
     })
   );
 
+  const openaiCheckoutEventLimiter = rateLimit({
+    windowMs: 60_000,
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.post("/api/ads/openai-checkout-started", openaiCheckoutEventLimiter, async (req, res) => {
+    const apiKey = process.env.OPENAI_ADS_CONVERSIONS_API_KEY?.trim();
+    if (!apiKey) return res.sendStatus(204);
+
+    const eventId = req.body?.id;
+    if (typeof eventId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(eventId)) {
+      return res.status(400).json({ message: "Invalid event id" });
+    }
+
+    let sourceUrl: URL;
+    try {
+      sourceUrl = new URL(req.body?.source_url);
+      const requestOrigin = new URL(req.protocol + "://" + req.get("host")).origin;
+      if (sourceUrl.origin !== requestOrigin) {
+        return res.status(400).json({ message: "Invalid source URL" });
+      }
+    } catch {
+      return res.status(400).json({ message: "Invalid source URL" });
+    }
+
+    try {
+      const response = await fetch(
+        "https://bzr.openai.com/v1/events?pid=QZyQa3doAFxBNsPUxfPuBM",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + apiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            validate_only: false,
+            events: [{
+              id: eventId,
+              type: "checkout_started",
+              timestamp_ms: Date.now(),
+              source_url: sourceUrl.toString(),
+              action_source: "web",
+              data: { type: "contents" },
+            }],
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        console.error("[openai-conversions] Upstream returned status " + response.status);
+        return res.status(502).json({ message: "Conversion event delivery failed" });
+      }
+
+      return res.sendStatus(204);
+    } catch (error) {
+      console.error("[openai-conversions] Request failed", error);
+      return res.status(502).json({ message: "Conversion event delivery failed" });
+    }
+  });
+
   app.use("/uploads", async (req, res, next) => {
     const filePath = path.join(uploadDir, req.path);
     if (fs.existsSync(filePath)) {
