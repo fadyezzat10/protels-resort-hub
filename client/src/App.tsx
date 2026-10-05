@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, Component, type ReactNode, type ErrorInfo, lazy, Suspense } from "react";
+import { useEffect, useRef, Component, type ReactNode, type ErrorInfo, lazy, Suspense } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -189,6 +189,25 @@ function ScrollToTop() {
   return null;
 }
 
+function TikTokPageViewTracker() {
+  const [location] = useLocation();
+  const previousLocation = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (previousLocation.current === null) {
+      previousLocation.current = location;
+      return;
+    }
+    if (previousLocation.current === location) return;
+
+    previousLocation.current = location;
+    const ttq = (window as Window & { ttq?: { page?: () => void } }).ttq;
+    ttq?.page?.();
+  }, [location]);
+
+  return null;
+}
+
 function ChatbotWrapper() {
   const [location] = useLocation();
   const isAdminOrCMS = location.startsWith("/admin") || location.startsWith("/controlpanal");
@@ -229,6 +248,7 @@ function App() {
               <ThemeProvider>
               <Toaster />
               <ScrollToTop />
+              <TikTokPageViewTracker />
               <Router />
               <Suspense fallback={null}>
                 <AdminToolbar />
