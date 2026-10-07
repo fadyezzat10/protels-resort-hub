@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_PROFITROOM_BOOKING_CONFIG, normalizeProfitroomBookingConfig, normalizeProfitroomScriptUrl, PROTELS_UPPERBOOKING_SCRIPT_URL, type ProfitroomBookingConfig } from "@/lib/profitroom";
+import { resolveFaviconUrl } from "@/lib/favicon";
 
 const PAGE_HEROES = [
   { key: "page_hero_home", label: "Home Page (Slider)", isSlider: true },
@@ -248,7 +249,7 @@ export default function CMSSettings() {
         return s?.value ?? "";
       };
       setGtmId(findSetting("gtm_id"));
-      setFaviconUrl(findSetting("favicon_url"));
+      setFaviconUrl(resolveFaviconUrl(findSetting("favicon_url")));
       setSiteName(findSetting("site_name"));
       setContactEmail(findSetting("contact_email"));
       setContactPhone(findSetting("contact_phone"));

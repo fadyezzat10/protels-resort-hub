@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useCMSSetting, useCMSSeo } from "@/lib/cms";
 import { useLocation } from "wouter";
 import { useI18n } from "@/lib/i18n";
+import { resolveFaviconUrl } from "@/lib/favicon";
 
 const SUPPORTED_LANGS = ["en", "ar", "fr", "de", "es", "ru", "pl", "cs"];
 
@@ -79,11 +80,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }, [seo]);
 
   useEffect(() => {
-    if (faviconUrl && typeof faviconUrl === "string" && faviconUrl.trim()) {
-      const link = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (link) {
-        link.href = faviconUrl;
-      }
+    const link = document.querySelector('link[rel="icon"]') as HTMLLinkElement | null;
+    if (link) {
+      link.href = resolveFaviconUrl(faviconUrl);
     }
   }, [faviconUrl]);
 
